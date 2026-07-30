@@ -49,7 +49,7 @@ const FAQ: FaqItem[] = [
     q: '국민연금을 받으면 피부양자 자격을 잃나요?',
     a: `연금액에 따라 다릅니다. 공적연금은 피부양자 자격 판정에서 총연금액 전액이 합산소득에 들어갑니다. 다른 소득과 합해 연 ${toManwon(
       INCOME.TOTAL_LIMIT,
-    )}를 넘으면 탈락합니다. 연금만 있고 그 금액이 ${toManwon(
+    )}을 넘으면 탈락합니다. 연금만 있고 그 금액이 ${toManwon(
       INCOME.TOTAL_LIMIT,
     )} 이하라면 자격은 유지됩니다.`,
   },
@@ -140,7 +140,7 @@ export default function Page() {
             <br />
             <br />
             <strong>자격 판정</strong> — 2,400만원 전액이 합산소득이므로{' '}
-            {toManwon(INCOME.TOTAL_LIMIT)}를 넘어 <strong>탈락</strong>합니다.
+            {toManwon(INCOME.TOTAL_LIMIT)}을 넘어 <strong>탈락</strong>합니다.
             <br />
             <strong>보험료 계산</strong> — 50%인 1,200만원이 반영되어 소득월액은
             100만원입니다.
@@ -194,7 +194,7 @@ export default function Page() {
 
         <Section id="threshold" title="2,000만원 선을 넘을 때">
           <P>
-            합산소득이 연 {toManwon(INCOME.TOTAL_LIMIT)}를 넘으면 탈락합니다.{' '}
+            합산소득이 연 {toManwon(INCOME.TOTAL_LIMIT)}을 넘으면 탈락합니다.{' '}
             <strong>1원만 초과해도 탈락이고, 월 기준이 아니라 연 합산 기준</strong>
             입니다.
           </P>
@@ -265,7 +265,7 @@ export default function Page() {
           <P>
             건강보험만 놓고 보면 판단 기준은 단순합니다.{' '}
             <strong>
-              연금 개시 후 합산소득이 {toManwon(INCOME.TOTAL_LIMIT)}를 넘는지,
+              연금 개시 후 합산소득이 {toManwon(INCOME.TOTAL_LIMIT)}을 넘는지,
               그리고 넘었을 때 지역가입자 보험료가 얼마인지
             </strong>{' '}
             두 가지입니다. 두 숫자를 먼저 구해두면 다른 요소를 얹어 판단하기가

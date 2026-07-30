@@ -61,7 +61,7 @@ const FAQ: FaqItem[] = [
       INCOME.BUSINESS_LIMIT_UNREGISTERED,
     )}까지 인정됩니다. 이 금액을 넘으면 등록 여부와 무관하게 탈락합니다. 또한 사업소득이 이 한도 안에 있어도 전체 합산소득이 연 ${toManwon(
       INCOME.TOTAL_LIMIT,
-    )}를 넘으면 탈락합니다.`,
+    )}을 넘으면 탈락합니다.`,
   },
   {
     q: '개발자도 사업자등록을 하면 부가세를 환급받을 수 있나요?',
@@ -174,7 +174,7 @@ export default function Page() {
 
           <P>
             여기에 별도로 <strong>합산소득 요건</strong>이 걸립니다. 사업·근로·공적연금·기타소득을
-            더해 연 {toManwon(INCOME.TOTAL_LIMIT)}를 넘으면 탈락합니다.
+            더해 연 {toManwon(INCOME.TOTAL_LIMIT)}을 넘으면 탈락합니다.
             {toManwon(INCOME.TOTAL_LIMIT)}에서 1원만 초과해도 탈락이고, 월 기준이
             아니라 연 합산 기준입니다.
           </P>

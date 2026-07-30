@@ -21,7 +21,7 @@ import type {
   JudgeResult,
   StepResult,
 } from './types';
-import { toEok, toManwon } from '../format';
+import { josa, toEok, toManwon } from '../format';
 
 // 기존 import 경로를 깨지 않기 위해 재수출한다.
 export { toEok, toManwon };
@@ -222,7 +222,7 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
       step,
       passed: false,
       message:
-        `합산소득이 연 ${toManwon(INCOME.TOTAL_LIMIT)}를 초과합니다. ` +
+        `합산소득이 연 ${josa(toManwon(INCOME.TOTAL_LIMIT), '을')} 초과합니다. ` +
         `(입력 합계: ${toManwon(total)}) 1원만 초과해도 탈락합니다.`,
       basis,
     };
@@ -318,7 +318,7 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
     message:
       `재산세 과세표준이 ${toEok(
         PROPERTY.HARD_LIMIT,
-      )}를 초과하면 소득이 없어도 탈락합니다. (입력: ${toEok(p)})`,
+      )}을 초과하면 소득이 없어도 탈락합니다. (입력: ${toEok(p)})`,
     basis,
   };
 }

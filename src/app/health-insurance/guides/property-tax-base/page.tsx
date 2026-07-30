@@ -249,7 +249,7 @@ export default function Page() {
 
           <P>
             <strong>첫째, 피부양자 자격 판정.</strong> 위의 구간표에 대입해{' '}
-            {toEok(PROPERTY.SAFE_LIMIT)} 이하인지, {toEok(PROPERTY.HARD_LIMIT)}를
+            {toEok(PROPERTY.SAFE_LIMIT)} 이하인지, {toEok(PROPERTY.HARD_LIMIT)}을
             넘는지 확인합니다.
           </P>
 

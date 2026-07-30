@@ -146,7 +146,7 @@ export default function Page() {
 
           <Ul>
             <li>
-              <strong>합산소득이 연 {toManwon(INCOME.TOTAL_LIMIT)}를 초과</strong>{' '}
+              <strong>합산소득이 연 {toManwon(INCOME.TOTAL_LIMIT)}을 초과</strong>{' '}
               — 1원만 넘어도 탈락하고, 월 기준이 아니라 연 합산 기준입니다.
             </li>
             <li>
@@ -156,7 +156,7 @@ export default function Page() {
             </li>
             <li>
               <strong>
-                재산세 과세표준이 {toEok(PROPERTY.HARD_LIMIT)}를 초과
+                재산세 과세표준이 {toEok(PROPERTY.HARD_LIMIT)}을 초과
               </strong>{' '}
               — 소득이 0원이어도 탈락합니다. {toEok(PROPERTY.SAFE_LIMIT)} 초과{' '}
               {toEok(PROPERTY.HARD_LIMIT)} 이하 구간이면 연소득{' '}
