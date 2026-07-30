@@ -20,7 +20,10 @@ import {
 } from './ui';
 import { compareAfterRetirement } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
-import { DISCLAIMER } from '@/lib/constants/2026';
+import {
+  DISCLAIMER,
+  VOLUNTARY_CONTINUATION,
+} from '@/lib/constants/2026';
 
 const emptyIncome: Income = {
   business: 0,
@@ -34,7 +37,9 @@ export default function VoluntaryComparison() {
   const [income, setIncome] = useState<Income>(emptyIncome);
   const [property, setProperty] = useState(0);
   const [avgWage, setAvgWage] = useState(3_000_000);
-  const [months, setMonths] = useState(24);
+  const [months, setMonths] = useState<number>(
+    VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS,
+  );
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -73,9 +78,16 @@ export default function VoluntaryComparison() {
           >
             <NumberInput
               value={months}
-              onChange={setMonths}
+              onChange={(value) =>
+                setMonths(
+                  Math.min(
+                    VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS,
+                    Math.max(0, value),
+                  ),
+                )
+              }
               min={0}
-              max={18}
+              max={VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}
             />
           </Field>
           <Field
