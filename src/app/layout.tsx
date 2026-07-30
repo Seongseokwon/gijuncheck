@@ -25,7 +25,10 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     siteName: SITE.name,
   },
-  robots: { index: true, follow: true },
+  // 최종 도메인이 아니면 전 페이지 noindex. src/lib/site.ts 참조
+  robots: SITE.indexable
+    ? { index: true, follow: true }
+    : { index: false, follow: false },
 };
 
 export default function RootLayout({
@@ -36,6 +39,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        {/*
+          최종 도메인이 아닐 때만 보이는 배너.
+          지금 어떤 상태로 배포됐는지 눈으로 확인할 수 있어야 한다.
+        */}
+        {!SITE.indexable && (
+          <div className="bg-amber-100 px-4 py-2 text-center text-xs text-amber-900">
+            <strong className="font-semibold">테스트 배포</strong> · 검색엔진
+            색인이 차단된 상태입니다. 도메인 연결 후 해제됩니다.
+          </div>
+        )}
+
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
             <a href={ROUTES.home.path} className="text-lg font-bold">
