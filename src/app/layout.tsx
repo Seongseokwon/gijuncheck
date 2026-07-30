@@ -20,10 +20,27 @@ export const metadata: Metadata = {
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
+
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
     siteName: SITE.name,
+    // 정적 export 라 ImageResponse(런타임 생성)를 쓸 수 없다.
+    // public/og.png 를 미리 만들어 두고 참조한다.
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: `${SITE.name} — ${SITE.description}`,
+      },
+    ],
+  },
+
+  twitter: {
+    // 이미지가 크게 나오는 카드. 도구 사이트는 이게 클릭률이 좋다
+    card: 'summary_large_image',
+    images: ['/og.png'],
   },
   // 최종 도메인이 아니면 전 페이지 noindex. src/lib/site.ts 참조
   robots: SITE.indexable

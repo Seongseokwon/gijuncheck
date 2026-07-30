@@ -30,6 +30,30 @@ export function wonExact(n: number): string {
   return `${n.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원`;
 }
 
+/**
+ * 사람이 읽는 금액 — 350000000 → "3억 5,000만원"
+ *
+ * 금액 입력란 아래에 보조로 띄운다.
+ * 이 사이트는 3천만원·5억 같은 큰 금액을 계속 입력하는 도구인데,
+ * 숫자만 보면 0 개수를 세야 해서 오입력이 잦다.
+ * 입력한 값을 한글 단위로 되읽어주면 그 자리에서 잡힌다.
+ */
+export function toKoreanAmount(amount: number): string {
+  const n = Math.floor(Math.abs(amount));
+  if (n === 0) return '0원';
+
+  const eok = Math.floor(n / 100_000_000);
+  const man = Math.floor((n % 100_000_000) / 10_000);
+  const rest = n % 10_000;
+
+  const parts: string[] = [];
+  if (eok) parts.push(`${eok.toLocaleString('ko-KR')}억`);
+  if (man) parts.push(`${man.toLocaleString('ko-KR')}만`);
+  if (rest) parts.push(rest.toLocaleString('ko-KR'));
+
+  return `${parts.join(' ')}원`;
+}
+
 /** 억 단위 — 540000000 → "5.4억원" */
 export function toEok(amount: number): string {
   const eok = amount / 100_000_000;

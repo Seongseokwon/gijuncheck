@@ -97,7 +97,6 @@ export default function VoluntaryComparison() {
             <MoneyInput
               value={property}
               onChange={setProperty}
-              step={1_000_000}
             />
           </Field>
         </div>
@@ -137,7 +136,8 @@ export default function VoluntaryComparison() {
       </Card>
 
       {submitted && (
-        <>
+        // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
+        <div role="status" aria-live="polite">
           {recommendation === 'notEligible' ? (
             <section className="rounded-lg border border-rose-200 bg-rose-50 p-5">
               <p className="text-base font-bold text-slate-900">
@@ -159,6 +159,7 @@ export default function VoluntaryComparison() {
               <p className="text-lg font-bold text-slate-900">
                 {voluntaryWins ? '임의계속가입' : '지역가입자'}가 월{' '}
                 {won(Math.abs(result.monthlySaving))} 유리합니다
+                {/* 비교 결과 강조 */}
               </p>
 
               <ReferenceOnlyNotice crossChecked={regional.crossChecked} />
@@ -255,7 +256,7 @@ export default function VoluntaryComparison() {
               </p>
             </section>
           )}
-        </>
+        </div>
       )}
     </div>
   );

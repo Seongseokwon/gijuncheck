@@ -7,9 +7,19 @@
  *  - 입력은 한 화면. 위저드로 쪼개면 이탈한다.
  *  - 계산은 클라이언트 순수 함수. 서버 왕복 없음.
  *  - 결과에 근거 조항과 기준 연도를 항상 표시.
+ *  - 폼 UI 는 ./ui 의 공용 컴포넌트를 쓴다. 여기서 다시 정의하지 말 것.
+ *    (중복 정의하면 금액 입력 개선 같은 변경이 이 도구에만 안 먹는다)
  */
 
 import { useMemo, useState } from 'react';
+import {
+  Card,
+  Field,
+  MoneyInput,
+  NumberInput,
+  Select,
+  SubmitButton,
+} from './ui';
 import { emptyInput, judgeDependent, toManwon } from '@/lib/dependent/judge';
 import {
   RELATION_LABEL,
@@ -36,30 +46,6 @@ const INCOME_FIELDS: Array<{
   { key: 'other', label: '기타소득' },
 ];
 
-function Field({
-  label,
-  hint,
-  children,
-}: {
-  label: string;
-  hint?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="block text-sm font-medium text-slate-700">
-        {label}
-        {hint && <span className="ml-1 text-xs text-slate-400">{hint}</span>}
-      </span>
-      <div className="mt-1">{children}</div>
-    </label>
-  );
-}
-
-const inputCls =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm ' +
-  'focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900';
-
 export default function DependentJudge() {
   const [input, setInput] = useState<DependentInput>(emptyInput);
   const [submitted, setSubmitted] = useState(false);
@@ -71,10 +57,7 @@ export default function DependentJudge() {
     value: DependentInput[K],
   ) => setInput((prev) => ({ ...prev, [key]: value }));
 
-  const setIncome = (
-    key: keyof DependentInput['income'],
-    value: number,
-  ) =>
+  const setIncome = (key: keyof DependentInput['income'], value: number) =>
     setInput((prev) => ({
       ...prev,
       income: { ...prev.income, [key]: value },
@@ -89,69 +72,61 @@ export default function DependentJudge() {
   return (
     <div className="space-y-8">
       {/* ---------- 입력 ---------- */}
-      <section className="space-y-5 rounded-lg border border-slate-200 bg-white p-5">
-        <h2 className="text-base font-semibold text-slate-900">
-          대상자 정보
-        </h2>
-
+      <Card title="대상자 정보">
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="가입자와의 관계">
-            <select
-              className={inputCls}
+            <Select
               value={input.relation}
-              onChange={(e) => set('relation', e.target.value as Relation)}
-            >
-              {(Object.keys(RELATION_LABEL) as Relation[]).map((r) => (
-                <option key={r} value={r}>
-                  {RELATION_LABEL[r]}
-                </option>
-              ))}
-            </select>
+              onChange={(v) => set('relation', v as Relation)}
+              options={(Object.keys(RELATION_LABEL) as Relation[]).map((r) => ({
+                value: r,
+                label: RELATION_LABEL[r],
+              }))}
+            />
           </Field>
 
           <Field label="동거 여부">
-            <select
-              className={inputCls}
+            <Select
               value={input.cohabiting ? 'y' : 'n'}
-              onChange={(e) => set('cohabiting', e.target.value === 'y')}
-            >
-              <option value="y">동거</option>
-              <option value="n">비동거</option>
-            </select>
+              onChange={(v) => set('cohabiting', v === 'y')}
+              options={[
+                { value: 'y', label: '동거' },
+                { value: 'n', label: '비동거' },
+              ]}
+            />
           </Field>
 
           {isSibling && (
             <Field label="만 나이" hint="형제자매만 판정에 사용">
-              <input
-                type="number"
-                min={0}
-                className={inputCls}
+              <NumberInput
                 value={input.age}
-                onChange={(e) => set('age', Number(e.target.value) || 0)}
+                onChange={(v) => set('age', v)}
+                min={0}
+                max={120}
               />
             </Field>
           )}
 
           <Field label="혼인 여부">
-            <select
-              className={inputCls}
+            <Select
               value={input.married ? 'y' : 'n'}
-              onChange={(e) => set('married', e.target.value === 'y')}
-            >
-              <option value="n">미혼</option>
-              <option value="y">기혼</option>
-            </select>
+              onChange={(v) => set('married', v === 'y')}
+              options={[
+                { value: 'n', label: '미혼' },
+                { value: 'y', label: '기혼' },
+              ]}
+            />
           </Field>
 
           <Field label="장애인 · 국가유공상이자">
-            <select
-              className={inputCls}
+            <Select
               value={input.disabled ? 'y' : 'n'}
-              onChange={(e) => set('disabled', e.target.value === 'y')}
-            >
-              <option value="n">해당 없음</option>
-              <option value="y">해당</option>
-            </select>
+              onChange={(v) => set('disabled', v === 'y')}
+              options={[
+                { value: 'n', label: '해당 없음' },
+                { value: 'y', label: '해당' },
+              ]}
+            />
           </Field>
 
           {needsSiblingIncomeFlag && (
@@ -159,16 +134,14 @@ export default function DependentJudge() {
               label="대상자와 동거하는 형제자매의 소득"
               hint="비동거 직계존속 판정에 사용"
             >
-              <select
-                className={inputCls}
+              <Select
                 value={input.cohabitingSiblingHasIncome ? 'y' : 'n'}
-                onChange={(e) =>
-                  set('cohabitingSiblingHasIncome', e.target.value === 'y')
-                }
-              >
-                <option value="n">없음 (또는 동거 형제자매 없음)</option>
-                <option value="y">있음</option>
-              </select>
+                onChange={(v) => set('cohabitingSiblingHasIncome', v === 'y')}
+                options={[
+                  { value: 'n', label: '없음 (또는 동거 형제자매 없음)' },
+                  { value: 'y', label: '있음' },
+                ]}
+              />
             </Field>
           )}
         </div>
@@ -180,15 +153,9 @@ export default function DependentJudge() {
           <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {INCOME_FIELDS.map((f) => (
               <Field key={f.key} label={f.label} hint={f.hint}>
-                <input
-                  type="number"
-                  min={0}
-                  step={10000}
-                  className={inputCls}
+                <MoneyInput
                   value={input.income[f.key]}
-                  onChange={(e) =>
-                    setIncome(f.key, Number(e.target.value) || 0)
-                  }
+                  onChange={(v) => setIncome(f.key, v)}
                 />
               </Field>
             ))}
@@ -200,47 +167,35 @@ export default function DependentJudge() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="사업자등록">
-            <select
-              className={inputCls}
+            <Select
               value={input.businessRegistered ? 'y' : 'n'}
-              onChange={(e) =>
-                set('businessRegistered', e.target.value === 'y')
-              }
-            >
-              <option value="n">없음</option>
-              <option value="y">있음</option>
-            </select>
+              onChange={(v) => set('businessRegistered', v === 'y')}
+              options={[
+                { value: 'n', label: '없음' },
+                { value: 'y', label: '있음' },
+              ]}
+            />
           </Field>
 
-          <Field
-            label="재산세 과세표준"
-            hint="실거래가·공시가격 아님"
-          >
-            <input
-              type="number"
-              min={0}
-              step={1000000}
-              className={inputCls}
+          <Field label="재산세 과세표준" hint="실거래가·공시가격 아님">
+            <MoneyInput
               value={input.propertyTaxBase}
-              onChange={(e) =>
-                set('propertyTaxBase', Number(e.target.value) || 0)
-              }
+              onChange={(v) => set('propertyTaxBase', v)}
             />
           </Field>
         </div>
 
-        <button
-          type="button"
-          onClick={() => setSubmitted(true)}
-          className="w-full rounded-md bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
-        >
+        <SubmitButton onClick={() => setSubmitted(true)}>
           자격 판정하기
-        </button>
-      </section>
+        </SubmitButton>
+      </Card>
 
       {/* ---------- 결과 ---------- */}
       {submitted && (
         <section
+          // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
+          role="status"
+          aria-live="polite"
           className={
             'rounded-lg border p-5 ' +
             (result.eligible
@@ -272,6 +227,9 @@ export default function DependentJudge() {
                   </span>
                   <span className="text-sm font-semibold text-slate-900">
                     {STEP_LABEL[s.step]}
+                    <span className="sr-only">
+                      {s.passed ? ' 통과' : ' 탈락'}
+                    </span>
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-slate-700">

@@ -8,6 +8,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { toKoreanAmount } from '@/lib/format';
 
 // won() 을 이 파일에 정의하면 안 된다. 'use client' 모듈의 함수는
 // 서버 컴포넌트에서 호출할 수 없어 빌드가 깨진다. @/lib/format 에서 가져온다.
@@ -37,28 +38,61 @@ export function Field({
   );
 }
 
-/** 금액 입력. 스피너를 없애고 0 이하를 막는다 */
+/**
+ * 금액 입력
+ *
+ * type="number" 를 쓰지 않는다. 이유가 세 가지다.
+ *  1. 콤마가 표시되지 않아 "30000000" 의 0 개수를 눈으로 세야 한다.
+ *     3천만원·5억을 계속 넣는 도구에서 이건 오입력을 만든다.
+ *  2. 마우스 휠·방향키로 값이 바뀌는 사고가 난다.
+ *  3. iOS 에서 소수점 키패드가 뜬다.
+ *
+ * 대신 text + inputMode="numeric" 으로 숫자 키패드를 띄우고
+ * 표시값에는 콤마를 넣는다. 입력 아래에는 한글 단위로 되읽어준다.
+ * ("30,000,000" 아래에 "3,000만원")
+ */
 export function MoneyInput({
   value,
   onChange,
-  step = 10_000,
+  /** 한글 단위 보조 표시. 금액이 큰 입력에서는 켜두는 게 좋다 */
+  showReading = true,
 }: {
   value: number;
   onChange: (v: number) => void;
-  step?: number;
+  showReading?: boolean;
 }) {
   return (
-    <input
-      type="number"
-      min={0}
-      step={step}
-      className={inputCls}
-      value={value}
-      onChange={(e) => onChange(Math.max(0, Number(e.target.value) || 0))}
-    />
+    <>
+      <input
+        type="text"
+        // 모바일 숫자 키패드. type=number 없이도 숫자 입력이 편해진다
+        inputMode="numeric"
+        autoComplete="off"
+        className={`${inputCls} text-right tabular-nums`}
+        value={value === 0 ? '' : value.toLocaleString('ko-KR')}
+        placeholder="0"
+        onChange={(e) => {
+          // 숫자만 남긴다. 콤마·원·공백을 붙여넣어도 받아준다
+          const digits = e.target.value.replace(/[^0-9]/g, '');
+          if (digits === '') return onChange(0);
+          // 자릿수 폭주 방지 (조 단위 이상은 입력 오류로 본다)
+          if (digits.length > 15) return;
+          onChange(Number(digits));
+        }}
+      />
+      {showReading && value > 0 && (
+        <p className="mt-1 text-right text-xs text-slate-500">
+          {toKoreanAmount(value)}
+        </p>
+      )}
+    </>
   );
 }
 
+/**
+ * 개수·나이 같은 작은 정수 입력.
+ * 금액에는 쓰지 말 것 — MoneyInput 을 쓴다.
+ */
 export function NumberInput({
   value,
   onChange,
@@ -70,15 +104,49 @@ export function NumberInput({
   min?: number;
   max?: number;
 }) {
+  const clamp = (n: number) =>
+    Math.min(max ?? Number.MAX_SAFE_INTEGER, Math.max(min, n));
+
   return (
     <input
-      type="number"
-      min={min}
-      max={max}
+      type="text"
+      inputMode="numeric"
+      autoComplete="off"
+      className={`${inputCls} tabular-nums`}
+      value={value}
+      onChange={(e) => {
+        const digits = e.target.value.replace(/[^0-9]/g, '');
+        onChange(digits === '' ? min : clamp(Number(digits)));
+      }}
+    />
+  );
+}
+
+/**
+ * 셀렉트.
+ * 각 도구가 select 를 직접 쓰면 스타일이 갈라지므로 여기로 모았다.
+ */
+export function Select<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (v: T) => void;
+  options: ReadonlyArray<{ value: T; label: string }>;
+}) {
+  return (
+    <select
       className={inputCls}
       value={value}
-      onChange={(e) => onChange(Number(e.target.value) || 0)}
-    />
+      onChange={(e) => onChange(e.target.value as T)}
+    >
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
+    </select>
   );
 }
 

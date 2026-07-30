@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!--
+    파비콘. 글꼴에 의존하지 않는 도형으로 만든다.
+    한글 글자를 넣으면 환경에 따라 렌더링이 달라진다.
+
+    의미: 3단 판정 체크리스트 — 통과 두 칸, 판정 한 칸.
+    이 사이트의 차별점이 "계산"이 아니라 "판정"이라는 것.
+  -->
+  <rect width="64" height="64" rx="14" fill="#0f172a" />
+
+  <!-- 1단 통과 -->
+  <path
+    d="M17 21.5l4.5 4.5 8-8.5"
+    fill="none"
+    stroke="#34d399"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- 2단 통과 -->
+  <path
+    d="M17 34.5l4.5 4.5 8-8.5"
+    fill="none"
+    stroke="#34d399"
+    stroke-width="4.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <!-- 3단 판정 중 -->
+  <circle
+    cx="21.5"
+    cy="48"
+    r="5"
+    fill="none"
+    stroke="#94a3b8"
+    stroke-width="4"
+  />
+
+  <!-- 항목 선 -->
+  <path
+    d="M38 22h10M38 35h10M38 48h10"
+    stroke="#475569"
+    stroke-width="4"
+    stroke-linecap="round"
+  />
+</svg>

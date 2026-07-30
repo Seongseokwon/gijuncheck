@@ -129,7 +129,6 @@ export default function RegionalPremiumCalc() {
           <MoneyInput
             value={property}
             onChange={setProperty}
-            step={1_000_000}
           />
         </Field>
         <p className="text-xs leading-relaxed text-slate-500">
@@ -145,7 +144,11 @@ export default function RegionalPremiumCalc() {
       </Card>
 
       {submitted && (
-        <section className="space-y-4 rounded-lg border border-slate-300 bg-white p-5">
+        <section
+          role="status"
+          aria-live="polite"
+          className="space-y-4 rounded-lg border border-slate-300 bg-white p-5"
+        >
           <h2 className="text-base font-semibold">월 보험료</h2>
 
           <ReferenceOnlyNotice crossChecked={result.crossChecked} />

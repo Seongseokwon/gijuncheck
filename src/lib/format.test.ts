@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { josa, toEok, toManwon, toPercent, won, wonExact } from './format';
+import {
+  josa,
+  toEok,
+  toKoreanAmount,
+  toManwon,
+  toPercent,
+  won,
+  wonExact,
+} from './format';
 
 describe('금액 표기', () => {
   it('won 은 반올림한다', () => {
@@ -31,6 +39,42 @@ describe('금액 표기', () => {
     expect(toPercent(0.0719)).toBe('7.19%');
     expect(toPercent(0.009448)).toBe('0.9448%');
     expect(toPercent(0.5)).toBe('50%');
+  });
+});
+
+/* ------------------------------------------------------------------ */
+describe('금액 되읽기 — 금액 입력란 보조 표시', () => {
+  it('0은 0원', () => {
+    expect(toKoreanAmount(0)).toBe('0원');
+  });
+
+  it('만원 미만은 그대로', () => {
+    expect(toKoreanAmount(5_000)).toBe('5,000원');
+  });
+
+  it('만 단위', () => {
+    expect(toKoreanAmount(300_000)).toBe('30만원');
+    expect(toKoreanAmount(30_000_000)).toBe('3,000만원');
+  });
+
+  it('억 단위는 만과 함께 읽는다', () => {
+    expect(toKoreanAmount(350_000_000)).toBe('3억 5,000만원');
+    expect(toKoreanAmount(100_000_000)).toBe('1억원');
+  });
+
+  it('억·만·원이 모두 있는 경우', () => {
+    expect(toKoreanAmount(1_234_567_890)).toBe('12억 3,456만 7,890원');
+    expect(toKoreanAmount(20_160)).toBe('2만 160원');
+  });
+
+  it('중간 단위가 0이면 건너뛴다', () => {
+    // 1억 + 500원 → "1억 500원" (만 단위 없음)
+    expect(toKoreanAmount(100_000_500)).toBe('1억 500원');
+  });
+
+  it('음수·소수는 정수 절대값으로 처리한다', () => {
+    expect(toKoreanAmount(-30_000_000)).toBe('3,000만원');
+    expect(toKoreanAmount(30_000_000.7)).toBe('3,000만원');
   });
 });
 
