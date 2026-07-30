@@ -1,0 +1,125 @@
+import type { Metadata } from 'next';
+import VoluntaryComparison from '@/components/VoluntaryComparison';
+import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
+import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+
+export const metadata: Metadata = {
+  title: '임의계속가입 비교 — 지역가입자보다 싼지 금액으로 확인',
+  description:
+    '퇴직 후 지역가입자와 임의계속가입 중 어느 쪽이 유리한지 월 금액으로 비교합니다. ' +
+    '임의계속가입은 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ' +
+    '최대 36개월, 퇴직 후 90일 이내 신고 시 소급 인정.',
+  alternates: { canonical: ROUTES.voluntaryContinuation.path },
+};
+
+const FAQ = [
+  {
+    q: '임의계속가입은 누가 신청할 수 있나요?',
+    a: `퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 동안 직장가입자 자격을 통산 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상 유지했다면 신청할 수 있습니다. 최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월까지 직장가입자 자격을 유지합니다.`,
+  },
+  {
+    q: '언제까지 신청해야 하나요?',
+    a: `퇴직 후 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내에 신고하면 퇴사일로 소급 인정됩니다. 이 기한을 놓치면 그 기간의 지역보험료를 그대로 내야 하므로, 퇴직하면 가장 먼저 확인해야 할 항목입니다.`,
+  },
+  {
+    q: '임의계속가입이 유리한 경우는 언제인가요?',
+    a:
+      '재산이 많고 퇴직 전 보수가 낮았던 경우입니다. 임의계속가입 보험료는 퇴직 전 12개월 보수월액 평균만으로 계산되고 재산이 반영되지 않기 때문입니다. ' +
+      '반대로 재산이 거의 없고 퇴직 전 급여가 높았다면 지역가입자가 더 쌉니다.',
+  },
+  {
+    q: '임의계속가입자도 피부양자를 등재할 수 있나요?',
+    a: '가능합니다. 직장가입자 자격이 유지되므로 배우자·부모 등을 피부양자로 등재할 수 있습니다. 지역가입자는 피부양자 제도가 없습니다.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: ROUTES.voluntaryContinuation.label,
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: FAQ.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
+
+const RELATED = [
+  ROUTES.regionalPremium,
+  ROUTES.dependent,
+  ROUTES[GUIDE_KEYS[3]],
+];
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <article className="space-y-8">
+        <header>
+          <h1 className="text-2xl font-bold">
+            {ROUTES.voluntaryContinuation.label}
+          </h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            퇴직하면 자동으로 지역가입자가 되지만, 신청하면 최대{' '}
+            {VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 직장가입자 자격을 유지할 수
+            있습니다. 재산이 보험료에 반영되지 않아 더 싼 경우가 많은데, 모르고
+            넘어가는 사람이 많습니다.
+          </p>
+        </header>
+
+        <VoluntaryComparison />
+
+        <section>
+          <h2 className="text-lg font-bold">자주 묻는 질문</h2>
+          <dl className="mt-4 space-y-4">
+            {FAQ.map(({ q, a }) => (
+              <div
+                key={q}
+                className="rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <dt className="text-sm font-semibold">{q}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {a}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section>
+          <h2 className="text-sm font-semibold text-slate-500">함께 읽기</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {RELATED.map((r) => (
+              <li key={r.path}>
+                {r.ready ? (
+                  <a
+                    href={r.path}
+                    className="text-slate-600 underline hover:text-slate-900"
+                  >
+                    {r.label}
+                  </a>
+                ) : (
+                  <span className="text-slate-400">{r.label} (준비 중)</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      </article>
+    </>
+  );
+}

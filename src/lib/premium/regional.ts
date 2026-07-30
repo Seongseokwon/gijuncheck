@@ -1,16 +1,70 @@
 /**
  * 지역가입자 보험료 · 임의계속가입 비교
  *
- * 지역보험료(월) = (소득월액 × 건강보험료율) + (재산부과점수 × 점수당 금액)
+ * 2026년 지역가입자 건강보험료
+ *   = (소득월액 × 건강보험료율) + (재산부과점수 × 점수당 금액)
+ *   → 상한·하한 적용
+ *
+ * 소득월액은 소득 종류별 반영률을 먼저 적용한 뒤 12로 나눈다.
+ * 근로·연금소득은 50%만 반영한다 — 이걸 놓치면 연금 수령자 보험료가 2배가 된다.
+ *
+ * 자동차 보험료는 2024년 2월부터 폐지되었으므로 계산하지 않는다.
+ *
  * 장기요양보험료 = 건강보험료 × (장기요양보험료율 ÷ 건강보험료율)
  */
 
-import { RATE, VOLUNTARY_CONTINUATION, BASIS } from '../constants/2026';
+import {
+  BASIS,
+  INCOME_REFLECTION,
+  PREMIUM_LIMIT,
+  RATE,
+  VOLUNTARY_CONTINUATION,
+} from '../constants/2026';
 import {
   VERIFIED,
   VERIFIED_AGAINST_NHIS,
   propertyScoreDetail,
 } from '../constants/property-score-table';
+import type { Income } from '../dependent/types';
+
+/* ------------------------------------------------------------------ */
+/* 소득월액                                                            */
+/* ------------------------------------------------------------------ */
+
+export interface IncomeBase {
+  /** 반영률 적용 후 연간 소득 (원) */
+  annualReflected: number;
+  /** 소득월액 (원) */
+  monthly: number;
+  /** 반영률 적용 전 연간 합산소득 (원) — 화면에 대비로 보여주면 이해가 쉽다 */
+  annualRaw: number;
+}
+
+/**
+ * 소득 종류별 반영률을 적용한 소득월액
+ *
+ *  - 이자·배당·사업·기타소득: 100%
+ *  - 근로·연금소득: 50%
+ */
+export function incomeBaseForPremium(income: Income): IncomeBase {
+  const full =
+    (income.business + income.financial + income.other) * INCOME_REFLECTION.FULL;
+  const half = (income.wage + income.pension) * INCOME_REFLECTION.HALF;
+
+  const annualReflected = full + half;
+  const annualRaw =
+    income.business +
+    income.financial +
+    income.other +
+    income.wage +
+    income.pension;
+
+  return { annualReflected, monthly: annualReflected / 12, annualRaw };
+}
+
+/* ------------------------------------------------------------------ */
+/* 보험료                                                              */
+/* ------------------------------------------------------------------ */
 
 export interface PremiumBreakdown {
   /** 소득 기준 보험료 (원/월) */
@@ -19,10 +73,14 @@ export interface PremiumBreakdown {
   propertyPortion: number;
   /** 적용된 재산 부과점수 */
   propertyScore: number;
-  /** 적용된 재산 등급 (1~60). 재산 계산이 없는 경우 null */
+  /** 적용된 재산 등급 (1~60). 재산을 반영하지 않는 경우 null */
   propertyGrade: number | null;
-  /** 건강보험료 (원/월) */
+  /** 상한·하한 적용 전 건강보험료 (원/월) */
+  healthBeforeLimit: number;
+  /** 건강보험료 (원/월). 상한·하한 적용 후 */
   health: number;
+  /** 상한·하한이 적용되었는지 */
+  limitApplied: 'lower' | 'upper' | null;
   /** 장기요양보험료 (원/월) */
   longTermCare: number;
   /** 합계 (원/월) */
@@ -34,7 +92,7 @@ export interface PremiumBreakdown {
    * false 인 동안은 UI에 "참고용" 표시를 함께 노출할 것.
    */
   crossChecked: boolean;
-  basis: string;
+  basis: string[];
 }
 
 /** 건강보험료에서 장기요양보험료를 산출하는 환산율 */
@@ -46,26 +104,41 @@ function longTermCareOf(health: number): number {
   return Math.round(health * longTermCareRatio());
 }
 
+/** 건강보험료에 상한·하한을 적용한다 */
+function applyLimit(health: number): {
+  health: number;
+  limitApplied: 'lower' | 'upper' | null;
+} {
+  if (health < PREMIUM_LIMIT.LOWER) {
+    return { health: PREMIUM_LIMIT.LOWER, limitApplied: 'lower' };
+  }
+  if (health > PREMIUM_LIMIT.UPPER) {
+    return { health: PREMIUM_LIMIT.UPPER, limitApplied: 'upper' };
+  }
+  return { health, limitApplied: null };
+}
+
 /**
  * 지역가입자 월 보험료
  *
- * @param annualIncome 연간 합산소득 (원)
- * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 기준.
- *                       전세·월세는 환산이 끝난 값으로 넣어야 한다.
+ * @param income 연간 소득 내역. 종류별 반영률이 다르므로 항목을 분리해서 받는다.
+ * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 + 전월세평가금액(30%).
+ *                       전세·월세 환산은 미지원이므로 환산이 끝난 값을 넣어야 한다.
  */
 export function calculateRegionalPremium(
-  annualIncome: number,
+  income: Income,
   propertyAmount: number,
 ): PremiumBreakdown {
-  const monthlyIncome = annualIncome / 12;
-  const incomePortion = Math.round(monthlyIncome * RATE.HEALTH);
+  const base = incomeBaseForPremium(income);
+  const incomePortion = Math.round(base.monthly * RATE.HEALTH);
 
   const property = propertyScoreDetail(propertyAmount);
   const propertyPortion = Math.round(
     property.score * RATE.PROPERTY_POINT_VALUE,
   );
 
-  const health = incomePortion + propertyPortion;
+  const healthBeforeLimit = incomePortion + propertyPortion;
+  const { health, limitApplied } = applyLimit(healthBeforeLimit);
   const longTermCare = longTermCareOf(health);
 
   return {
@@ -73,12 +146,14 @@ export function calculateRegionalPremium(
     propertyPortion,
     propertyScore: property.score,
     propertyGrade: property.grade,
+    healthBeforeLimit,
     health,
+    limitApplied,
     longTermCare,
     total: health + longTermCare,
     verified: VERIFIED,
     crossChecked: VERIFIED_AGAINST_NHIS,
-    basis: BASIS.RATE,
+    basis: [BASIS.RATE, BASIS.PROPERTY_SCORE, BASIS.PREMIUM_LIMIT],
   };
 }
 
@@ -94,7 +169,8 @@ export function calculateVoluntaryPremium(
   avgMonthlyWage: number,
 ): PremiumBreakdown {
   const full = avgMonthlyWage * RATE.HEALTH;
-  const health = Math.round(full / 2); // 본인 부담 50%
+  const beforeLimit = Math.round(full / 2); // 본인 부담 50%
+  const { health, limitApplied } = applyLimit(beforeLimit);
   const longTermCare = longTermCareOf(health);
 
   return {
@@ -102,15 +178,21 @@ export function calculateVoluntaryPremium(
     propertyPortion: 0,
     propertyScore: 0,
     propertyGrade: null, // 재산을 반영하지 않으므로 등급 개념이 없다
+    healthBeforeLimit: beforeLimit,
     health,
+    limitApplied,
     longTermCare,
     total: health + longTermCare,
     // 재산점수표에 의존하지 않으므로 등급표 검증 상태와 무관하다
     verified: true,
     crossChecked: true,
-    basis: BASIS.RATE,
+    basis: [BASIS.RATE, BASIS.PREMIUM_LIMIT],
   };
 }
+
+/* ------------------------------------------------------------------ */
+/* 임의계속가입 비교                                                    */
+/* ------------------------------------------------------------------ */
 
 export interface EligibilityForVoluntary {
   /** 퇴직 전 18개월 중 직장가입 통산 개월 수 */
@@ -148,13 +230,13 @@ export interface ComparisonResult {
  * 재산이 많고 퇴직 전 보수가 낮았을수록 임의계속가입이 유리하다.
  */
 export function compareAfterRetirement(params: {
-  annualIncome: number;
+  income: Income;
   propertyAmount: number;
   avgMonthlyWage: number;
   insuredMonthsInLookback: number;
 }): ComparisonResult {
   const regional = calculateRegionalPremium(
-    params.annualIncome,
+    params.income,
     params.propertyAmount,
   );
 

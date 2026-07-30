@@ -21,17 +21,10 @@ import type {
   JudgeResult,
   StepResult,
 } from './types';
+import { toEok, toManwon } from '../format';
 
-/** 억 단위로 읽기 쉽게 변환 — 540000000 → "5.4억원" */
-export function toEok(won: number): string {
-  const eok = won / 100_000_000;
-  return `${Number.isInteger(eok) ? eok : eok.toFixed(1)}억원`;
-}
-
-/** 만원 단위 — 20000000 → "2,000만원" */
-export function toManwon(won: number): string {
-  return `${(won / 10_000).toLocaleString('ko-KR')}만원`;
-}
+// 기존 import 경로를 깨지 않기 위해 재수출한다.
+export { toEok, toManwon };
 
 /** 합산소득. 사적연금은 합산 대상이 아니므로 income.pension 에는 공적연금만 넣는다. */
 export function sumIncome(income: Income): number {

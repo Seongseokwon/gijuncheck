@@ -1,10 +1,17 @@
 import type { Metadata } from 'next';
-import { ROUTES } from '@/lib/routes';
+import { POLICY_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
 // 주의: 이 파일에서 SITE 같은 임의 상수를 export 하면 빌드가 실패한다.
 // Next.js App Router 는 layout 파일의 export 필드를 제한한다. → src/lib/site.ts 사용
+
+/** 헤더 네비게이션용 짧은 이름. ROUTES 의 label 은 페이지 제목용이라 길다. */
+const NAV_LABEL: Record<(typeof TOOL_KEYS)[number], string> = {
+  dependent: '피부양자 판정',
+  regionalPremium: '보험료 계산',
+  voluntaryContinuation: '임의계속가입',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -34,10 +41,16 @@ export default function RootLayout({
             <a href={ROUTES.home.path} className="text-lg font-bold">
               {SITE.name}
             </a>
-            <nav className="flex gap-4 text-sm text-slate-600">
-              <a href={ROUTES.dependent.path} className="hover:text-slate-900">
-                피부양자 판정
-              </a>
+            <nav className="hidden gap-4 text-sm text-slate-600 sm:flex">
+              {TOOL_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
+                <a
+                  key={k}
+                  href={ROUTES[k].path}
+                  className="hover:text-slate-900"
+                >
+                  {NAV_LABEL[k]}
+                </a>
+              ))}
             </nav>
           </div>
         </header>
@@ -53,6 +66,17 @@ export default function RootLayout({
             <p className="mt-2">
               기준 · {SITE.baseYear}년 · 최종 확인 {SITE.lastVerified}
             </p>
+            <nav className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
+              {POLICY_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
+                <a
+                  key={k}
+                  href={ROUTES[k].path}
+                  className="underline hover:text-slate-700"
+                >
+                  {ROUTES[k].label}
+                </a>
+              ))}
+            </nav>
           </div>
         </footer>
       </body>

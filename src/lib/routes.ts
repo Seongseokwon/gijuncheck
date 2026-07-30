@@ -44,13 +44,13 @@ export const ROUTES = {
     path: '/health-insurance/regional-premium/',
     label: '지역가입자 보험료 계산',
     priority: 0.9,
-    ready: false,
+    ready: true,
   },
   voluntaryContinuation: {
     path: '/health-insurance/voluntary-continuation/',
     label: '임의계속가입 비교',
     priority: 0.8,
-    ready: false,
+    ready: true,
   },
 
   // ---- 건강보험 가이드 ----
@@ -112,21 +112,21 @@ export const ROUTES = {
     path: '/privacy/',
     label: '개인정보처리방침',
     priority: 0.1,
-    ready: false,
+    ready: true,
     noindex: true,
   },
   terms: {
     path: '/terms/',
     label: '이용약관',
     priority: 0.1,
-    ready: false,
+    ready: true,
     noindex: true,
   },
   contact: {
     path: '/contact/',
     label: '문의',
     priority: 0.1,
-    ready: false,
+    ready: true,
     noindex: true,
   },
   // as const 를 붙이지 않는다. 붙이면 ready 가 리터럴 true/false 로 좁혀져서
@@ -153,6 +153,10 @@ export const TOOL_KEYS = [
   'regionalPremium',
   'voluntaryContinuation',
 ] as const satisfies readonly RouteKey[];
+
+/** 푸터에 표시할 정책 페이지 */
+export const POLICY_KEYS = ['privacy', 'terms', 'contact'] as const satisfies
+  readonly RouteKey[];
 
 /** 도구 페이지 하단 "함께 읽기"에 넣을 가이드 */
 export const GUIDE_KEYS = [
