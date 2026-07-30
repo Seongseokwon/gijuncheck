@@ -29,6 +29,7 @@ import {
 } from '@/lib/dependent/types';
 import { DISCLAIMER } from '@/lib/constants/2026';
 import { ROUTES } from '@/lib/routes';
+import { track } from '@/lib/analytics';
 
 const INCOME_FIELDS: Array<{
   key: keyof DependentInput['income'];
@@ -185,7 +186,19 @@ export default function DependentJudge() {
           </Field>
         </div>
 
-        <SubmitButton onClick={() => setSubmitted(true)}>
+        <SubmitButton
+          onClick={() => {
+            setSubmitted(true);
+            // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
+            // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
+            track('judge_complete', {
+              eligible: result.eligible,
+              failed_at: result.failedAt,
+              relation: input.relation,
+              business_registered: input.businessRegistered,
+            });
+          }}
+        >
           자격 판정하기
         </SubmitButton>
       </Card>

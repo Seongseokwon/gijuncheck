@@ -26,6 +26,7 @@ import {
 import type { Income } from '@/lib/dependent/types';
 import { DISCLAIMER } from '@/lib/constants/2026';
 import { ROUTES } from '@/lib/routes';
+import { track } from '@/lib/analytics';
 
 const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = [
   { key: 'business', label: '사업소득' },
@@ -54,6 +55,8 @@ export default function RegionalPremiumCalc() {
   const [income, setIncome] = useState<Income>(emptyIncome);
   const [property, setProperty] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  /** 판정기에서 넘어왔는지. 퍼널이 작동하는지 보려고 이벤트에 담는다 */
+  const [fromJudge, setFromJudge] = useState(false);
 
   // 판정기에서 넘어온 값이 있으면 채운다. 다시 타이핑하게 만들면 이탈한다.
   useEffect(() => {
@@ -67,6 +70,7 @@ export default function RegionalPremiumCalc() {
     if (Number.isFinite(inc) && inc > 0) {
       setIncome({ ...emptyIncome, business: inc });
       setSubmitted(true);
+      setFromJudge(true);
     }
   }, []);
 
@@ -138,7 +142,16 @@ export default function RegionalPremiumCalc() {
           보험료에 반영되지 않습니다.
         </p>
 
-        <SubmitButton onClick={() => setSubmitted(true)}>
+        <SubmitButton
+          onClick={() => {
+            setSubmitted(true);
+            track('premium_calculate', {
+              has_property: property > 0,
+              limit_applied: result.limitApplied ?? 'none',
+              from_judge: fromJudge,
+            });
+          }}
+        >
           보험료 계산하기
         </SubmitButton>
       </Card>

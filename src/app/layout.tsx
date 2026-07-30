@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Analytics from '@/components/Analytics';
 import { POLICY_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import './globals.css';
@@ -55,6 +56,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
+      <Analytics />
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         {/*
           최종 도메인이 아닐 때만 보이는 배너.

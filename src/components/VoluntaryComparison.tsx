@@ -24,6 +24,7 @@ import {
   DISCLAIMER,
   VOLUNTARY_CONTINUATION,
 } from '@/lib/constants/2026';
+import { track } from '@/lib/analytics';
 
 const emptyIncome: Income = {
   business: 0,
@@ -130,7 +131,12 @@ export default function VoluntaryComparison() {
           </div>
         </div>
 
-        <SubmitButton onClick={() => setSubmitted(true)}>
+        <SubmitButton
+          onClick={() => {
+            setSubmitted(true);
+            track('voluntary_compare', { recommendation });
+          }}
+        >
           어느 쪽이 유리한지 비교하기
         </SubmitButton>
       </Card>
