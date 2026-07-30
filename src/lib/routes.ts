@@ -58,13 +58,13 @@ export const ROUTES = {
     path: '/health-insurance/guides/property-tax-base/',
     label: '재산세 과세표준 확인하는 방법',
     priority: 0.7,
-    ready: false,
+    ready: true,
   },
   guideBusinessRegistration: {
     path: '/health-insurance/guides/before-business-registration/',
     label: '사업자등록 전에 반드시 계산해야 하는 것',
     priority: 0.7,
-    ready: false,
+    ready: true,
   },
   guideLosingEligibility: {
     path: '/health-insurance/guides/losing-eligibility/',

@@ -1,4 +1,4 @@
-import { ROUTES, TOOL_KEYS } from '@/lib/routes';
+import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 
 const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
   dependent:
@@ -61,6 +61,23 @@ export default function Home() {
               </li>
             );
           })}
+        </ul>
+      </section>
+
+      {/* 도구 → 해설 동선. 도구만 있는 사이트는 체류시간이 짧아 RPM 이 낮다 */}
+      <section>
+        <h2 className="text-sm font-semibold text-slate-500">가이드</h2>
+        <ul className="mt-3 space-y-2">
+          {GUIDE_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
+            <li key={k}>
+              <a
+                href={ROUTES[k].path}
+                className="block rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm transition hover:border-slate-900"
+              >
+                {ROUTES[k].label}
+              </a>
+            </li>
+          ))}
         </ul>
       </section>
     </div>
