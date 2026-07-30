@@ -17,10 +17,25 @@
 
 ```bash
 npm install
-npm test        # 판정·보험료 로직 79개 테스트
-npm run build   # 정적 사이트를 out/ 으로 내보냄
-npm run dev
+npm run dev       # 개발 서버
+npm test          # 판정·보험료 로직 79개 테스트
+npm run verify    # 타입체크 + 테스트 + 빌드 한 번에
 ```
+
+### 프로덕션 결과 확인
+
+`output: 'export'` 설정이므로 **`next start` 를 쓸 수 없습니다.**
+빌드 결과인 `out/` 을 정적 서버로 띄웁니다.
+
+```bash
+npm run build     # out/ 생성
+npm run preview   # out/ 을 정적 서버로 서빙
+# 또는 한 번에
+npm start
+```
+
+이 제약을 포함해 `output: 'export'` 때문에 생기는 세 가지 주의사항은
+`next.config.mjs` 주석에 적어뒀습니다.
 
 ## 검증 상태
 
