@@ -1,0 +1,125 @@
+import type { Metadata } from 'next';
+import DependentJudge from '@/components/DependentJudge';
+import { INCOME, PROPERTY } from '@/lib/constants/2026';
+import { toEok, toManwon } from '@/lib/dependent/judge';
+
+export const metadata: Metadata = {
+  title: '피부양자 자격판정 — 소득·재산·관계 3단 자동 판정',
+  description:
+    `2026년 기준 건강보험 피부양자 자격을 자동 판정합니다. 합산소득 ${toManwon(
+      INCOME.TOTAL_LIMIT,
+    )}, 재산세 과세표준 ${toEok(PROPERTY.SAFE_LIMIT)}·${toEok(
+      PROPERTY.HARD_LIMIT,
+    )} 구간, 사업자등록 여부, 관계별 부양요건까지 반영. 탈락 시 근거 조항을 함께 보여줍니다.`,
+  alternates: { canonical: '/건강보험/피부양자-자격판정/' },
+};
+
+/** 검색 결과에서 자리를 넓게 차지하도록 FAQ 구조화 데이터를 넣는다 */
+const FAQ = [
+  {
+    q: '피부양자 소득 기준은 얼마인가요?',
+    a: `연간 합산소득 ${toManwon(
+      INCOME.TOTAL_LIMIT,
+    )} 이하입니다. 사업소득·근로소득·공적연금소득·금융소득·기타소득을 모두 합산하며, 1원만 초과해도 자격을 잃습니다.`,
+  },
+  {
+    q: '사업자등록을 하면 피부양자에서 탈락하나요?',
+    a: '사업자등록이 있는 경우 사업소득이 발생하면 금액과 무관하게 탈락합니다. 사업자등록이 없다면 사업소득 연 500만원까지는 유지됩니다.',
+  },
+  {
+    q: '재산 기준은 공시가격인가요?',
+    a: `실거래가나 공시가격이 아니라 재산세 과세표준입니다. 과세표준 ${toEok(
+      PROPERTY.SAFE_LIMIT,
+    )} 이하면 인정되고, ${toEok(PROPERTY.HARD_LIMIT)}를 초과하면 소득이 없어도 탈락합니다. 공시가격 10억이면 과세표준은 약 6억입니다.`,
+  },
+  {
+    q: '형제자매도 피부양자로 등록할 수 있나요?',
+    a: `만 30세 미만이거나 만 65세 이상, 또는 장애인인 경우로서 미혼이고 동거할 때만 인정됩니다. 재산 기준도 과세표준 ${toEok(
+      PROPERTY.SIBLING_LIMIT,
+    )} 이하로 일반보다 엄격합니다.`,
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: '피부양자 자격판정',
+      applicationCategory: 'FinanceApplication',
+      operatingSystem: 'Web',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: FAQ.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
+
+const GUIDES: Array<[string, string]> = [
+  ['재산세 과세표준 확인하는 방법', '/건강보험/가이드/재산세-과세표준-확인방법/'],
+  ['사업자등록 전에 반드시 계산해야 하는 것', '/건강보험/가이드/사업자등록-전-확인사항/'],
+  ['임의계속가입이 유리한 경우', '/건강보험/가이드/임의계속가입-유리한경우/'],
+];
+
+export default function Page() {
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
+      <article className="space-y-8">
+        <header>
+          <h1 className="text-2xl font-bold">피부양자 자격판정</h1>
+          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+            부양요건 · 소득요건 · 재산요건을 순서대로 판정합니다. 탈락하면 어느
+            단계에서 왜 걸리는지 근거 조항과 함께 보여줍니다.
+          </p>
+        </header>
+
+        <DependentJudge />
+
+        <section>
+          <h2 className="text-lg font-bold">자주 묻는 질문</h2>
+          <dl className="mt-4 space-y-4">
+            {FAQ.map(({ q, a }) => (
+              <div
+                key={q}
+                className="rounded-lg border border-slate-200 bg-white p-4"
+              >
+                <dt className="text-sm font-semibold">{q}</dt>
+                <dd className="mt-2 text-sm leading-relaxed text-slate-600">
+                  {a}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/* 도구 → 해설 동선. RPM 방어용이므로 빼지 말 것 */}
+        <section>
+          <h2 className="text-sm font-semibold text-slate-500">함께 읽기</h2>
+          <ul className="mt-3 space-y-2 text-sm">
+            {GUIDES.map(([label, href]) => (
+              <li key={href}>
+                <a
+                  href={href}
+                  className="text-slate-600 underline hover:text-slate-900"
+                >
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </article>
+    </>
+  );
+}
