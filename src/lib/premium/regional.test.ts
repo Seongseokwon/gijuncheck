@@ -77,11 +77,28 @@ describe('소득 종류별 반영률 — 가장 조심해야 하는 지점', () 
 
   it('종류가 섞이면 각각의 반영률이 따로 적용된다', () => {
     const r = incomeBaseForPremium(
-      income({ pension: 20_000_000, financial: 5_000_000 }),
+      income({ pension: 20_000_000, financial: 12_000_000 }),
     );
-    // 연금 2,000만 × 50% + 금융 500만 × 100% = 1,500만
-    expect(r.annualReflected).toBe(15_000_000);
-    expect(r.annualRaw).toBe(25_000_000);
+    // 연금 2,000만 × 50% + 금융 1,200만 × 100% = 2,200만
+    expect(r.annualReflected).toBe(22_000_000);
+    expect(r.annualRaw).toBe(32_000_000);
+  });
+
+  it('금융소득이 1,000만원 이하면 부과 대상에서 빠진다', () => {
+    const r = incomeBaseForPremium(income({ financial: 9_000_000 }));
+    expect(r.annualReflected).toBe(0);
+    expect(r.annualRaw).toBe(9_000_000);
+    expect(r.financialExcluded).toBe(true);
+  });
+
+  it('금융소득이 1,000만원을 넘으면 전액 반영된다', () => {
+    const r = incomeBaseForPremium(income({ financial: 11_000_000 }));
+    expect(r.annualReflected).toBe(11_000_000);
+    expect(r.financialExcluded).toBe(false);
+  });
+
+  it('금융소득이 아예 없으면 제외 플래그가 켜지지 않는다', () => {
+    expect(incomeBaseForPremium(income({})).financialExcluded).toBe(false);
   });
 
   it('소득월액은 반영 후 금액을 12로 나눈 값이다', () => {

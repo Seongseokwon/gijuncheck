@@ -26,13 +26,30 @@ import { toEok, toManwon } from '../format';
 // 기존 import 경로를 깨지 않기 위해 재수출한다.
 export { toEok, toManwon };
 
-/** 합산소득. 사적연금은 합산 대상이 아니므로 income.pension 에는 공적연금만 넣는다. */
+/**
+ * 합산소득에 반영되는 금융소득.
+ *
+ * 1,000만원 이하면 전액 제외, 초과하면 전액 합산한다.
+ * 초과분만 더하는 것이 아니라는 점이 함정이다.
+ */
+export function countableFinancialIncome(financial: number): number {
+  return financial > INCOME.FINANCIAL_INCLUSION_THRESHOLD ? financial : 0;
+}
+
+/**
+ * 피부양자 소득요건 판정용 합산소득.
+ *
+ * - 공적연금은 **총연금액 전액**을 합산한다. 연금소득공제를 적용하지 않는다.
+ *   (보험료 계산에서는 50%만 반영하지만 자격 판정은 다르다.)
+ * - 사적연금(연금저축·IRP)은 합산 대상이 아니므로 income.pension 에 넣지 않는다.
+ * - 금융소득은 1,000만원 문턱을 넘을 때만 전액 합산한다.
+ */
 export function sumIncome(income: Income): number {
   return (
     income.business +
     income.wage +
     income.pension +
-    income.financial +
+    countableFinancialIncome(income.financial) +
     income.other
   );
 }

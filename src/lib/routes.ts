@@ -70,25 +70,26 @@ export const ROUTES = {
     path: '/health-insurance/guides/losing-eligibility/',
     label: '피부양자 자격상실 시점과 소급 부과',
     priority: 0.7,
-    ready: false,
+    ready: true,
   },
   guideVoluntaryContinuation: {
     path: '/health-insurance/guides/when-voluntary-continuation-wins/',
     label: '임의계속가입이 유리한 경우',
     priority: 0.7,
-    ready: false,
+    ready: true,
   },
   guidePensionImpact: {
     path: '/health-insurance/guides/pension-impact/',
     label: '연금 수령이 피부양자 자격에 미치는 영향',
     priority: 0.7,
-    ready: false,
+    ready: true,
   },
   guideNovemberReassessment: {
     path: '/health-insurance/guides/november-reassessment/',
-    label: '11월 자격 일괄 재산정이란',
-    priority: 0.7,
-    ready: false,
+    // 11월 피크를 겨냥한 글. 검색량이 몰리는 시기 전에 순위를 만들어둬야 한다.
+    label: '11월 건강보험 자격 일괄 재산정이란',
+    priority: 0.8,
+    ready: true,
   },
 
   // ---- 국민연금 ----

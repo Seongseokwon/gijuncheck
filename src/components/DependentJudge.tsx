@@ -28,7 +28,11 @@ const INCOME_FIELDS: Array<{
   { key: 'business', label: '사업소득' },
   { key: 'wage', label: '근로소득' },
   { key: 'pension', label: '공적연금소득', hint: '개인연금은 제외' },
-  { key: 'financial', label: '금융소득', hint: '이자 + 배당' },
+  {
+    key: 'financial',
+    label: '금융소득',
+    hint: '이자 + 배당 · 1,000만원 이하면 합산 제외',
+  },
   { key: 'other', label: '기타소득' },
 ];
 

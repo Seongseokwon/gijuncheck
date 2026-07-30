@@ -25,6 +25,7 @@ import {
   VERIFIED_AGAINST_NHIS,
   propertyScoreDetail,
 } from '../constants/property-score-table';
+import { countableFinancialIncome } from '../dependent/judge';
 import type { Income } from '../dependent/types';
 
 /* ------------------------------------------------------------------ */
@@ -38,6 +39,8 @@ export interface IncomeBase {
   monthly: number;
   /** 반영률 적용 전 연간 합산소득 (원) — 화면에 대비로 보여주면 이해가 쉽다 */
   annualRaw: number;
+  /** 금융소득이 1,000만원 문턱을 넘지 못해 제외되었는지. 화면에 설명을 띄우는 데 쓴다 */
+  financialExcluded: boolean;
 }
 
 /**
@@ -45,10 +48,15 @@ export interface IncomeBase {
  *
  *  - 이자·배당·사업·기타소득: 100%
  *  - 근로·연금소득: 50%
+ *
+ * 금융소득은 반영률을 적용하기 전에 1,000만원 문턱을 통과해야 한다.
+ * 1,000만원 이하면 부과 대상에서 아예 빠진다.
  */
 export function incomeBaseForPremium(income: Income): IncomeBase {
+  const financial = countableFinancialIncome(income.financial);
+
   const full =
-    (income.business + income.financial + income.other) * INCOME_REFLECTION.FULL;
+    (income.business + financial + income.other) * INCOME_REFLECTION.FULL;
   const half = (income.wage + income.pension) * INCOME_REFLECTION.HALF;
 
   const annualReflected = full + half;
@@ -59,7 +67,12 @@ export function incomeBaseForPremium(income: Income): IncomeBase {
     income.wage +
     income.pension;
 
-  return { annualReflected, monthly: annualReflected / 12, annualRaw };
+  return {
+    annualReflected,
+    monthly: annualReflected / 12,
+    annualRaw,
+    financialExcluded: income.financial > 0 && financial === 0,
+  };
 }
 
 /* ------------------------------------------------------------------ */

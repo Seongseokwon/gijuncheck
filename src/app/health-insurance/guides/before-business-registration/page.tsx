@@ -173,11 +173,23 @@ export default function Page() {
           />
 
           <P>
-            여기에 별도로 <strong>합산소득 요건</strong>이 걸립니다. 사업·근로·공적연금·금융·기타소득을
-            모두 더해 연 {toManwon(INCOME.TOTAL_LIMIT)}를 넘으면 탈락합니다.
+            여기에 별도로 <strong>합산소득 요건</strong>이 걸립니다. 사업·근로·공적연금·기타소득을
+            더해 연 {toManwon(INCOME.TOTAL_LIMIT)}를 넘으면 탈락합니다.
             {toManwon(INCOME.TOTAL_LIMIT)}에서 1원만 초과해도 탈락이고, 월 기준이
             아니라 연 합산 기준입니다.
           </P>
+
+          <Callout tone="info" title="금융소득에는 별도의 문턱이 있습니다">
+            이자·배당 등 금융소득은 연{' '}
+            {toManwon(INCOME.FINANCIAL_INCLUSION_THRESHOLD)} 이하면 합산소득에서{' '}
+            <strong>전액 제외</strong>됩니다. 넘으면 초과분만이 아니라{' '}
+            <strong>전액</strong>이 합산됩니다.
+            <br />
+            <br />
+            예를 들어 근로소득 1,500만원에 금융소득 900만원이면 합산소득은
+            1,500만원으로 자격이 유지됩니다. 금융소득이 1,100만원이 되면 합산소득이
+            2,600만원으로 뛰어 탈락합니다.
+          </Callout>
 
           <P>
             정리하면 프리랜서가 등록 없이 소액으로 일하는 동안에는 자격이

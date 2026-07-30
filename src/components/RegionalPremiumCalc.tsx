@@ -29,7 +29,11 @@ import { ROUTES } from '@/lib/routes';
 
 const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = [
   { key: 'business', label: '사업소득' },
-  { key: 'financial', label: '금융소득', hint: '이자 + 배당' },
+  {
+    key: 'financial',
+    label: '금융소득',
+    hint: '이자 + 배당 · 1,000만원 이하면 제외',
+  },
   { key: 'other', label: '기타소득' },
 ];
 
@@ -84,7 +88,8 @@ export default function RegionalPremiumCalc() {
             {' '}
             근로·연금소득은 50%
           </strong>
-          만 반영됩니다.
+          만 반영됩니다. 금융소득은 연 1,000만원을 넘을 때만 전액 반영되고, 그
+          이하면 부과 대상에서 빠집니다.
         </p>
 
         <div className="grid gap-4 sm:grid-cols-3">

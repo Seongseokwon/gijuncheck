@@ -7,7 +7,14 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { judgeDependent, emptyInput, sumIncome, toEok, toManwon } from './judge';
+import {
+  countableFinancialIncome,
+  emptyInput,
+  judgeDependent,
+  sumIncome,
+  toEok,
+  toManwon,
+} from './judge';
 import type { DependentInput, Relation } from './types';
 
 /** 통과하는 기본 입력을 만들고 일부만 덮어쓴다 */
@@ -34,16 +41,16 @@ describe('기본 동작', () => {
     expect(r.year).toBe(2026);
   });
 
-  it('합산소득은 5개 항목을 모두 더한다', () => {
+  it('합산소득은 항목을 더한다 (금융소득은 문턱 미달로 제외)', () => {
     expect(
       sumIncome({
         business: 1_000_000,
         wage: 2_000_000,
         pension: 3_000_000,
-        financial: 4_000_000,
+        financial: 4_000_000, // 1,000만원 이하 → 제외
         other: 5_000_000,
       }),
-    ).toBe(15_000_000);
+    ).toBe(11_000_000);
   });
 
   it('탈락 시 이후 단계는 판정하지 않는다', () => {
@@ -69,10 +76,60 @@ describe('소득요건 — 합산소득 2,000만원 경계', () => {
 
   it('여러 소득의 합이 2,000만원을 넘으면 탈락한다', () => {
     const r = judgeDependent(
-      withIncome({ wage: 15_000_000, financial: 5_000_001 }),
+      withIncome({ wage: 15_000_000, other: 5_000_001 }),
     );
     expect(r.eligible).toBe(false);
     expect(r.failedAt).toBe('income');
+  });
+});
+
+/* ------------------------------------------------------------------ */
+describe('소득요건 — 금융소득 1,000만원 문턱', () => {
+  it('1,000만원 이하면 합산에서 전액 제외된다', () => {
+    expect(countableFinancialIncome(0)).toBe(0);
+    expect(countableFinancialIncome(5_000_000)).toBe(0);
+    expect(countableFinancialIncome(10_000_000)).toBe(0);
+  });
+
+  it('1,000만원 + 1원이면 초과분이 아니라 전액이 합산된다', () => {
+    expect(countableFinancialIncome(10_000_001)).toBe(10_000_001);
+    expect(countableFinancialIncome(12_000_000)).toBe(12_000_000);
+  });
+
+  it('금융소득 900만 + 근로소득 1,500만은 인정된다 (합산 1,500만)', () => {
+    // 문턱을 무시하고 더하면 2,400만이 되어 잘못 탈락시킨다
+    const r = judgeDependent(
+      withIncome({ financial: 9_000_000, wage: 15_000_000 }),
+    );
+    expect(r.totalIncome).toBe(15_000_000);
+    expect(r.eligible).toBe(true);
+  });
+
+  it('금융소득 1,100만 + 근로소득 1,500만은 탈락한다 (합산 2,600만)', () => {
+    const r = judgeDependent(
+      withIncome({ financial: 11_000_000, wage: 15_000_000 }),
+    );
+    expect(r.totalIncome).toBe(26_000_000);
+    expect(r.eligible).toBe(false);
+    expect(r.failedAt).toBe('income');
+  });
+
+  it('금융소득만 1,200만원이면 합산 1,200만원으로 인정된다', () => {
+    // "금융소득 1,000만원 초과 = 즉시 탈락" 은 틀린 설명이다.
+    // 전액 합산된 결과가 2,000만원을 넘어야 탈락한다.
+    const r = judgeDependent(withIncome({ financial: 12_000_000 }));
+    expect(r.totalIncome).toBe(12_000_000);
+    expect(r.eligible).toBe(true);
+  });
+
+  it('재산 5.4억 초과 구간에서는 금융소득 1,200만원만으로도 탈락한다', () => {
+    // 이때 걸리는 1,000만원은 재산요건의 소득 상한이고
+    // 금융소득 문턱과는 다른 기준이다.
+    const r = judgeDependent(
+      withIncome({ financial: 12_000_000 }, { propertyTaxBase: 600_000_000 }),
+    );
+    expect(r.eligible).toBe(false);
+    expect(r.failedAt).toBe('property');
   });
 });
 
