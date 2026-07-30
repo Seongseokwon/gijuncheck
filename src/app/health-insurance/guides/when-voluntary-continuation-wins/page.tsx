@@ -18,7 +18,7 @@ import {
 } from '@/components/guide';
 import { RATE, VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
-import { toEok, toPercent, won } from '@/lib/format';
+import { toEok, toPercent, wonExact } from '@/lib/format';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideVoluntaryContinuation.path;
@@ -158,7 +158,7 @@ export default function Page() {
           <P>
             지역가입자 건강보험료는 소득월액에{' '}
             {toPercent(RATE.HEALTH)}를 곱한 금액에, 재산 부과점수 × 점수당{' '}
-            {won(RATE.PROPERTY_POINT_VALUE)}을 더해 산정합니다. 재산세 과세표준에서
+            {wonExact(RATE.PROPERTY_POINT_VALUE)}을 더해 산정합니다. 재산세 과세표준에서
             기본공제 {toEok(BASIC_DEDUCTION)}을 뺀 금액이 클수록 보험료가
             올라갑니다.
           </P>

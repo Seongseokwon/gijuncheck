@@ -16,9 +16,9 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { PROPERTY } from '@/lib/constants/2026';
+import { PROPERTY, RATE } from '@/lib/constants/2026';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
-import { toEok, won } from '@/lib/format';
+import { toEok, wonExact } from '@/lib/format';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guidePropertyTaxBase.path;
@@ -261,7 +261,8 @@ export default function Page() {
           <P>
             <strong>둘째, 지역가입자 보험료 계산.</strong> 피부양자에서 탈락하면
             과세표준 합계에서 기본공제 {toEok(BASIC_DEDUCTION)}을 뺀 금액을 60등급
-            표에 대입해 재산 부과점수를 구하고, 점수당 {won(211.5)}을 곱합니다.
+            표에 대입해 재산 부과점수를 구하고, 점수당{' '}
+            {wonExact(RATE.PROPERTY_POINT_VALUE)}을 곱합니다.
           </P>
 
           <Callout tone="info" title="기본공제가 있습니다">

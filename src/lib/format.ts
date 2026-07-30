@@ -9,9 +9,25 @@
  * "Attempted to call won() from the server but won is on the client" 로 빌드가 깨진다.
  */
 
-/** 원화 표기 — 143800 → "143,800원" */
+/**
+ * 원화 표기 — 143800 → "143,800원"
+ *
+ * 반올림한다. 보험료 금액은 원 단위로 고지되므로 이게 맞다.
+ * 다만 **소수점이 있는 값에는 쓰지 말 것.**
+ * 점수당 금액 211.5원을 이 함수로 찍으면 "212원"이 되어 사실이 틀어진다.
+ * 그런 값은 wonExact() 를 쓴다.
+ */
 export function won(n: number): string {
   return `${Math.round(n).toLocaleString('ko-KR')}원`;
+}
+
+/**
+ * 반올림하지 않는 원화 표기 — 211.5 → "211.5원"
+ *
+ * 재산보험료부과점수당 금액처럼 소수점이 의미를 갖는 값에 쓴다.
+ */
+export function wonExact(n: number): string {
+  return `${n.toLocaleString('ko-KR', { maximumFractionDigits: 2 })}원`;
 }
 
 /** 억 단위 — 540000000 → "5.4억원" */

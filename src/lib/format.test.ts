@@ -1,10 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { josa, toEok, toManwon, toPercent, won } from './format';
+import { josa, toEok, toManwon, toPercent, won, wonExact } from './format';
 
 describe('금액 표기', () => {
-  it('won', () => {
+  it('won 은 반올림한다', () => {
     expect(won(143_800)).toBe('143,800원');
-    expect(won(211.5)).toBe('212원'); // 반올림
+    expect(won(211.5)).toBe('212원');
+  });
+
+  it('wonExact 는 소수점을 유지한다', () => {
+    // 점수당 금액 211.5원을 won() 으로 찍으면 212원이 되어 사실이 틀어진다
+    expect(wonExact(211.5)).toBe('211.5원');
+    expect(wonExact(20_160)).toBe('20,160원');
+    expect(wonExact(4_591_740)).toBe('4,591,740원');
   });
 
   it('toManwon', () => {
