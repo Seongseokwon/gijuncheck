@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "description": "사대보험 — 소득이 바뀔 때 내 사회보험이 어떻게 바뀌는지 판정해주는 도구",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
