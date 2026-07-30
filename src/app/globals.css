@@ -2,7 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 숫자 입력의 스피너 제거 — 금액 입력에서 방해가 된다 */
+/*
+  iOS 대응 — 실제 아이폰 카카오톡 인앱 브라우저에서 발견한 문제들
+
+  1) 셀렉트가 회색으로 보여 비활성처럼 느껴진다
+     사용자 기기가 다크모드면 Safari 가 폼 컨트롤에 자체 보정을 넣는다.
+     color-scheme 을 light 로 못박아 그 보정을 끈다. 이게 근본 원인이다.
+
+  2) appearance 를 리셋하지 않으면 iOS 기본 UI 가 그대로 나온다
+     글자색·배경색도 명시하지 않으면 시스템 색을 따라간다.
+
+  3) 폼 글자가 16px 미만이면 포커스 시 화면이 자동 확대된다
+     금액을 계속 입력하는 도구라 확대가 반복되면 매우 거슬린다.
+     모바일에서 16px, 넓은 화면에서 14px 로 되돌린다.
+*/
+
+:root {
+  color-scheme: light;
+}
+
+/* --- 폼 컨트롤 공통 --- */
+input,
+select,
+textarea,
+button {
+  color-scheme: light;
+}
+
+/*
+  글자 크기는 여기서 정하지 않는다.
+  클래스(.text-sm)가 요소 선택자를 이기므로 싸움이 난다.
+  대신 components/ui.tsx 의 inputCls 에서 `text-base sm:text-sm` 으로 처리한다.
+*/
+
+/* --- 셀렉트 --- */
+select {
+  -webkit-appearance: none;
+  appearance: none;
+
+  /*
+    시스템 색을 따라가지 않도록 명시.
+    Tailwind 의 text-slate-900 / bg-white 가 클래스로도 걸려 있지만,
+    회색으로 보이는 증상이 재발하지 않도록 요소 선택자에도 둔다.
+    (클래스가 우선하므로 값이 어긋나지 않게 같은 색을 쓴다)
+  */
+  color: #0f172a; /* slate-900 */
+  background-color: #ffffff;
+  opacity: 1; /* iOS 가 임의로 낮추는 경우가 있다 */
+
+  /* appearance 를 끄면 화살표가 사라지므로 직접 그린다 */
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.25rem;
+}
+
+/* 드롭다운이 펼쳐졌을 때의 항목. 안드로이드 일부 기기에서 필요하다 */
+select option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+/* --- 숫자 입력 스피너 제거 --- */
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;

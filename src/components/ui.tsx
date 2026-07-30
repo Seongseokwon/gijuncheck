@@ -14,8 +14,21 @@ import { toKoreanAmount } from '@/lib/format';
 // 서버 컴포넌트에서 호출할 수 없어 빌드가 깨진다. @/lib/format 에서 가져온다.
 export { won } from '@/lib/format';
 
+/**
+ * 폼 컨트롤 공통 클래스
+ *
+ * `text-base sm:text-sm` 인 이유:
+ * iOS 는 폼 글자가 16px 미만이면 포커스할 때 화면을 자동 확대한다.
+ * 금액을 계속 입력하는 도구라 확대가 반복되면 매우 거슬린다.
+ * 모바일에서는 16px(text-base), 넓은 화면에서만 14px(text-sm) 로 되돌린다.
+ *
+ * 색을 명시하는 이유:
+ * 기기가 다크모드면 iOS Safari 가 폼 컨트롤 색을 자체 보정해
+ * 비활성처럼 회색으로 보인다. globals.css 의 color-scheme 과 함께 막는다.
+ */
 export const inputCls =
-  'w-full rounded-md border border-slate-300 px-3 py-2 text-sm ' +
+  'w-full rounded-md border border-slate-300 bg-white px-3 py-2 ' +
+  'text-base text-slate-900 placeholder:text-slate-400 sm:text-sm ' +
   'focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900';
 
 export function Field({
