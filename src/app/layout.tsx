@@ -1,12 +1,10 @@
 import type { Metadata } from 'next';
+import { ROUTES } from '@/lib/routes';
+import { SITE } from '@/lib/site';
 import './globals.css';
 
-export const SITE = {
-  name: '사대보험',
-  url: 'https://xn--vg1b09lltcqk3t.kr', // 사대보험.kr — 도메인 확보 후 확인
-  description:
-    '소득이 바뀔 때 내 사회보험이 어떻게 바뀌는지 판정해주는 도구. 건강보험 피부양자 자격, 지역가입자 보험료, 임의계속가입 비교.',
-} as const;
+// 주의: 이 파일에서 SITE 같은 임의 상수를 export 하면 빌드가 실패한다.
+// Next.js App Router 는 layout 파일의 export 필드를 제한한다. → src/lib/site.ts 사용
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -33,11 +31,11 @@ export default function RootLayout({
       <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
         <header className="border-b border-slate-200 bg-white">
           <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-            <a href="/" className="text-lg font-bold">
-              사대보험
+            <a href={ROUTES.home.path} className="text-lg font-bold">
+              {SITE.name}
             </a>
             <nav className="flex gap-4 text-sm text-slate-600">
-              <a href="/건강보험/피부양자-자격판정/" className="hover:text-slate-900">
+              <a href={ROUTES.dependent.path} className="hover:text-slate-900">
                 피부양자 판정
               </a>
             </nav>
@@ -52,7 +50,9 @@ export default function RootLayout({
               본 사이트의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
               최종 확인은 국민건강보험공단(1577-1000)에 문의하시기 바랍니다.
             </p>
-            <p className="mt-2">기준 · 2026년 · 최종 확인 2026-07-30</p>
+            <p className="mt-2">
+              기준 · {SITE.baseYear}년 · 최종 확인 {SITE.lastVerified}
+            </p>
           </div>
         </footer>
       </body>

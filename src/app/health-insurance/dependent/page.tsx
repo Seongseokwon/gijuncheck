@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import DependentJudge from '@/components/DependentJudge';
 import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/dependent/judge';
+import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 
 export const metadata: Metadata = {
   title: '피부양자 자격판정 — 소득·재산·관계 3단 자동 판정',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     )}, 재산세 과세표준 ${toEok(PROPERTY.SAFE_LIMIT)}·${toEok(
       PROPERTY.HARD_LIMIT,
     )} 구간, 사업자등록 여부, 관계별 부양요건까지 반영. 탈락 시 근거 조항을 함께 보여줍니다.`,
-  alternates: { canonical: '/건강보험/피부양자-자격판정/' },
+  alternates: { canonical: ROUTES.dependent.path },
 };
 
 /** 검색 결과에서 자리를 넓게 차지하도록 FAQ 구조화 데이터를 넣는다 */
@@ -45,7 +46,7 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'WebApplication',
-      name: '피부양자 자격판정',
+      name: ROUTES.dependent.label,
       applicationCategory: 'FinanceApplication',
       operatingSystem: 'Web',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
@@ -61,11 +62,8 @@ const jsonLd = {
   ],
 };
 
-const GUIDES: Array<[string, string]> = [
-  ['재산세 과세표준 확인하는 방법', '/건강보험/가이드/재산세-과세표준-확인방법/'],
-  ['사업자등록 전에 반드시 계산해야 하는 것', '/건강보험/가이드/사업자등록-전-확인사항/'],
-  ['임의계속가입이 유리한 경우', '/건강보험/가이드/임의계속가입-유리한경우/'],
-];
+/** 이 도구와 관련도가 높은 가이드 3개 */
+const RELATED = GUIDE_KEYS.slice(0, 3).map((k) => ROUTES[k]);
 
 export default function Page() {
   return (
@@ -77,7 +75,7 @@ export default function Page() {
 
       <article className="space-y-8">
         <header>
-          <h1 className="text-2xl font-bold">피부양자 자격판정</h1>
+          <h1 className="text-2xl font-bold">{ROUTES.dependent.label}</h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             부양요건 · 소득요건 · 재산요건을 순서대로 판정합니다. 탈락하면 어느
             단계에서 왜 걸리는지 근거 조항과 함께 보여줍니다.
@@ -107,14 +105,18 @@ export default function Page() {
         <section>
           <h2 className="text-sm font-semibold text-slate-500">함께 읽기</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {GUIDES.map(([label, href]) => (
-              <li key={href}>
-                <a
-                  href={href}
-                  className="text-slate-600 underline hover:text-slate-900"
-                >
-                  {label}
-                </a>
+            {RELATED.map((g) => (
+              <li key={g.path}>
+                {g.ready ? (
+                  <a
+                    href={g.path}
+                    className="text-slate-600 underline hover:text-slate-900"
+                  >
+                    {g.label}
+                  </a>
+                ) : (
+                  <span className="text-slate-400">{g.label} (준비 중)</span>
+                )}
               </li>
             ))}
           </ul>

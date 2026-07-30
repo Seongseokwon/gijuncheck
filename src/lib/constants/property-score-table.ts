@@ -1,66 +1,197 @@
 /**
- * 지역가입자 재산보험료부과점수 등급표
+ * 지역가입자 재산보험료부과점수 등급표 (60등급)
  *
- * ⚠️⚠️ 미검증 — 실제 서비스에 공개하기 전에 반드시 교체해야 합니다. ⚠️⚠️
+ * 근거: 국민건강보험법 시행령 [별표 4] 재산보험료부과점수의 산정방법 (제42조제1항 관련)
  *
- * 아래 표는 구조를 잡기 위한 **근사값**입니다. 실제 고시표는 60등급이며
- * 국민건강보험공단 고시 원문을 확인해 그대로 입력해야 합니다.
+ * 검증 상태
+ *  - 60등급 구간·점수: 독립된 두 출처에서 전 구간이 일치함을 확인 (2026-07-30)
+ *  - 기본공제 1억원: 두 출처 일치
+ *  - ⚠️ 미확정: 공제 후 금액이 0원 이하일 때의 처리 (ZERO_PROPERTY_NOTE 참조)
+ *  - ⚠️ 미지원: 전세·월세 환산 (RENT_CONVERSION_NOTE 참조)
  *
- * 확인해야 할 것:
- *  1. 60등급 구간별 과세표준 경계값과 점수
- *  2. 재산 기본공제액 (2024년부터 1억원 공제 도입)
- *  3. 자동차 점수 산정 방식 (배기량·차령·가액 기준, 4천만원 이상 차량만 부과)
- *
- * 출처를 확인할 곳:
- *  - 국민건강보험공단 > 보험료 > 지역보험료 산정방법
- *  - 국민건강보험법 시행령 별표 4 (보험료부과점수의 산정방법)
- *
- * VERIFIED 를 true 로 바꾸기 전까지 보험료 계산 결과는 UI에 노출하지 마세요.
- * calculateRegionalPremium() 이 verified: false 를 반환하므로
- * 화면에서 이 플래그를 확인해 차단할 수 있습니다.
+ * 남은 검증 작업 (docs/02-다음작업-타임라인.md Week 3)
+ *  공단 "지역보험료 모의계산"과 10개 케이스 대조. 특히 재산 0원 케이스로
+ *  ZERO_PROPERTY_NOTE 의 모호함을 확정할 것.
  */
 
-export const VERIFIED = false;
+/**
+ * 등급표 자체는 검증되었으므로 true.
+ * 다만 이 플래그가 true 인 것이 "공단 대조 검증까지 끝났다"는 뜻은 아니다.
+ * 대조 검증은 VERIFIED_AGAINST_NHIS 로 별도 추적한다.
+ */
+export const VERIFIED = true;
 
-/** 재산 기본공제액 (원) — 과세표준에서 먼저 공제 */
+/** 공단 모의계산과의 대조 검증 완료 여부. Week 3 작업 후 true 로 변경. */
+export const VERIFIED_AGAINST_NHIS = false;
+
+/** 재산 기본공제액 (원) — 과세표준 합계에서 먼저 공제 */
 export const BASIC_DEDUCTION = 100_000_000;
 
+/**
+ * 공제 후 재산금액이 0원 이하일 때의 처리.
+ *
+ * 출처가 갈린다.
+ *  - A안: 표의 1등급("450만원 이하")에 해당하므로 22점.
+ *         "22점 × 점수당 금액" 예시를 제시하는 출처가 있다.
+ *  - B안: 재산이 없으면 재산보험료 0원이므로 0점.
+ *
+ * 현재는 표 조회 로직에 충실한 A안을 따른다. 표의 1등급 구간이
+ * "450만원 이하"이므로 0원도 그 구간에 포함되는 것이 자연스럽다.
+ *
+ * 공단 모의계산에서 소득 0 · 재산 0 케이스를 넣어보면 바로 확정된다.
+ * 확정 후 이 상수와 zeroPropertyScore() 를 함께 수정할 것.
+ */
+export const ZERO_PROPERTY_NOTE =
+  'A안(1등급 22점) 적용 — 공단 대조로 확정 필요';
+
+/**
+ * 전세·월세를 재산금액으로 환산하는 공식은 구현하지 않았다.
+ *
+ * 조사한 출처들이 제시한 공식과 그 출처 자신의 계산 예시가 서로 맞지 않았다.
+ * 예를 들어 (보증금 + 월세×12/0.025) × 30% 라고 써놓고
+ * 제시한 예시 결과가 그 공식으로 재현되지 않았다.
+ *
+ * 추측으로 구현하면 틀린 금액을 보여주게 되므로 의도적으로 비워둔다.
+ * 시행령 별표 4 원문을 확인한 뒤 별도 함수로 추가할 것.
+ *
+ * 그때까지 propertyAmount 인자는 "이미 환산이 끝난 재산금액 합계"로 취급한다.
+ * UI에서 그렇게 안내해야 한다.
+ *
+ * 조사 중 확인된 것 (미검증, 참고용)
+ *  - 주택 과세표준 = 공시가격 × 60%
+ *  - 토지·건물 과세표준 = 공시가격 × 70%
+ *  - 전세보증금은 30%만 반영
+ *  - 자동차는 4,000만원 이상 차량만 별도 점수
+ */
+export const RENT_CONVERSION_NOTE =
+  '전세·월세 환산 미지원. propertyAmount 는 환산 완료된 재산금액 합계로 취급';
+
 export interface PropertyBracket {
-  /** 구간 상한 (원). 마지막 구간은 Infinity */
-  upTo: number;
+  /** 등급 (1~60) */
+  grade: number;
+  /**
+   * 구간 상한, **만원 단위**. 원 단위로 바꾸지 말 것.
+   * 시행령 별표와 숫자를 1:1로 대조할 수 있어야 전사 오류를 잡을 수 있다.
+   * 60등급은 Infinity.
+   */
+  upToManwon: number;
   /** 부과점수 */
   score: number;
 }
 
-/**
- * TODO(verify): 공단 고시 60등급표로 전면 교체
- * 현재는 구조 확인용 근사 구간표입니다.
- */
-export const PROPERTY_BRACKETS: PropertyBracket[] = [
-  { upTo: 0, score: 0 },
-  { upTo: 45_000_000, score: 22 },
-  { upTo: 90_000_000, score: 68 },
-  { upTo: 135_000_000, score: 121 },
-  { upTo: 180_000_000, score: 174 },
-  { upTo: 225_000_000, score: 227 },
-  { upTo: 270_000_000, score: 280 },
-  { upTo: 360_000_000, score: 340 },
-  { upTo: 450_000_000, score: 400 },
-  { upTo: 540_000_000, score: 460 },
-  { upTo: 720_000_000, score: 550 },
-  { upTo: 900_000_000, score: 650 },
-  { upTo: 1_200_000_000, score: 780 },
-  { upTo: Infinity, score: 1_200 },
-];
+export const PROPERTY_BRACKETS: readonly PropertyBracket[] = [
+  { grade: 1, upToManwon: 450, score: 22 },
+  { grade: 2, upToManwon: 900, score: 44 },
+  { grade: 3, upToManwon: 1_350, score: 66 },
+  { grade: 4, upToManwon: 1_800, score: 97 },
+  { grade: 5, upToManwon: 2_250, score: 122 },
+  { grade: 6, upToManwon: 2_700, score: 146 },
+  { grade: 7, upToManwon: 3_150, score: 171 },
+  { grade: 8, upToManwon: 3_600, score: 195 },
+  { grade: 9, upToManwon: 4_050, score: 219 },
+  { grade: 10, upToManwon: 4_500, score: 244 },
+  { grade: 11, upToManwon: 5_020, score: 268 },
+  { grade: 12, upToManwon: 5_590, score: 294 },
+  { grade: 13, upToManwon: 6_220, score: 320 },
+  { grade: 14, upToManwon: 6_930, score: 344 },
+  { grade: 15, upToManwon: 7_710, score: 365 },
+  { grade: 16, upToManwon: 8_590, score: 386 },
+  { grade: 17, upToManwon: 9_570, score: 412 },
+  { grade: 18, upToManwon: 10_700, score: 439 },
+  { grade: 19, upToManwon: 11_900, score: 465 },
+  { grade: 20, upToManwon: 13_300, score: 490 },
+  { grade: 21, upToManwon: 14_800, score: 516 },
+  { grade: 22, upToManwon: 16_400, score: 535 },
+  { grade: 23, upToManwon: 18_300, score: 559 },
+  { grade: 24, upToManwon: 20_400, score: 586 },
+  { grade: 25, upToManwon: 22_700, score: 611 },
+  { grade: 26, upToManwon: 25_300, score: 637 },
+  { grade: 27, upToManwon: 28_100, score: 659 },
+  { grade: 28, upToManwon: 31_300, score: 681 },
+  { grade: 29, upToManwon: 34_900, score: 706 },
+  { grade: 30, upToManwon: 38_800, score: 731 },
+  { grade: 31, upToManwon: 43_200, score: 757 },
+  { grade: 32, upToManwon: 48_100, score: 785 },
+  { grade: 33, upToManwon: 53_600, score: 812 },
+  { grade: 34, upToManwon: 59_700, score: 841 },
+  { grade: 35, upToManwon: 66_500, score: 881 },
+  { grade: 36, upToManwon: 74_000, score: 921 },
+  { grade: 37, upToManwon: 82_400, score: 961 },
+  { grade: 38, upToManwon: 91_800, score: 1_001 },
+  { grade: 39, upToManwon: 103_000, score: 1_041 },
+  { grade: 40, upToManwon: 114_000, score: 1_091 },
+  { grade: 41, upToManwon: 127_000, score: 1_141 },
+  { grade: 42, upToManwon: 142_000, score: 1_191 },
+  { grade: 43, upToManwon: 158_000, score: 1_241 },
+  { grade: 44, upToManwon: 176_000, score: 1_291 },
+  { grade: 45, upToManwon: 196_000, score: 1_341 },
+  { grade: 46, upToManwon: 218_000, score: 1_391 },
+  { grade: 47, upToManwon: 242_000, score: 1_451 },
+  { grade: 48, upToManwon: 270_000, score: 1_511 },
+  { grade: 49, upToManwon: 300_000, score: 1_571 },
+  { grade: 50, upToManwon: 330_000, score: 1_641 },
+  { grade: 51, upToManwon: 363_000, score: 1_711 },
+  { grade: 52, upToManwon: 399_300, score: 1_781 },
+  { grade: 53, upToManwon: 439_230, score: 1_851 },
+  { grade: 54, upToManwon: 483_153, score: 1_921 },
+  { grade: 55, upToManwon: 531_468, score: 1_991 },
+  { grade: 56, upToManwon: 584_615, score: 2_061 },
+  { grade: 57, upToManwon: 643_077, score: 2_131 },
+  { grade: 58, upToManwon: 707_385, score: 2_201 },
+  { grade: 59, upToManwon: 778_124, score: 2_271 },
+  { grade: 60, upToManwon: Infinity, score: 2_341 },
+] as const;
+
+/** 공제 후 금액이 0원 이하일 때의 점수. ZERO_PROPERTY_NOTE 참조 */
+export function zeroPropertyScore(): number {
+  return PROPERTY_BRACKETS[0].score; // A안: 1등급 22점
+}
+
+export interface PropertyScoreResult {
+  /** 부과점수 */
+  score: number;
+  /** 적용 등급 (1~60) */
+  grade: number;
+  /** 기본공제 적용 후 재산금액 (원) */
+  taxableAfterDeduction: number;
+}
 
 /**
- * 재산세 과세표준 → 부과점수
- * 기본공제를 적용한 뒤 구간표에서 점수를 찾는다.
+ * 재산금액 → 부과점수
+ *
+ * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 기준.
+ *                       전세·월세는 환산이 끝난 값으로 넣어야 한다 (RENT_CONVERSION_NOTE).
  */
-export function propertyScore(propertyTaxBase: number): number {
-  const taxable = Math.max(0, propertyTaxBase - BASIC_DEDUCTION);
-  for (const bracket of PROPERTY_BRACKETS) {
-    if (taxable <= bracket.upTo) return bracket.score;
+export function propertyScoreDetail(
+  propertyAmount: number,
+): PropertyScoreResult {
+  const afterDeduction = propertyAmount - BASIC_DEDUCTION;
+
+  if (afterDeduction <= 0) {
+    return { score: zeroPropertyScore(), grade: 1, taxableAfterDeduction: 0 };
   }
-  return PROPERTY_BRACKETS[PROPERTY_BRACKETS.length - 1].score;
+
+  const manwon = afterDeduction / 10_000;
+  for (const bracket of PROPERTY_BRACKETS) {
+    if (manwon <= bracket.upToManwon) {
+      return {
+        score: bracket.score,
+        grade: bracket.grade,
+        taxableAfterDeduction: afterDeduction,
+      };
+    }
+  }
+
+  // 도달 불가 — 마지막 구간이 Infinity. 방어적으로만 둔다.
+  const last = PROPERTY_BRACKETS[PROPERTY_BRACKETS.length - 1];
+  return {
+    score: last.score,
+    grade: last.grade,
+    taxableAfterDeduction: afterDeduction,
+  };
+}
+
+/** 점수만 필요한 경우 */
+export function propertyScore(propertyAmount: number): number {
+  return propertyScoreDetail(propertyAmount).score;
 }

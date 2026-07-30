@@ -18,6 +18,7 @@ import {
   type Relation,
 } from '@/lib/dependent/types';
 import { DISCLAIMER } from '@/lib/constants/2026';
+import { ROUTES } from '@/lib/routes';
 
 const INCOME_FIELDS: Array<{
   key: keyof DependentInput['income'];
@@ -277,9 +278,14 @@ export default function DependentJudge() {
             ))}
           </ol>
 
-          {!result.eligible && (
+          {/*
+            탈락 시 "그래서 얼마 내나"로 이어지는 동선.
+            입력값을 쿼리로 넘겨 다시 타이핑하지 않게 한다.
+            보험료 페이지가 준비되기 전에는 링크를 노출하지 않는다.
+          */}
+          {!result.eligible && ROUTES.regionalPremium.ready && (
             <a
-              href="/건강보험/지역가입자-보험료계산/"
+              href={`${ROUTES.regionalPremium.path}?income=${result.totalIncome}&property=${input.propertyTaxBase}`}
               className="mt-4 block rounded-md bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
             >
               그러면 보험료는 얼마인가요 →

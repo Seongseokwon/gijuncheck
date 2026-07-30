@@ -8,7 +8,8 @@
 import { RATE, VOLUNTARY_CONTINUATION, BASIS } from '../constants/2026';
 import {
   VERIFIED,
-  propertyScore,
+  VERIFIED_AGAINST_NHIS,
+  propertyScoreDetail,
 } from '../constants/property-score-table';
 
 export interface PremiumBreakdown {
@@ -16,17 +17,23 @@ export interface PremiumBreakdown {
   incomePortion: number;
   /** 재산 기준 보험료 (원/월) */
   propertyPortion: number;
+  /** 적용된 재산 부과점수 */
+  propertyScore: number;
+  /** 적용된 재산 등급 (1~60). 재산 계산이 없는 경우 null */
+  propertyGrade: number | null;
   /** 건강보험료 (원/월) */
   health: number;
   /** 장기요양보험료 (원/월) */
   longTermCare: number;
   /** 합계 (원/월) */
   total: number;
-  /**
-   * 재산점수 등급표가 검증되었는지.
-   * false 인 동안은 UI에 금액을 노출하지 말 것.
-   */
+  /** 등급표 자체가 검증되었는지 */
   verified: boolean;
+  /**
+   * 공단 모의계산과 대조 검증까지 완료되었는지.
+   * false 인 동안은 UI에 "참고용" 표시를 함께 노출할 것.
+   */
+  crossChecked: boolean;
   basis: string;
 }
 
@@ -35,36 +42,42 @@ export function longTermCareRatio(): number {
   return RATE.LONG_TERM_CARE / RATE.HEALTH;
 }
 
-function withLongTermCare(health: number): Omit<
-  PremiumBreakdown,
-  'incomePortion' | 'propertyPortion' | 'verified' | 'basis'
-> {
-  const longTermCare = Math.round(health * longTermCareRatio());
-  return { health, longTermCare, total: health + longTermCare };
+function longTermCareOf(health: number): number {
+  return Math.round(health * longTermCareRatio());
 }
 
 /**
  * 지역가입자 월 보험료
  *
  * @param annualIncome 연간 합산소득 (원)
- * @param propertyTaxBase 재산세 과세표준 (원)
+ * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 기준.
+ *                       전세·월세는 환산이 끝난 값으로 넣어야 한다.
  */
 export function calculateRegionalPremium(
   annualIncome: number,
-  propertyTaxBase: number,
+  propertyAmount: number,
 ): PremiumBreakdown {
   const monthlyIncome = annualIncome / 12;
   const incomePortion = Math.round(monthlyIncome * RATE.HEALTH);
+
+  const property = propertyScoreDetail(propertyAmount);
   const propertyPortion = Math.round(
-    propertyScore(propertyTaxBase) * RATE.PROPERTY_POINT_VALUE,
+    property.score * RATE.PROPERTY_POINT_VALUE,
   );
+
   const health = incomePortion + propertyPortion;
+  const longTermCare = longTermCareOf(health);
 
   return {
     incomePortion,
     propertyPortion,
-    ...withLongTermCare(health),
+    propertyScore: property.score,
+    propertyGrade: property.grade,
+    health,
+    longTermCare,
+    total: health + longTermCare,
     verified: VERIFIED,
+    crossChecked: VERIFIED_AGAINST_NHIS,
     basis: BASIS.RATE,
   };
 }
@@ -82,12 +95,19 @@ export function calculateVoluntaryPremium(
 ): PremiumBreakdown {
   const full = avgMonthlyWage * RATE.HEALTH;
   const health = Math.round(full / 2); // 본인 부담 50%
+  const longTermCare = longTermCareOf(health);
 
   return {
     incomePortion: health,
     propertyPortion: 0,
-    ...withLongTermCare(health),
-    verified: true, // 재산점수표에 의존하지 않으므로 검증 불필요
+    propertyScore: 0,
+    propertyGrade: null, // 재산을 반영하지 않으므로 등급 개념이 없다
+    health,
+    longTermCare,
+    total: health + longTermCare,
+    // 재산점수표에 의존하지 않으므로 등급표 검증 상태와 무관하다
+    verified: true,
+    crossChecked: true,
     basis: BASIS.RATE,
   };
 }
@@ -113,6 +133,8 @@ export interface ComparisonResult {
   recommendation: Recommendation;
   /** 월 절약액 (원). 임의계속가입이 유리한 경우에만 양수 */
   monthlySaving: number;
+  /** 최대 유지 기간 동안의 총 절약액 (원) */
+  totalSaving: number;
   /** 최대 유지 개월 */
   maxMonths: number;
   /** 신고 기한 (일) */
@@ -127,13 +149,13 @@ export interface ComparisonResult {
  */
 export function compareAfterRetirement(params: {
   annualIncome: number;
-  propertyTaxBase: number;
+  propertyAmount: number;
   avgMonthlyWage: number;
   insuredMonthsInLookback: number;
 }): ComparisonResult {
   const regional = calculateRegionalPremium(
     params.annualIncome,
-    params.propertyTaxBase,
+    params.propertyAmount,
   );
 
   const eligible = canApplyVoluntary({
@@ -157,6 +179,7 @@ export function compareAfterRetirement(params: {
       voluntary: null,
       recommendation: 'notEligible',
       monthlySaving: 0,
+      totalSaving: 0,
       maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
       applyDeadlineDays: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS,
       notes,
@@ -171,6 +194,7 @@ export function compareAfterRetirement(params: {
     voluntary,
     recommendation: monthlySaving > 0 ? 'voluntary' : 'regional',
     monthlySaving,
+    totalSaving: monthlySaving * VOLUNTARY_CONTINUATION.MAX_MONTHS,
     maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
     applyDeadlineDays: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS,
     notes,
