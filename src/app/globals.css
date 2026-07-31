@@ -21,6 +21,27 @@
   color-scheme: light;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter,
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: #dff5f3;
+  color: #102a43;
+}
+
 /* --- 폼 컨트롤 공통 --- */
 input,
 select,

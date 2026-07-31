@@ -11,8 +11,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Card,
   Field,
+  FormCard,
+  FormSection,
   MoneyInput,
   ReferenceOnlyNotice,
   ResultRow,
@@ -85,8 +86,12 @@ export default function RegionalPremiumCalc() {
 
   return (
     <div className="space-y-8">
-      <Card title="연간 소득">
-        <p className="text-xs leading-relaxed text-slate-500">
+      <FormCard
+        title="지역가입자 보험료 계산"
+        description="소득과 재산을 입력하면 적용한 기준과 월 보험료 구성을 함께 보여드립니다."
+      >
+        <FormSection number="1" title="연간 소득을 입력해주세요">
+        <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
           소득 종류에 따라 반영률이 다릅니다. 사업·금융·기타소득은 100%,
           <strong className="font-semibold text-slate-700">
             {' '}
@@ -96,7 +101,7 @@ export default function RegionalPremiumCalc() {
           이하면 부과 대상에서 빠집니다.
         </p>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-3">
           {FULL_FIELDS.map((f) => (
             <Field key={f.key} label={`${f.label} (100%)`} hint={f.hint}>
               <MoneyInput
@@ -107,7 +112,7 @@ export default function RegionalPremiumCalc() {
           ))}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 sm:grid-cols-2">
           {HALF_FIELDS.map((f) => (
             <Field key={f.key} label={`${f.label} (50%)`} hint={f.hint}>
               <MoneyInput
@@ -118,14 +123,14 @@ export default function RegionalPremiumCalc() {
           ))}
         </div>
 
-        <div className="rounded-md bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        <div className="rounded-xl bg-canvas px-4 py-3 text-sm text-slate-600">
           합산소득 {won(base.annualRaw)} → 반영 후{' '}
           <strong className="font-semibold">{won(base.annualReflected)}</strong>{' '}
           → 소득월액 {won(base.monthly)}
         </div>
-      </Card>
+        </FormSection>
 
-      <Card title="재산">
+        <FormSection number="2" title="재산을 입력해주세요">
         <Field
           label="재산금액 합계"
           hint="재산세 과세표준 + 전월세평가금액(30%)"
@@ -135,13 +140,16 @@ export default function RegionalPremiumCalc() {
             onChange={setProperty}
           />
         </Field>
-        <p className="text-xs leading-relaxed text-slate-500">
+        <p className="text-sm leading-6 text-slate-600">
           실거래가나 공시가격이 아니라 <strong>재산세 과세표준</strong>입니다.
           주택·건물을 소유하지 않은 경우에만 임차보증금·월세가 재산으로 평가되며,
           그 경우 평가금액의 30%를 더해 입력하세요. 자동차는 2024년 2월부터
           보험료에 반영되지 않습니다.
         </p>
 
+        </FormSection>
+
+        <div className="px-5 py-6 sm:px-7 sm:py-7">
         <SubmitButton
           onClick={() => {
             setSubmitted(true);
@@ -154,15 +162,17 @@ export default function RegionalPremiumCalc() {
         >
           보험료 계산하기
         </SubmitButton>
-      </Card>
+        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.</p>
+        </div>
+      </FormCard>
 
       {submitted && (
         <section
           role="status"
           aria-live="polite"
-          className="space-y-4 rounded-lg border border-slate-200 bg-white p-5"
+          className="space-y-5 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7"
         >
-          <h2 className="text-base font-semibold">월 보험료</h2>
+          <h2 className="text-2xl font-extrabold tracking-tight text-brand-950">월 보험료</h2>
 
           <ReferenceOnlyNotice crossChecked={result.crossChecked} />
 
@@ -193,13 +203,13 @@ export default function RegionalPremiumCalc() {
           </div>
 
           {result.limitApplied === 'lower' && (
-            <p className="text-xs leading-relaxed text-slate-500">
+            <p className="text-sm leading-6 text-slate-600">
               계산 결과가 하한액보다 낮아 <strong>하한 보험료</strong>가
               적용되었습니다. (계산값 {won(result.healthBeforeLimit)})
             </p>
           )}
           {result.limitApplied === 'upper' && (
-            <p className="text-xs leading-relaxed text-slate-500">
+            <p className="text-sm leading-6 text-slate-600">
               계산 결과가 상한액을 넘어 <strong>상한 보험료</strong>가
               적용되었습니다. (계산값 {won(result.healthBeforeLimit)})
             </p>
@@ -208,7 +218,7 @@ export default function RegionalPremiumCalc() {
           {ROUTES.voluntaryContinuation.ready && (
             <a
               href={`${ROUTES.voluntaryContinuation.path}?property=${property}`}
-              className="block min-h-[44px] rounded-md bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
+              className="block min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
             >
               임의계속가입이 더 싸지 않을까요 →
             </a>
@@ -222,7 +232,7 @@ export default function RegionalPremiumCalc() {
             ))}
           </div>
 
-          <p className="text-xs leading-relaxed text-slate-500">{DISCLAIMER}</p>
+          <p className="rounded-xl bg-canvas px-4 py-3 text-sm leading-6 text-slate-600">{DISCLAIMER}</p>
         </section>
       )}
     </div>

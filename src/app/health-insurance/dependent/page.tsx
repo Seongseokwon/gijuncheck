@@ -73,10 +73,11 @@ export default function Page() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <article className="space-y-8">
-        <header>
-          <h1 className="text-2xl font-bold">{ROUTES.dependent.label}</h1>
-          <p className="mt-3 text-sm leading-relaxed text-slate-600">
+      <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
+        <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <p className="text-sm font-extrabold text-accent-700">건강보험 피부양자</p>
+          <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">{ROUTES.dependent.label}</h1>
+          <p className="mt-5 text-base leading-8 text-slate-600">
             부양요건 · 소득요건 · 재산요건을 순서대로 판정합니다. 탈락하면 어느
             단계에서 왜 걸리는지 근거 조항과 함께 보여줍니다.
           </p>
@@ -85,15 +86,15 @@ export default function Page() {
         <DependentJudge />
 
         <section>
-          <h2 className="text-lg font-bold">자주 묻는 질문</h2>
-          <dl className="mt-4 space-y-4">
+          <h2 className="text-2xl font-extrabold tracking-tight text-brand-950">자주 묻는 질문</h2>
+          <dl className="mt-6 space-y-4">
             {FAQ.map(({ q, a }) => (
               <div
                 key={q}
-                className="rounded-lg border border-slate-200 bg-white p-4"
+                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
               >
-                <dt className="text-sm font-semibold">{q}</dt>
-                <dd className="mt-2 text-sm leading-relaxed text-slate-600">
+                <dt className="text-base font-extrabold text-brand-950">{q}</dt>
+                <dd className="mt-3 text-base leading-7 text-slate-600">
                   {a}
                 </dd>
               </div>
@@ -102,15 +103,15 @@ export default function Page() {
         </section>
 
         {/* 도구 → 해설 동선. RPM 방어용이므로 빼지 말 것 */}
-        <section>
-          <h2 className="text-sm font-semibold text-slate-500">함께 읽기</h2>
-          <ul className="mt-3 space-y-2 text-sm">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-base font-extrabold text-brand-950">함께 읽기</h2>
+          <ul className="mt-4 space-y-3 text-sm">
             {RELATED.map((g) => (
               <li key={g.path}>
                 {g.ready ? (
                   <a
                     href={g.path}
-                    className="text-slate-600 underline hover:text-slate-900"
+                    className="text-slate-600 underline underline-offset-4 hover:text-accent-700"
                   >
                     {g.label}
                   </a>

@@ -106,7 +106,7 @@ export default function Page() {
         }}
       />
 
-      <article className="space-y-10">
+      <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
         <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
 
         <Section id="direction" title="소급은 양방향이다 — 취득과 상실의 차이">

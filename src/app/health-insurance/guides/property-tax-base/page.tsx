@@ -110,7 +110,7 @@ export default function Page() {
         }}
       />
 
-      <article className="space-y-10">
+      <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
         <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
 
         <Section id="why" title="왜 이걸 먼저 확인해야 하나">

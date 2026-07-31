@@ -13,8 +13,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Card,
   Field,
+  FormCard,
+  FormSection,
   MoneyInput,
   NumberInput,
   ReferenceOnlyNotice,
@@ -72,8 +73,12 @@ export default function VoluntaryComparison() {
 
   return (
     <div className="space-y-8">
-      <Card title="퇴직 후 상황">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <FormCard
+        title="퇴직 후 보험료 비교"
+        description="퇴직 전 보수와 퇴직 후 소득·재산을 기준으로 두 선택지를 비교합니다."
+      >
+        <FormSection number="1" title="퇴직 전 상황을 입력해주세요">
+        <div className="grid gap-5 sm:grid-cols-2">
           <Field label="퇴직 전 12개월 보수월액 평균" hint="세전 월급 평균">
             <MoneyInput value={avgWage} onChange={setAvgWage} />
           </Field>
@@ -105,15 +110,11 @@ export default function VoluntaryComparison() {
             />
           </Field>
         </div>
+        </FormSection>
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900">
-            퇴직 후 연간 소득{' '}
-            <span className="font-normal text-slate-600">
-              (근로·연금은 50% 반영)
-            </span>
-          </h3>
-          <div className="mt-2 grid gap-4 sm:grid-cols-3">
+        <FormSection number="2" title="퇴직 후 소득을 입력해주세요">
+          <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">근로·연금소득은 50%, 사업·금융소득은 100% 반영합니다.</p>
+          <div className="grid gap-5 sm:grid-cols-3">
             <Field label="연금소득 (50%)">
               <MoneyInput
                 value={income.pension}
@@ -133,8 +134,9 @@ export default function VoluntaryComparison() {
               />
             </Field>
           </div>
-        </div>
+        </FormSection>
 
+        <div className="px-5 py-6 sm:px-7 sm:py-7">
         <SubmitButton
           onClick={() => {
             setSubmitted(true);
@@ -143,20 +145,22 @@ export default function VoluntaryComparison() {
         >
           어느 쪽이 유리한지 비교하기
         </SubmitButton>
-      </Card>
+        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.</p>
+        </div>
+      </FormCard>
 
       {submitted && (
         // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
         <div role="status" aria-live="polite">
           {recommendation === 'notEligible' ? (
-            <section className="rounded-lg border border-rose-200 bg-rose-50 p-5">
-              <p className="text-base font-bold text-slate-900">
+            <section className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-xl font-extrabold tracking-tight text-brand-950">
                 임의계속가입을 신청할 수 없습니다
               </p>
               <p className="mt-2 text-sm leading-relaxed text-slate-700">
                 {result.notes[0]}
               </p>
-              <div className="mt-4 rounded-md border border-slate-200 bg-white p-4">
+              <div className="mt-5 rounded-xl bg-canvas p-4">
                 <ResultRow
                   label="지역가입자 보험료"
                   value={won(regional.total)}
@@ -165,8 +169,8 @@ export default function VoluntaryComparison() {
               </div>
             </section>
           ) : (
-            <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
-              <p className="text-lg font-bold text-slate-900">
+            <section className="space-y-5 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
+              <p className="text-xl font-extrabold tracking-tight text-brand-950">
                 {voluntaryWins ? '임의계속가입' : '지역가입자'}가 월{' '}
                 {won(Math.abs(result.monthlySaving))} 유리합니다
                 {/* 비교 결과 강조 */}
@@ -177,10 +181,7 @@ export default function VoluntaryComparison() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <div
                   className={
-                    'rounded-md border p-4 ' +
-                    (voluntaryWins
-                      ? 'border-slate-200 bg-slate-50'
-                      : 'border-emerald-300 bg-emerald-50')
+                    'rounded-xl border border-slate-200 bg-canvas p-5 '
                   }
                 >
                   <p className="text-sm font-semibold text-slate-700">
@@ -190,13 +191,13 @@ export default function VoluntaryComparison() {
                     className={
                       'mt-1 ' +
                       (voluntaryWins
-                        ? 'text-lg text-slate-500'
-                        : 'text-2xl font-bold text-slate-900')
+                        ? 'text-lg text-slate-600'
+                        : 'text-2xl font-extrabold text-brand-950')
                     }
                   >
                     {won(regional.total)}
                   </p>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-sm text-slate-600">
                     소득 {won(regional.incomePortion)} + 재산{' '}
                     {won(regional.propertyPortion)}
                     {regional.propertyGrade &&
@@ -206,10 +207,7 @@ export default function VoluntaryComparison() {
 
                 <div
                   className={
-                    'rounded-md border p-4 ' +
-                    (voluntaryWins
-                      ? 'border-emerald-300 bg-emerald-50'
-                      : 'border-slate-200 bg-slate-50')
+                    'rounded-xl border border-slate-200 bg-canvas p-5 '
                   }
                 >
                   <p className="text-sm font-semibold text-slate-700">
@@ -219,20 +217,20 @@ export default function VoluntaryComparison() {
                     className={
                       'mt-1 ' +
                       (voluntaryWins
-                        ? 'text-2xl font-bold text-slate-900'
-                        : 'text-lg text-slate-500')
+                        ? 'text-2xl font-extrabold text-brand-950'
+                        : 'text-lg text-slate-600')
                     }
                   >
                     {won(voluntary!.total)}
                   </p>
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-sm text-slate-600">
                     재산 미반영 · 보수월액의 절반 부담
                   </p>
                 </div>
               </div>
 
               {voluntaryWins && (
-                <div className="rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3">
+                <div className="rounded-xl border border-slate-200 bg-canvas px-4 py-3">
                   <p className="text-sm text-slate-800">
                     최대 {result.maxMonths}개월 유지하면 총{' '}
                     <strong className="font-bold">
@@ -243,7 +241,7 @@ export default function VoluntaryComparison() {
                 </div>
               )}
 
-              <div className="rounded-md border border-brand-900 bg-brand-900 px-4 py-3">
+              <div className="rounded-xl border border-brand-900 bg-brand-900 px-5 py-4">
                 <p className="text-sm font-semibold text-white">
                   {result.applyDeadlineRule} 신고하세요
                 </p>
@@ -262,7 +260,7 @@ export default function VoluntaryComparison() {
                 ))}
               </ul>
 
-              <p className="text-sm leading-relaxed text-slate-600">
+              <p className="rounded-xl bg-canvas px-4 py-3 text-sm leading-6 text-slate-600">
                 {DISCLAIMER}
               </p>
             </section>

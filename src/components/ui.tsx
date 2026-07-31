@@ -32,32 +32,60 @@ export { won } from '@/lib/format';
  * 비활성처럼 회색으로 보인다. globals.css 의 color-scheme 과 함께 막는다.
  */
 export const inputCls =
-  'w-full rounded-md border border-slate-500 bg-white px-3 py-2 ' +
-  'text-base text-slate-900 placeholder:text-slate-500 sm:text-sm ' +
-  'focus:border-accent-700 focus:outline-none focus:ring-1 focus:ring-accent-700';
+  'min-h-12 w-full rounded-[10px] border border-slate-500 bg-white px-3.5 py-2.5 ' +
+  'text-base text-slate-900 placeholder:text-slate-500 ' +
+  'transition focus:border-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-100';
 
 export function Field({
   label,
   hint,
   children,
 }: {
-  label: string;
-  hint?: string;
+  label: ReactNode;
+  hint?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium text-slate-700">
+      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-bold text-slate-700">
         {label}
         {/*
           text-slate-600 인 이유: slate-400(2.56:1)·slate-500(4.01:1, 14px 미만에서
           4.5:1 기준 미달)는 본문 대비 기준을 통과하지 못한다. slate-600(5.85:1)부터
           통과한다 — 00-brief.md 대비표 및 index3.html(ADR-002)과 동일한 결론.
         */}
-        {hint && <span className="ml-1 text-xs text-slate-600">{hint}</span>}
+        {hint && <InfoTooltip>{hint}</InfoTooltip>}
       </span>
       <div className="mt-1">{children}</div>
     </label>
+  );
+}
+
+/**
+ * 입력 흐름을 끊지 않는 짧은 도움말.
+ *
+ * 마우스에서는 올려보기, 키보드에서는 Tab으로 포커스해 읽을 수 있다. 모바일에서는
+ * 아이콘을 탭하면 포커스가 남아 내용을 확인한다. `aria-label`에 본문을 함께 넣어
+ * 툴팁을 열지 않아도 스크린리더가 설명을 전달한다.
+ */
+export function InfoTooltip({ children }: { children: ReactNode }) {
+  const text = typeof children === 'string' ? children : '입력 도움말';
+
+  return (
+    <span
+      tabIndex={0}
+      role="img"
+      aria-label={`도움말: ${text}`}
+      className="group relative inline-flex h-[18px] w-[18px] shrink-0 cursor-help items-center justify-center rounded-full border border-slate-400 text-[11px] font-bold leading-none text-slate-600 outline-none transition hover:border-accent-700 hover:text-accent-700 focus:border-accent-700 focus:text-accent-700 focus:ring-4 focus:ring-accent-100"
+    >
+      <span aria-hidden>i</span>
+      <span
+        role="tooltip"
+        className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100"
+      >
+        {children}
+      </span>
+    </span>
   );
 }
 
@@ -104,7 +132,7 @@ export function MoneyInput({
         }}
       />
       {showReading && value > 0 && (
-        <p className="mt-1 text-right text-xs text-slate-500">
+        <p className="mt-1.5 text-right text-sm text-slate-600">
           {toKoreanAmount(value)}
         </p>
       )}
@@ -204,10 +232,54 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      {title && (
-        <h2 className="text-base font-semibold text-brand-950">{title}</h2>
-      )}
+    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+      {title && <h2 className="border-b border-slate-200 px-7 py-6 text-xl font-bold tracking-tight text-brand-950">{title}</h2>}
+      <div className="space-y-6 p-7">{children}</div>
+    </section>
+  );
+}
+
+/** index3의 단계형 입력 영역. 판정 도구와 계산기에서 같은 리듬을 쓴다. */
+export function FormSection({
+  number,
+  title,
+  children,
+}: {
+  number: string;
+  title: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="grid grid-cols-[36px_minmax(0,1fr)] gap-4 border-b border-slate-200 px-5 py-7 sm:grid-cols-[44px_minmax(0,1fr)] sm:gap-5 sm:px-7">
+      <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-brand-900 text-sm font-bold text-white sm:h-11 sm:w-11">
+        {number}
+      </span>
+      <div>
+        <h3 className="mt-1 text-lg font-bold tracking-tight text-brand-950">{title}</h3>
+        <div className="mt-5">{children}</div>
+      </div>
+    </section>
+  );
+}
+
+export function FormCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+      <header className="flex items-start justify-between gap-5 border-b border-slate-200 px-5 py-6 sm:px-7">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight text-brand-950">{title}</h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-accent-100 px-3 py-1.5 text-xs font-bold text-accent-700">약 3분</span>
+      </header>
       {children}
     </section>
   );
@@ -224,7 +296,7 @@ export function SubmitButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full min-h-[48px] rounded-md bg-brand-900 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-800"
+      className="min-h-[54px] w-full rounded-xl bg-brand-900 px-5 py-3 text-base font-bold text-white shadow-[0_8px_20px_rgba(23,50,77,.14)] transition hover:bg-brand-800"
     >
       {children}
     </button>

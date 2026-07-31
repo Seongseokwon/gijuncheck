@@ -115,7 +115,7 @@ export default function Page() {
         }}
       />
 
-      <article className="space-y-10">
+      <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
         <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
 
         <Section id="trap" title="사업자등록의 숨은 비용">

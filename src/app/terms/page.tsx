@@ -10,13 +10,16 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <article className="max-w-none space-y-6 text-sm leading-relaxed text-slate-700">
-      <h1 className="text-2xl font-bold text-slate-900">
-        {ROUTES.terms.label}
-      </h1>
+    <article className="mx-auto max-w-3xl space-y-6 px-4 py-12 text-base leading-8 text-slate-700 sm:py-16">
+      <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-sm font-extrabold text-accent-700">정책</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950">
+          {ROUTES.terms.label}
+        </h1>
+      </header>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           1. 서비스의 성격
         </h2>
         <p>
@@ -26,11 +29,11 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           2. 결과의 법적 효력 없음
         </h2>
-        <p className="rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-900">
+        <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
           본 사이트가 제공하는 모든 판정 결과와 계산 금액은{' '}
           <strong>참고용 추정치이며 법적 효력이 없습니다.</strong> 실제 자격
           인정 여부와 부과 금액은 국민건강보험공단의 심사와 처분에 따라
@@ -39,8 +42,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           3. 정보의 정확성과 한계
         </h2>
         <p>
@@ -58,8 +61,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">4. 면책</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">4. 면책</h2>
         <p>
           이용자가 본 사이트의 결과를 근거로 의사결정을 하여 발생한 직접적·간접적
           손해에 대하여 운영자는 책임을 지지 않습니다. 자격 취득·상실 신고, 보험료
@@ -68,8 +71,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           5. 서비스의 변경 및 중단
         </h2>
         <p>
@@ -78,8 +81,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">6. 저작권</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">6. 저작권</h2>
         <p>
           본 사이트가 작성한 해설 콘텐츠의 저작권은 운영자에게 있습니다. 인용 시
           출처를 표기해 주시기 바랍니다. 법령 조문 등 공공저작물은 각 기관의 이용
@@ -87,7 +90,7 @@ export default function Page() {
         </p>
       </section>
 
-      <p className="border-t border-slate-200 pt-4 text-xs text-slate-500">
+      <p className="border-t border-slate-200 pt-6 text-sm text-slate-600">
         시행일 · {SITE.lastVerified}
       </p>
     </article>

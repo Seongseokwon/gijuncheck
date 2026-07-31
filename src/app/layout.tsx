@@ -1,18 +1,11 @@
 import type { Metadata } from 'next';
 import Analytics from '@/components/Analytics';
-import { POLICY_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
+import { POLICY_KEYS, ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
 // 주의: 이 파일에서 SITE 같은 임의 상수를 export 하면 빌드가 실패한다.
 // Next.js App Router 는 layout 파일의 export 필드를 제한한다. → src/lib/site.ts 사용
-
-/** 헤더 네비게이션용 짧은 이름. ROUTES 의 label 은 페이지 제목용이라 길다. */
-const NAV_LABEL: Record<(typeof TOOL_KEYS)[number], string> = {
-  dependent: '피부양자 판정',
-  regionalPremium: '보험료 계산',
-  voluntaryContinuation: '임의계속가입',
-};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -59,7 +52,7 @@ export default function RootLayout({
           지적한 "공공기관 오인" 리스크에 대응한다. design-preview/index3.html
           .service-notice 와 동일한 문구·색(ADR-002).
         */}
-        <div className="border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-xs font-semibold text-amber-900">
+        <div className="border-b border-[#ead9a8] bg-[#fff9e8] px-4 py-1.5 text-center text-xs font-bold text-[#6f4b0c]">
           민간 정보 서비스 · 국민건강보험공단의 공식 판정 화면이 아닙니다
         </div>
 
@@ -74,32 +67,30 @@ export default function RootLayout({
           </div>
         )}
 
-        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4">
+        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+          <div className="mx-auto flex min-h-[68px] max-w-[1120px] items-center justify-between gap-6 px-4">
             <a
               href={ROUTES.home.path}
               aria-label="홈"
-              className="inline-flex items-center gap-2 text-lg font-extrabold tracking-tight text-brand-950"
+              className="inline-flex min-h-[44px] items-center text-brand-950"
             >
-              <span
-                className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-900 text-sm text-white"
-                aria-hidden
-              >
-                ✓
+              <span className="relative block h-9 w-9" aria-hidden>
+                <span
+                  className="absolute left-0 top-0 h-6 w-7 bg-brand-900"
+                  style={{ clipPath: 'polygon(0 0, 100% 0, 100% 34%, 48% 34%, 48% 100%, 0 100%)' }}
+                />
+                <span
+                  className="absolute bottom-0 right-0 h-6 w-7 bg-accent-600"
+                  style={{ clipPath: 'polygon(52% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 52% 66%)' }}
+                />
               </span>
             </a>
             <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
-              {TOOL_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
-                <a
-                  key={k}
-                  href={ROUTES[k].path}
-                  className="min-h-[44px] inline-flex items-center hover:text-brand-900"
-                >
-                  {NAV_LABEL[k]}
-                </a>
-              ))}
+              <a href="/#guides" className="min-h-[44px] inline-flex items-center hover:text-brand-900">가이드</a>
+              <a href="/#journey" className="min-h-[44px] inline-flex items-center hover:text-brand-900">이용 방법</a>
+              <a href="/#judge" className="min-h-[44px] inline-flex items-center hover:text-brand-900">피부양자 판정</a>
               <a
-                href={ROUTES.dependent.path}
+                href="/#judge"
                 className="min-h-[44px] inline-flex items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
               >
                 내 자격 확인
@@ -108,10 +99,10 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
+        <main className="w-full">{children}</main>
 
-        <footer className="mt-16 border-t border-slate-200 bg-white">
-          <div className="mx-auto max-w-3xl px-4 py-6 text-sm leading-relaxed text-slate-600">
+        <footer className="border-t border-slate-200 bg-white">
+          <div className="mx-auto max-w-[1120px] px-4 py-10 text-sm leading-relaxed text-slate-600">
             <p>
               본 사이트의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
               최종 확인은 국민건강보험공단(1577-1000)에 문의하시기 바랍니다.

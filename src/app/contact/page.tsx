@@ -11,17 +11,16 @@ const CONTACT_EMAIL = 'devswseong@gmail.com';
 
 export default function Page() {
   return (
-    <article className="max-w-none space-y-6 text-sm leading-relaxed text-slate-700">
-      <h1 className="text-2xl font-bold text-slate-900">
-        {ROUTES.contact.label}
-      </h1>
+    <article className="mx-auto max-w-3xl space-y-8 px-4 py-12 text-base leading-8 text-slate-700 sm:py-16">
+      <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-sm font-extrabold text-accent-700">도움말</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950">
+          {ROUTES.contact.label}
+        </h1>
+        <p className="mt-4">서비스 문의, 계산 오류 신고, 제도 개정 반영 요청은 아래 이메일로 보내주시기 바랍니다.</p>
+      </header>
 
-      <p>
-        서비스 문의, 계산 오류 신고, 제도 개정 반영 요청은 아래 이메일로
-        보내주시기 바랍니다.
-      </p>
-
-      <p className="rounded-md border border-slate-200 bg-white p-4">
+      <p className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <a
           href={`mailto:${CONTACT_EMAIL}`}
           className="text-base font-semibold text-slate-900 underline"
@@ -30,23 +29,23 @@ export default function Page() {
         </a>
       </p>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           계산 오류를 발견하셨다면
         </h2>
         <p>
           이 사이트의 가치는 정확성입니다. 오류 신고는 가장 반가운 메일입니다.
           가능하면 다음을 함께 알려주세요.
         </p>
-        <ul className="ml-4 list-disc space-y-1">
+        <ul className="mt-4 ml-5 list-disc space-y-2">
           <li>어떤 도구인지 (피부양자 판정 / 보험료 계산 / 임의계속가입 비교)</li>
           <li>입력한 값</li>
           <li>본 사이트의 결과와 공단에서 확인한 실제 값</li>
         </ul>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           답변드릴 수 없는 것
         </h2>
         <p>

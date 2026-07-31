@@ -13,13 +13,16 @@ const CONTACT_EMAIL = 'devswseong@gmail.com';
 
 export default function Page() {
   return (
-    <article className="prose-sm max-w-none space-y-6 text-sm leading-relaxed text-slate-700">
-      <h1 className="text-2xl font-bold text-slate-900">
-        {ROUTES.privacy.label}
-      </h1>
+    <article className="prose-sm mx-auto max-w-3xl space-y-6 px-4 py-12 text-base leading-8 text-slate-700 sm:py-16">
+      <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p className="text-sm font-extrabold text-accent-700">정책</p>
+        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950">
+          {ROUTES.privacy.label}
+        </h1>
+      </header>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           1. 수집하는 개인정보
         </h2>
         <p>
@@ -34,8 +37,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           2. 쿠키 및 광고
         </h2>
         <p>
@@ -70,8 +73,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           3. 접속 통계
         </h2>
         <p>
@@ -84,21 +87,21 @@ export default function Page() {
           어떤 도구가 실제로 사용되는지 파악하기 위해 다음과 같은 익명 이벤트를
           함께 수집합니다.
         </p>
-        <ul className="ml-4 list-disc space-y-1">
+        <ul className="ml-5 list-disc space-y-2">
           <li>판정 결과가 자격 인정인지 탈락인지, 탈락이라면 어느 요건인지</li>
           <li>선택한 가족관계, 사업자등록 여부</li>
           <li>보험료 계산에서 상한·하한이 적용되었는지</li>
           <li>임의계속가입 비교의 결론</li>
         </ul>
-        <p className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <p className="rounded-xl border border-slate-200 bg-canvas p-4">
           <strong>입력하신 소득·재산 금액과 나이는 전송되지 않습니다.</strong>{' '}
           수집하는 것은 위와 같은 참·거짓 값과 선택 항목뿐이며, 금액은 어떤
           형태로도 서버나 분석 도구로 전달되지 않습니다.
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">
           4. 개인정보의 제3자 제공
         </h2>
         <p>
@@ -106,8 +109,8 @@ export default function Page() {
         </p>
       </section>
 
-      <section className="space-y-2">
-        <h2 className="text-base font-semibold text-slate-900">5. 문의</h2>
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-xl font-extrabold text-brand-950">5. 문의</h2>
         <p>
           개인정보 처리에 관한 문의는{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
@@ -117,7 +120,7 @@ export default function Page() {
         </p>
       </section>
 
-      <p className="border-t border-slate-200 pt-4 text-xs text-slate-500">
+      <p className="border-t border-slate-200 pt-6 text-sm text-slate-600">
         시행일 · {SITE.lastVerified}
       </p>
     </article>

@@ -13,8 +13,9 @@
 
 import { useMemo, useState } from 'react';
 import {
-  Card,
   Field,
+  FormCard,
+  FormSection,
   MoneyInput,
   NumberInput,
   Select,
@@ -28,7 +29,6 @@ import {
   type JudgeStep,
   type Relation,
 } from '@/lib/dependent/types';
-import { DISCLAIMER } from '@/lib/constants/2026';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 
@@ -87,8 +87,12 @@ export default function DependentJudge() {
   return (
     <div className="space-y-8">
       {/* ---------- 입력 ---------- */}
-      <Card title="대상자 정보">
-        <div className="grid gap-4 sm:grid-cols-2">
+      <FormCard
+        title="피부양자 자격 확인"
+        description="관계·소득·재산 정보를 차례로 입력하면 적용 기준과 근거를 함께 확인할 수 있습니다."
+      >
+        <FormSection number="1" title="누구를 피부양자로 등록하나요?">
+          <div className="grid gap-5 sm:grid-cols-2">
           <Field label="가입자와의 관계">
             <Select
               value={input.relation}
@@ -159,13 +163,14 @@ export default function DependentJudge() {
               />
             </Field>
           )}
-        </div>
+          </div>
+        </FormSection>
 
-        <div>
-          <h3 className="text-sm font-semibold text-slate-900">
-            연간 소득 <span className="font-normal text-slate-400">(원)</span>
-          </h3>
-          <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <FormSection number="2" title="연간 소득을 입력해주세요">
+          <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
+            사업·근로·공적연금·금융·기타소득을 입력합니다. 개인연금은 포함하지 않습니다.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {INCOME_FIELDS.map((f) => (
               <Field key={f.key} label={f.label} hint={f.hint}>
                 <MoneyInput
@@ -175,12 +180,14 @@ export default function DependentJudge() {
               </Field>
             ))}
           </div>
-          <p className="mt-2 text-xs text-slate-500">
-            합산소득 {toManwon(result.totalIncome)}
+          <p className="mt-5 flex items-center justify-between rounded-[11px] bg-canvas px-4 py-3 text-sm text-slate-600">
+            <span>현재 합산소득</span>
+            <strong className="text-base font-extrabold text-brand-950">{toManwon(result.totalIncome)}</strong>
           </p>
-        </div>
+        </FormSection>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <FormSection number="3" title="사업자등록과 재산을 확인해주세요">
+          <div className="grid gap-5 sm:grid-cols-2">
           <Field label="사업자등록">
             <Select
               value={input.businessRegistered ? 'y' : 'n'}
@@ -198,24 +205,30 @@ export default function DependentJudge() {
               onChange={(v) => set('propertyTaxBase', v)}
             />
           </Field>
-        </div>
+          </div>
+        </FormSection>
 
-        <SubmitButton
-          onClick={() => {
-            setSubmitted(true);
-            // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
-            // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
-            track('judge_complete', {
-              eligible: result.eligible,
-              failed_at: result.failedAt,
-              relation: input.relation,
-              business_registered: input.businessRegistered,
-            });
-          }}
-        >
-          자격 판정하기
-        </SubmitButton>
-      </Card>
+        <div className="px-5 py-6 sm:px-7 sm:py-7">
+          <SubmitButton
+            onClick={() => {
+              setSubmitted(true);
+              // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
+              // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
+              track('judge_complete', {
+                eligible: result.eligible,
+                failed_at: result.failedAt,
+                relation: input.relation,
+                business_registered: input.businessRegistered,
+              });
+            }}
+          >
+            내 자격 판정하기
+          </SubmitButton>
+          <p className="mt-3 text-center text-sm text-slate-600">
+            입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.
+          </p>
+        </div>
+      </FormCard>
 
       {/*
         ---------- 결과 ----------
@@ -229,16 +242,24 @@ export default function DependentJudge() {
           // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
           role="status"
           aria-live="polite"
-          className="rounded-lg border border-slate-200 bg-slate-50 p-5"
+          className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
         >
-          <p className="text-lg font-bold text-brand-950">
+          <div className="border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
+          <p className="text-xl font-extrabold tracking-tight text-brand-950">
             {result.eligible
               ? '피부양자 자격이 인정될 것으로 보입니다'
               : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
           </p>
 
+          <p className="mt-4 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-700">
+            입력한 조건과 2026년 기준으로 계산한 참고 결과입니다.{' '}
+            <strong className="font-semibold text-brand-950">
+              최종 자격은 국민건강보험공단 심사에 따라 결정됩니다.
+            </strong>
+          </p>
+
           {/* 입력값 요약 — 결론과 같은 시야에 둔다 (ADR-001 결과 화면 순서 결정) */}
-          <p className="mt-2 text-sm text-slate-600">
+          <p className="mt-4 text-sm text-slate-600">
             확인에 사용한 입력 · 합산소득{' '}
             <strong className="font-semibold text-slate-900">
               {toManwon(result.totalIncome)}
@@ -249,11 +270,12 @@ export default function DependentJudge() {
             </strong>
           </p>
 
-          <ol className="mt-4 space-y-3">
+          </div>
+          <ol className="space-y-4 px-5 py-6 sm:px-7">
             {result.steps.map((s) => (
               <li
                 key={s.step}
-                className="rounded-md border border-slate-200 bg-white p-3"
+                className="rounded-xl border border-slate-200 bg-white p-4"
               >
                 <div className="flex items-center gap-2">
                   <span
@@ -295,15 +317,12 @@ export default function DependentJudge() {
           {!result.eligible && ROUTES.regionalPremium.ready && (
             <a
               href={`${ROUTES.regionalPremium.path}?income=${result.totalIncome}&property=${input.propertyTaxBase}`}
-              className="mt-4 block min-h-[44px] rounded-md bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
+              className="mx-5 mb-6 block min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800 sm:mx-7"
             >
               그러면 보험료는 얼마인가요 →
             </a>
           )}
 
-          <p className="mt-4 text-sm leading-relaxed text-slate-600">
-            {DISCLAIMER}
-          </p>
         </section>
       )}
     </div>
