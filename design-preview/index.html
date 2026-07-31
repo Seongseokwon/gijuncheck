@@ -744,10 +744,12 @@
       grid-template-columns: 54px 1fr;
       gap: 17px;
       padding: 28px;
-      background: var(--green-100);
+      background: linear-gradient(135deg, var(--sky-50), #eef8f7);
     }
 
-    .result.fail .result-summary { background: var(--red-100); }
+    .result.fail .result-summary {
+      background: linear-gradient(135deg, var(--sky-50), #fff6f7);
+    }
 
     .result-symbol {
       display: grid;
@@ -755,13 +757,13 @@
       height: 52px;
       place-items: center;
       border-radius: 16px;
-      background: var(--green-700);
+      background: var(--navy-900);
       color: white;
       font-size: 24px;
       font-weight: 900;
     }
 
-    .result.fail .result-symbol { background: var(--red-700); }
+    .result.fail .result-symbol { background: var(--navy-900); }
 
     .result-summary h3 {
       margin: 0;
@@ -875,7 +877,164 @@
     .basis {
       margin: 18px 0 0;
       color: var(--slate-500);
-      font-size: 11px;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .basis a, .evidence-link {
+      color: var(--teal-700);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .cite {
+      display: inline-block;
+      margin-left: 4px;
+      color: var(--teal-700);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .evidence-card {
+      margin-top: 18px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      border-radius: 14px;
+      background: white;
+    }
+
+    .evidence-card summary {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 15px;
+      color: var(--navy-950);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 800;
+      list-style: none;
+    }
+
+    .evidence-card summary::-webkit-details-marker { display: none; }
+    .evidence-card summary::after {
+      content: "+";
+      color: var(--teal-700);
+      font-size: 20px;
+    }
+    .evidence-card[open] summary::after { content: "−"; }
+
+    .evidence-content {
+      padding: 0 15px 15px;
+      color: var(--slate-600);
+      font-size: 14px;
+    }
+
+    .calc-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 9px 0;
+      border-top: 1px solid var(--slate-100);
+    }
+
+    .calc-line strong {
+      color: var(--navy-950);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .result-tools a, .result-tools button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border: 1px solid var(--slate-300);
+      border-radius: 9px;
+      background: white;
+      color: var(--navy-900);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+
+    .result-tools a:hover, .result-tools button:hover {
+      border-color: var(--teal-700);
+    }
+
+    .source-box {
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid #c4e6e4;
+      border-radius: 12px;
+      background: #f5fbfa;
+    }
+
+    .source-box strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--navy-950);
+      font-size: 13px;
+    }
+
+    .source-box p {
+      margin: 0 0 9px;
+      color: var(--slate-600);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .guide-band {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .guide-card {
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border: 1px solid var(--slate-200);
+      border-radius: 16px;
+      background: white;
+      text-decoration: none;
+      box-shadow: var(--shadow-sm);
+      transition: transform .16s ease, border-color .16s ease;
+    }
+
+    .guide-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--teal-700);
+    }
+
+    .guide-card small {
+      color: var(--teal-700);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .guide-card strong {
+      margin-top: 10px;
+      color: var(--navy-950);
+      font-size: 16px;
+    }
+
+    .guide-card span {
+      margin-top: 7px;
+      color: var(--slate-500);
+      font-size: 13px;
+      line-height: 1.55;
     }
 
     footer {
@@ -947,6 +1106,7 @@
       .hero-panel { padding: 22px; }
       .section { padding: 62px 0; }
       .scenario-grid { grid-template-columns: 1fr; }
+      .guide-band { grid-template-columns: 1fr; }
       .scenario { min-height: auto; }
       .scenario-icon { margin-bottom: 16px; }
       .journey { grid-template-columns: 1fr; }
@@ -981,6 +1141,17 @@
       .footer-meta { text-align: left; }
       .preview-chip { display: none; }
     }
+
+    @media print {
+      .service-notice, .topbar, .hero, .scenario-grid, #journey,
+      #guides, .form-card, .side-card, footer, .preview-chip,
+      .result-tools, .section-head { display: none !important; }
+      body, .section.white { background: white; }
+      #judge { padding: 0; }
+      .tool-wrap { display: block; }
+      .result { display: block !important; border: 0; box-shadow: none; }
+      .result-body { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -995,6 +1166,7 @@
       </a>
       <nav class="nav-links" aria-label="주요 메뉴">
         <a href="#journey">이용 방법</a>
+        <a href="#guides">가이드</a>
         <a href="#judge">피부양자 판정</a>
         <a class="nav-cta" href="#judge">내 자격 확인</a>
       </nav>
@@ -1112,6 +1284,33 @@
             <strong>임의계속가입 비교</strong>
             <p>지역보험료 기준 검증이 끝난 뒤 비교 기능을 공개합니다.</p>
           </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section white" id="guides" aria-labelledby="guides-title">
+      <div class="shell">
+        <div class="section-head">
+          <span class="section-label">질문별 가이드</span>
+          <h2 id="guides-title">판정 전에 많이 묻는 질문</h2>
+          <p>조항 번호보다 실제로 궁금해하는 질문을 먼저 보여주고, 각 글에서 공식 근거로 이어집니다.</p>
+        </div>
+        <div class="guide-band">
+          <a class="guide-card" href="#judge">
+            <small>재산요건 · 시행령 제41조</small>
+            <strong>재산세 과세표준은 어디서 확인하나요?</strong>
+            <span>공시가격·실거래가와 다른 과세표준을 확인하는 방법입니다.</span>
+          </a>
+          <a class="guide-card" href="#judge">
+            <small>소득요건 · 별표1의2</small>
+            <strong>사업자등록을 하면 바로 탈락하나요?</strong>
+            <span>등록 여부와 실제 사업소득이 함께 적용되는 기준을 설명합니다.</span>
+          </a>
+          <a class="guide-card" href="#judge">
+            <small>자격상실 · 국민건강보험법</small>
+            <strong>피부양자 자격은 언제 상실되나요?</strong>
+            <span>자격이 바뀌는 시점과 지역보험료 확인 순서를 안내합니다.</span>
+          </a>
         </div>
       </div>
     </section>
@@ -1250,19 +1449,39 @@
                   <div class="check-row">
                     <span class="check-dot">✓</span>
                     <strong>부양요건</strong>
-                    <span>선택한 관계와 동거 조건을 충족합니다.</span>
+                    <span>선택한 관계와 동거 조건을 충족합니다. <span class="cite">[별표1의2 제3호]</span></span>
                   </div>
                   <div class="check-row" id="income-row">
                     <span class="check-dot" id="income-dot">✓</span>
                     <strong>소득요건</strong>
-                    <span id="income-message">연간 합산소득이 기준 이내입니다.</span>
+                    <span id="income-message">연간 합산소득이 기준 이내입니다. <span class="cite">[별표1의2 제2호]</span></span>
                   </div>
                   <div class="check-row" id="property-row">
                     <span class="check-dot" id="property-dot">✓</span>
                     <strong>재산요건</strong>
-                    <span id="property-message">재산세 과세표준이 기준 이내입니다.</span>
+                    <span id="property-message">재산세 과세표준이 기준 이내입니다. <span class="cite">[시행령 제41조]</span></span>
                   </div>
-                  <p class="basis">적용 기준 · 국민건강보험법 시행규칙 별표 1의2 · 2026년 기준 · 최종 확인: 국민건강보험공단</p>
+                  <details class="evidence-card">
+                    <summary>계산 과정과 적용 기준 보기</summary>
+                    <div class="evidence-content" id="calc-detail">
+                      <div class="calc-line"><span>연간 합산소득</span><strong>0만원</strong></div>
+                      <div class="calc-line"><span>재산세 과세표준</span><strong>0만원</strong></div>
+                      <div class="calc-line"><span>사업자등록 상태</span><strong>없음</strong></div>
+                      <p>
+                        이 화면은 입력값을 2026년 예시 기준과 비교합니다.
+                        실제 서비스에서는 검증된 판정 함수의 단계별 결과를 그대로 표시합니다.
+                      </p>
+                    </div>
+                  </details>
+                  <div class="result-tools">
+                    <a href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">법령 원문 보기</a>
+                    <button type="button" id="print-btn">인쇄 · PDF 저장</button>
+                  </div>
+                  <p class="basis">
+                    적용 기준 · 국민건강보험법 시행규칙 별표 1의2 · 2026년 기준<br>
+                    이 결과는 참고용이며 최종 자격은
+                    <a href="https://www.nhis.or.kr/" target="_blank" rel="noopener">국민건강보험공단</a>에서 확인하세요.
+                  </p>
                 </div>
                 <aside class="next-box">
                   <h4>다음으로 무엇을 할까요?</h4>
@@ -1303,6 +1522,11 @@
                 <p>최종 자격은 국민건강보험공단에서 확인해야 합니다.</p>
               </div>
             </div>
+            <div class="source-box">
+              <strong>근거를 직접 확인할 수 있습니다</strong>
+              <p>판정 단계마다 적용 조항을 표시하고 공식 법령 원문으로 연결합니다.</p>
+              <a class="evidence-link" href="https://www.law.go.kr/" target="_blank" rel="noopener">국가법령정보센터 열기 →</a>
+            </div>
           </aside>
         </div>
       </div>
@@ -1331,6 +1555,11 @@
   <div class="preview-chip">DESIGN PREVIEW · 실제 서비스 아님</div>
 
   <script>
+    const INCOME_LIMIT = 20000000;
+    const PROPERTY_SAFE = 540000000;
+    const PROPERTY_UPPER = 900000000;
+    const PROPERTY_INCOME_SUBLIMIT = 10000000;
+
     const moneyInputs = [
       document.querySelector('#business-income'),
       document.querySelector('#wage-income'),
@@ -1383,8 +1612,11 @@
       const property = digits(document.querySelector('#property').value);
       const registered = document.querySelector('#registered').value === 'yes';
 
-      const incomeFailed = totalIncome > 20000000 || (registered && businessIncome > 0);
-      const propertyFailed = property > 900000000;
+      const incomeFailed =
+        totalIncome > INCOME_LIMIT || (registered && businessIncome > 0);
+      const propertyFailed =
+        property > PROPERTY_UPPER ||
+        (property > PROPERTY_SAFE && totalIncome > PROPERTY_INCOME_SUBLIMIT);
       const failed = incomeFailed || propertyFailed;
 
       const result = document.querySelector('#result');
@@ -1400,6 +1632,7 @@
       const nextCopy = document.querySelector('#next-copy');
       const nextAction = document.querySelector('#next-action');
       const inputSummaryText = document.querySelector('#input-summary-text');
+      const calcDetail = document.querySelector('#calc-detail');
 
       result.classList.toggle('fail', failed);
       result.classList.add('visible');
@@ -1430,22 +1663,46 @@
         '만원 · 사업자등록 ' + (registered ? '있음' : '없음');
 
       if (registered && businessIncome > 0) {
-        incomeMessage.textContent = '사업자등록 상태에서 사업소득이 입력되어 요건을 충족하지 못합니다.';
-      } else if (totalIncome > 20000000) {
-        const excess = Math.round((totalIncome - 20000000) / 10000);
-        incomeMessage.textContent =
-          '합산소득이 예시 기준을 ' + excess.toLocaleString('ko-KR') + '만원 초과합니다.';
+        incomeMessage.innerHTML =
+          '사업자등록 상태에서 사업소득이 입력되어 요건을 충족하지 못합니다. <span class="cite">[별표1의2 제2호]</span>';
+      } else if (totalIncome > INCOME_LIMIT) {
+        const excess = Math.round((totalIncome - INCOME_LIMIT) / 10000);
+        incomeMessage.innerHTML =
+          '합산소득이 예시 기준을 ' + excess.toLocaleString('ko-KR') +
+          '만원 초과합니다. <span class="cite">[별표1의2 제2호]</span>';
       } else {
-        incomeMessage.textContent = '연간 합산소득이 예시 기준 이내입니다.';
+        incomeMessage.innerHTML =
+          '연간 합산소득이 예시 기준 이내입니다. <span class="cite">[별표1의2 제2호]</span>';
       }
 
-      propertyMessage.textContent = propertyFailed
-        ? '재산세 과세표준이 예시 상한을 초과합니다.'
-        : '재산세 과세표준이 예시 기준 이내입니다.';
+      if (property > PROPERTY_UPPER) {
+        propertyMessage.innerHTML =
+          '재산세 과세표준이 9억원을 초과합니다. <span class="cite">[시행령 제41조]</span>';
+      } else if (property > PROPERTY_SAFE && totalIncome > PROPERTY_INCOME_SUBLIMIT) {
+        propertyMessage.innerHTML =
+          '과세표준 5.4억~9억원 구간에서 연소득 1,000만원 기준을 초과합니다. <span class="cite">[시행령 제41조]</span>';
+      } else {
+        propertyMessage.innerHTML =
+          '재산세 과세표준과 해당 소득 구간이 예시 기준 이내입니다. <span class="cite">[시행령 제41조]</span>';
+      }
+
+      calcDetail.innerHTML =
+        '<div class="calc-line"><span>연간 합산소득</span><strong>' +
+        Math.round(totalIncome / 10000).toLocaleString('ko-KR') +
+        '만원</strong></div>' +
+        '<div class="calc-line"><span>재산세 과세표준</span><strong>' +
+        Math.round(property / 10000).toLocaleString('ko-KR') +
+        '만원</strong></div>' +
+        '<div class="calc-line"><span>사업자등록 상태</span><strong>' +
+        (registered ? '있음' : '없음') +
+        '</strong></div>' +
+        '<p>소득요건은 연 2,000만원, 재산요건은 과세표준 5.4억원과 9억원 구간을 기준으로 비교한 디자인용 예시입니다.</p>';
 
       result.focus({ preventScroll: true });
       result.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
+
+    document.querySelector('#print-btn').addEventListener('click', () => window.print());
   </script>
 </body>
 </html>
