@@ -69,6 +69,17 @@
       backdrop-filter: blur(14px);
     }
 
+    .service-notice {
+      border-bottom: 1px solid #ead9a8;
+      background: #fff9e8;
+      color: #6f4b0c;
+      font-size: 12px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .service-notice .shell { padding-block: 7px; }
+
     .nav {
       min-height: 68px;
       display: flex;
@@ -463,6 +474,28 @@
       font-size: 14px;
     }
 
+    .availability {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 14px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: var(--green-100);
+      color: var(--green-700);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .journey-step.pending { background: #fafafa; }
+    .journey-step.pending .journey-num {
+      background: var(--slate-200);
+      color: var(--slate-600);
+    }
+    .journey-step.pending .availability {
+      background: var(--slate-100);
+      color: var(--slate-600);
+    }
+
     .tool-wrap {
       display: grid;
       grid-template-columns: minmax(0, 1fr) 300px;
@@ -743,6 +776,32 @@
       font-size: 14px;
     }
 
+    .result-caveat {
+      margin: 14px 0 0;
+      padding: 11px 13px;
+      border: 1px solid rgba(23, 50, 77, .18);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .72);
+      color: var(--navy-950) !important;
+      font-size: 13px !important;
+      font-weight: 700;
+    }
+
+    .input-summary {
+      margin-bottom: 20px;
+      padding: 16px;
+      border: 1px solid var(--slate-200);
+      border-radius: 12px;
+      background: var(--sky-50);
+    }
+
+    .input-summary h4 { margin-bottom: 8px; }
+    .input-summary p {
+      margin: 0;
+      color: var(--slate-600);
+      font-size: 13px;
+    }
+
     .result-body {
       display: grid;
       grid-template-columns: 1fr 260px;
@@ -925,6 +984,9 @@
   </style>
 </head>
 <body>
+  <div class="service-notice">
+    <div class="shell">민간 정보 서비스 · 국민건강보험공단의 공식 판정 화면이 아닙니다</div>
+  </div>
   <header class="topbar">
     <div class="shell nav">
       <a class="brand" href="#top" aria-label="사대보험 홈">
@@ -934,7 +996,6 @@
       <nav class="nav-links" aria-label="주요 메뉴">
         <a href="#journey">이용 방법</a>
         <a href="#judge">피부양자 판정</a>
-        <a href="#judge">보험료 계산</a>
         <a class="nav-cta" href="#judge">내 자격 확인</a>
       </nav>
     </div>
@@ -946,7 +1007,7 @@
         <div>
           <div class="eyebrow">
             <span class="eyebrow-dot" aria-hidden="true"></span>
-            2026년 건강보험 기준 반영
+            2026년 기준 · 참고용 모의 확인
           </div>
           <h1>피부양자 자격,<br>혼자 판단하기 어렵다면</h1>
           <p class="hero-copy">
@@ -961,6 +1022,7 @@
             <span>약 3분</span>
             <span>회원가입 없음</span>
             <span>입력 정보 저장 안 함</span>
+            <span>판정 근거 표시</span>
           </div>
         </div>
 
@@ -1003,7 +1065,7 @@
           <button class="scenario active" type="button" data-relation="parent">
             <span class="scenario-icon" aria-hidden="true">퇴</span>
             <strong>퇴직을 앞두고 있어요</strong>
-            <span>피부양자 가능 여부부터 임의계속가입 비교까지 확인합니다.</span>
+            <span>현재는 피부양자 가능 여부와 적용 근거를 확인합니다.</span>
           </button>
           <button class="scenario" type="button" data-relation="self">
             <span class="scenario-icon" aria-hidden="true">사</span>
@@ -1027,25 +1089,28 @@
     <section class="section" id="journey" aria-labelledby="journey-title">
       <div class="shell">
         <div class="section-head">
-          <span class="section-label">한 번에 이어서</span>
-          <h2 id="journey-title">판정에서 다음 행동까지</h2>
-          <p>세 개의 도구를 따로 찾을 필요 없이 결과에 따라 다음 확인 단계로 자연스럽게 이어집니다.</p>
+          <span class="section-label">제공 범위</span>
+          <h2 id="journey-title">지금 확인할 수 있는 도구</h2>
+          <p>검증이 끝난 범위만 이용할 수 있습니다. 준비 중인 계산 도구는 결과를 제공하지 않습니다.</p>
         </div>
         <div class="journey">
           <article class="journey-step">
             <span class="journey-num">1</span>
+            <span class="availability">이용 가능</span>
             <strong>피부양자 자격판정</strong>
             <p>관계·소득·재산 세 단계에서 자격 가능성과 탈락 이유를 확인합니다.</p>
           </article>
-          <article class="journey-step">
+          <article class="journey-step pending" aria-disabled="true">
             <span class="journey-num">2</span>
+            <span class="availability">검증 완료 후 공개</span>
             <strong>지역보험료 계산</strong>
-            <p>피부양자가 어렵다면 현재 소득과 재산으로 예상 보험료를 계산합니다.</p>
+            <p>공단 기준 대조가 끝날 때까지 접근과 계산 결과 제공을 중단합니다.</p>
           </article>
-          <article class="journey-step">
+          <article class="journey-step pending" aria-disabled="true">
             <span class="journey-num">3</span>
+            <span class="availability">검증 완료 후 공개</span>
             <strong>임의계속가입 비교</strong>
-            <p>퇴직 전 보험료와 지역보험료를 비교해 더 유리한 선택을 확인합니다.</p>
+            <p>지역보험료 기준 검증이 끝난 뒤 비교 기능을 공개합니다.</p>
           </article>
         </div>
       </div>
@@ -1172,10 +1237,15 @@
                 <div>
                   <h3 id="result-title">피부양자 자격이 인정될 가능성이 높습니다</h3>
                   <p id="result-description">입력한 정보를 기준으로 부양·소득·재산요건을 모두 충족합니다.</p>
+                  <p class="result-caveat">참고용 모의 결과이며, 최종 자격은 국민건강보험공단의 심사에 따라 결정됩니다.</p>
                 </div>
               </div>
               <div class="result-body">
                 <div>
+                  <div class="input-summary">
+                    <h4>확인에 사용한 입력</h4>
+                    <p id="input-summary-text">연간 소득과 재산세 과세표준 입력값을 기준으로 확인했습니다.</p>
+                  </div>
                   <h4>단계별 판정 근거</h4>
                   <div class="check-row">
                     <span class="check-dot">✓</span>
@@ -1192,7 +1262,7 @@
                     <strong>재산요건</strong>
                     <span id="property-message">재산세 과세표준이 기준 이내입니다.</span>
                   </div>
-                  <p class="basis">적용 기준 · 국민건강보험법 시행규칙 별표 1의2 · 2026년 기준</p>
+                  <p class="basis">적용 기준 · 국민건강보험법 시행규칙 별표 1의2 · 2026년 기준 · 최종 확인: 국민건강보험공단</p>
                 </div>
                 <aside class="next-box">
                   <h4>다음으로 무엇을 할까요?</h4>
@@ -1329,6 +1399,7 @@
       const propertyMessage = document.querySelector('#property-message');
       const nextCopy = document.querySelector('#next-copy');
       const nextAction = document.querySelector('#next-action');
+      const inputSummaryText = document.querySelector('#input-summary-text');
 
       result.classList.toggle('fail', failed);
       result.classList.add('visible');
@@ -1343,8 +1414,8 @@
           ? '소득요건을 충족하지 못할 가능성이 높습니다'
           : '재산요건을 충족하지 못할 가능성이 높습니다';
         description.textContent = '입력값을 기준으로 자격 유지가 어려운 조건이 확인됐습니다.';
-        nextCopy.textContent = '피부양자가 어렵다면 예상 지역보험료를 이어서 확인할 수 있습니다.';
-        nextAction.textContent = '예상 지역보험료 확인하기 →';
+        nextCopy.textContent = '입력값과 적용 기준을 다시 확인한 뒤 국민건강보험공단에 최종 자격을 문의하세요.';
+        nextAction.textContent = '입력 내용 다시 확인하기';
       } else {
         symbol.textContent = '✓';
         title.textContent = '피부양자 자격이 인정될 가능성이 높습니다';
@@ -1352,6 +1423,11 @@
         nextCopy.textContent = '실제 등록 전 공단에서 최종 자격을 확인하세요.';
         nextAction.textContent = '입력 내용 다시 확인하기';
       }
+
+      inputSummaryText.textContent =
+        '연간 합산소득 ' + Math.round(totalIncome / 10000).toLocaleString('ko-KR') +
+        '만원 · 재산세 과세표준 ' + Math.round(property / 10000).toLocaleString('ko-KR') +
+        '만원 · 사업자등록 ' + (registered ? '있음' : '없음');
 
       if (registered && businessIncome > 0) {
         incomeMessage.textContent = '사업자등록 상태에서 사업소득이 입력되어 요건을 충족하지 못합니다.';
