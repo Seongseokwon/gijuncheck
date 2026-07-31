@@ -23,7 +23,7 @@ export default function Page() {
           1. 수집하는 개인정보
         </h2>
         <p>
-          {SITE.name}은 <strong>회원가입 절차가 없으며, 이용자를 식별할 수 있는
+          본 서비스는 <strong>회원가입 절차가 없으며, 이용자를 식별할 수 있는
           개인정보를 수집하지 않습니다.</strong>
         </p>
         <p>

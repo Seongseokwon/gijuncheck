@@ -49,7 +49,6 @@ export function guideJsonLd({
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         datePublished: published,
         dateModified: SITE.lastVerified,
-        publisher: { '@type': 'Organization', name: SITE.name },
         inLanguage: 'ko',
       },
       {

@@ -2,7 +2,7 @@
   "name": "sabohum",
   "version": "0.1.0",
   "private": true,
-  "description": "사대보험 — 소득이 바뀔 때 내 사회보험이 어떻게 바뀌는지 판정해주는 도구",
+  "description": "건강보험 피부양자 자격을 관계·소득·재산 기준으로 확인하는 도구",
   "engines": {
     "node": ">=20.9.0"
   },

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { ROUTES } from '@/lib/routes';
-import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: ROUTES.contact.label,
@@ -18,8 +17,8 @@ export default function Page() {
       </h1>
 
       <p>
-        {SITE.name}에 대한 문의, 계산 오류 신고, 제도 개정 반영 요청은 아래
-        이메일로 보내주시기 바랍니다.
+        서비스 문의, 계산 오류 신고, 제도 개정 반영 요청은 아래 이메일로
+        보내주시기 바랍니다.
       </p>
 
       <p className="rounded-md border border-slate-200 bg-white p-4">

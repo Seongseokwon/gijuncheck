@@ -27,8 +27,6 @@ const PRODUCTION_URL = 'https://xn--vk1bu2qt3cr52a.kr';
 const override = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
 export const SITE = {
-  name: '사대보험',
-
   url: override || PRODUCTION_URL,
 
   /**

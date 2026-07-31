@@ -16,16 +16,12 @@ const NAV_LABEL: Record<(typeof TOOL_KEYS)[number], string> = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: {
-    default: `${SITE.name} — 피부양자 자격부터 보험료까지 자동 판정`,
-    template: `%s | ${SITE.name}`,
-  },
+  title: '건강보험 피부양자 자격 확인 — 관계·소득·재산 기준',
   description: SITE.description,
 
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    siteName: SITE.name,
     // 정적 export 라 ImageResponse(런타임 생성)를 쓸 수 없다.
     // public/og.png 를 미리 만들어 두고 참조한다.
     images: [
@@ -33,7 +29,7 @@ export const metadata: Metadata = {
         url: '/og.png',
         width: 1200,
         height: 630,
-        alt: `${SITE.name} — ${SITE.description}`,
+        alt: SITE.description,
       },
     ],
   },
@@ -82,6 +78,7 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4">
             <a
               href={ROUTES.home.path}
+              aria-label="홈"
               className="inline-flex items-center gap-2 text-lg font-extrabold tracking-tight text-brand-950"
             >
               <span
@@ -90,7 +87,6 @@ export default function RootLayout({
               >
                 ✓
               </span>
-              {SITE.name}
             </a>
             <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
               {TOOL_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
