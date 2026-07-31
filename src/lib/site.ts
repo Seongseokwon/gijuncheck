@@ -27,6 +27,9 @@ const PRODUCTION_URL = 'https://xn--vk1bu2qt3cr52a.kr';
 const override = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 
 export const SITE = {
+  /** 화면·메타데이터에 쓰는 공식 서비스명 */
+  name: '기준체크',
+
   url: override || PRODUCTION_URL,
 
   /**
@@ -42,7 +45,7 @@ export const SITE = {
   indexable: !override,
 
   description:
-    '소득이 바뀔 때 내 사회보험이 어떻게 바뀌는지 판정해주는 도구. 건강보험 피부양자 자격, 지역가입자 보험료, 임의계속가입 비교.',
+    '기준체크는 건강보험 피부양자 자격을 관계·소득·재산 기준으로 확인하고 근거를 함께 보여주는 민간 정보 서비스입니다.',
 
   /**
    * SNS 수집기는 이미지 URL을 길게 캐시한다. OG 이미지를 교체할 때 이 값도

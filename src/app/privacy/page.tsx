@@ -26,7 +26,7 @@ export default function Page() {
           1. 수집하는 개인정보
         </h2>
         <p>
-          본 서비스는 <strong>회원가입 절차가 없으며, 이용자를 식별할 수 있는
+          {SITE.name}는 <strong>회원가입 절차가 없으며, 이용자를 식별할 수 있는
           개인정보를 수집하지 않습니다.</strong>
         </p>
         <p>
@@ -42,7 +42,7 @@ export default function Page() {
           2. 쿠키 및 광고
         </h2>
         <p>
-          본 사이트는 Google AdSense를 통해 광고를 게재할 수 있습니다. Google을
+          {SITE.name}는 Google AdSense를 통해 광고를 게재할 수 있습니다. Google을
           포함한 제3자 광고 사업자는 쿠키를 사용하여 이용자의 이전 방문 기록에
           기반한 광고를 게재할 수 있습니다.
         </p>
@@ -69,7 +69,7 @@ export default function Page() {
         </p>
         <p>
           또한 브라우저 설정에서 쿠키 저장을 거부할 수 있습니다. 쿠키를 거부해도
-          본 사이트의 판정·계산 기능은 정상적으로 이용할 수 있습니다.
+          {SITE.name}의 판정·계산 기능은 정상적으로 이용할 수 있습니다.
         </p>
       </section>
 

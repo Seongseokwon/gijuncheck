@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { ROUTES } from '@/lib/routes';
+import { SITE } from '@/lib/site';
 
 export const metadata: Metadata = {
   title: ROUTES.contact.label,
@@ -34,13 +35,13 @@ export default function Page() {
           계산 오류를 발견하셨다면
         </h2>
         <p>
-          이 사이트의 가치는 정확성입니다. 오류 신고는 가장 반가운 메일입니다.
+          {SITE.name}의 가치는 정확성입니다. 오류 신고는 가장 반가운 메일입니다.
           가능하면 다음을 함께 알려주세요.
         </p>
         <ul className="mt-4 ml-5 list-disc space-y-2">
           <li>어떤 도구인지 (피부양자 판정 / 보험료 계산 / 임의계속가입 비교)</li>
           <li>입력한 값</li>
-          <li>본 사이트의 결과와 공단에서 확인한 실제 값</li>
+          <li>{SITE.name}의 결과와 공단에서 확인한 실제 값</li>
         </ul>
       </section>
 
@@ -50,7 +51,7 @@ export default function Page() {
         </h2>
         <p>
           개별 사안에 대한 자격 판정이나 세무·노무 상담은 어렵습니다. 운영자는
-          세무사나 노무사가 아니며, 본 사이트의 결과는 법적 효력이 없습니다.
+          세무사나 노무사가 아니며, {SITE.name}의 결과는 법적 효력이 없습니다.
         </p>
         <p>
           자격과 보험료에 대한 확정적인 답변은{' '}

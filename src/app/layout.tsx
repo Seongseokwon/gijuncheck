@@ -9,7 +9,10 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: '건강보험 피부양자 자격 확인 — 관계·소득·재산 기준',
+  title: {
+    default: `${SITE.name} | 건강보험 피부양자 자격 확인`,
+    template: `%s | ${SITE.name}`,
+  },
   description: SITE.description,
 
   openGraph: {
@@ -53,7 +56,7 @@ export default function RootLayout({
           .service-notice 와 동일한 문구·색(ADR-002).
         */}
         <div className="border-b border-[#ead9a8] bg-[#fff9e8] px-4 py-1.5 text-center text-xs font-bold text-[#6f4b0c]">
-          민간 정보 서비스 · 국민건강보험공단의 공식 판정 화면이 아닙니다
+          기준체크는 민간 정보 서비스이며, 국민건강보험공단의 공식 판정 화면이 아닙니다
         </div>
 
         {/*
@@ -71,7 +74,7 @@ export default function RootLayout({
           <div className="mx-auto flex min-h-[68px] max-w-[1120px] items-center justify-between gap-6 px-4">
             <a
               href={ROUTES.home.path}
-              aria-label="홈"
+              aria-label={`${SITE.name} 홈`}
               className="inline-flex min-h-[44px] items-center text-brand-950"
             >
               <span className="relative block h-9 w-9" aria-hidden>
@@ -83,6 +86,9 @@ export default function RootLayout({
                   className="absolute bottom-0 right-0 h-6 w-7 bg-accent-600"
                   style={{ clipPath: 'polygon(52% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 52% 66%)' }}
                 />
+              </span>
+              <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
+                {SITE.name}
               </span>
             </a>
             <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
@@ -104,7 +110,7 @@ export default function RootLayout({
         <footer className="border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-[1120px] px-4 py-10 text-sm leading-relaxed text-slate-600">
             <p>
-              본 사이트의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
+              {SITE.name}의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
               최종 확인은 국민건강보험공단(1577-1000)에 문의하시기 바랍니다.
             </p>
             <p className="mt-2">
