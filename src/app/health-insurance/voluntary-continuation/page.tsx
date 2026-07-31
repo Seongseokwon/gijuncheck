@@ -8,8 +8,14 @@ export const metadata: Metadata = {
   description:
     '퇴직 후 지역가입자와 임의계속가입 중 어느 쪽이 유리한지 월 금액으로 비교합니다. ' +
     '임의계속가입은 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ' +
-    '최대 36개월, 퇴직 후 90일 이내 신고 시 소급 인정.',
+    `최대 36개월, ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정.`,
   alternates: { canonical: ROUTES.voluntaryContinuation.path },
+  /*
+   * ROUTES.voluntaryContinuation.ready 가 false 인 동안 검색 노출을 막는다.
+   * regionalPremium 과 동일한 미검증 수치에 의존하므로 함께 비공개.
+   * 공단 대조가 끝나 ready:true 로 바뀌면 이 줄도 지운다.
+   */
+  robots: { index: false, follow: true },
 };
 
 const FAQ = [
@@ -19,7 +25,7 @@ const FAQ = [
   },
   {
     q: '언제까지 신청해야 하나요?',
-    a: `퇴직 후 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내에 신고하면 퇴사일로 소급 인정됩니다. 이 기한을 놓치면 그 기간의 지역보험료를 그대로 내야 하므로, 퇴직하면 가장 먼저 확인해야 할 항목입니다.`,
+    a: `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고하면 퇴사일로 소급 인정됩니다. "퇴직 후 90일"로 알려진 경우가 많은데 낡은 기준입니다 — 실제로는 퇴직일이 아니라 지역가입자로 전환된 뒤 공단이 보내는 첫 지역보험료 고지서의 납부기한이 기준입니다. 이 기한을 놓치면 그 기간의 지역보험료를 그대로 내야 하므로, 첫 고지서를 받으면 가장 먼저 확인해야 할 항목입니다.`,
   },
   {
     q: '임의계속가입이 유리한 경우는 언제인가요?',
@@ -113,7 +119,7 @@ export default function Page() {
                     {r.label}
                   </a>
                 ) : (
-                  <span className="text-slate-400">{r.label} (준비 중)</span>
+                  <span className="text-slate-500">{r.label} (준비 중)</span>
                 )}
               </li>
             ))}

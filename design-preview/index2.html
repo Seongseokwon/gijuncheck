@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="사대보험 디자인 콘셉트 미리보기 2 — 디자인 토론 채택안(ADR-001, mandate C) 기준 재구성">
+  <title>사대보험 — 디자인 콘셉트 미리보기 2 (토론 채택안 기준)</title>
+  <style>
+    /*
+      팔레트·타이포·간격 값의 출처: docs/design-debate/01-direction-c.md §6,
+      docs/design-debate/03-rebuttal-c.md(반론 수정값), docs/design-decisions/ADR-001-design-direction.md.
+      index.html(기존 미리보기)의 navy/teal 팔레트는 이 결정 이전 문서(03-디자인-방향-제안.md)의 것이므로 여기서는 쓰지 않는다.
+    */
+    :root {
+      --ink: #171717;           /* 기본 텍스트 */
+      --ink-soft: #3F3F46;      /* 보조 설명 텍스트 */
+      --citation: #1E3A5F;      /* 근거 마커·조항 링크 전용색 (성공/실패 색과 분리) */
+      --panel: #EEF2F6;         /* 근거·각주 패널 배경 */
+      --border: #71717A;        /* 표/블록 테두리 — 반론 수정값(원안 #D4D4D8은 대비 1.48:1로 실패) */
+      --verified: #0F5132;
+      --verified-bg: #EAF3EE;
+      --unverified: #7A5B00;
+      --unverified-bg: #FDF6E3;
+      --bg: #FFFFFF;
+      --brandbar: #171717;
+      --brandbar-badge: #3F3F46;
+      --radius-chip: 4px;       /* 반론에서 명시한 유일한 radius 예외(검증 상태 칩) */
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; color-scheme: light; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", Inter,
+        system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;      /* 본문 프로즈 16px/1.7 — 01-direction-c.md §6 */
+      line-height: 1.7;
+      word-break: keep-all;
+    }
+
+    .mono {
+      font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    button, input, select { font: inherit; }
+    a { color: inherit; }
+    a:focus-visible, button:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(30,58,95,.35);
+      outline-offset: 2px;
+    }
+
+    .shell { width: min(1040px, calc(100% - 40px)); margin-inline: auto; }
+
+    /* ---- 브랜드 바 — 반론 §1: 56px, 배경 #171717, 텍스트 흰색, "민간 서비스" 배지 상시 노출 ---- */
+    .brand-bar {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      background: var(--brandbar);
+      color: #FFFFFF;
+    }
+    .brand-bar-inner {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      padding-block: 10px;
+    }
+    .brand-bar-name { font-weight: 800; font-size: 15px; letter-spacing: -.02em; }
+    .brand-bar-badge {
+      padding: 3px 8px;
+      border-radius: var(--radius-chip);
+      background: var(--brandbar-badge);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .brand-bar-note { color: #D4D4D8; font-size: 12px; }
+
+    /* ---- 상단 내비 — 문서형, 그라데이션·큰 히어로 없음 ---- */
+    .topbar {
+      border-bottom: 1px solid #E4E4E7;
+      background: var(--bg);
+    }
+    .nav {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-block: 10px;
+    }
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -.02em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .wordmark-mark {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 1px solid var(--ink);
+      font-size: 12px;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .nav-links a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      color: var(--citation);
+    }
+
+    /* ---- 문서 헤더 — h1 22px(mandate C 지정값), 마케팅 카피·그라데이션 없음 ---- */
+    .doc-header { padding: 40px 0 32px; border-bottom: 1px solid #E4E4E7; }
+    .doc-label {
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 8px 0 0;
+      color: var(--ink);
+      font-size: 22px;
+      line-height: 1.4;
+      letter-spacing: -.01em;
+    }
+    .doc-lede {
+      max-width: 680px;
+      margin: 14px 0 0;
+      color: var(--ink-soft);
+      font-size: 16px;
+    }
+    .doc-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 18px;
+      margin-top: 18px;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+    .doc-meta strong { color: var(--ink); }
+
+    /* ---- 섹션 공통 ---- */
+    .section { padding: 40px 0; border-bottom: 1px solid #E4E4E7; }
+    .section:last-of-type { border-bottom: 0; }
+    .section-num {
+      display: inline-block;
+      margin-bottom: 6px;
+      color: var(--citation);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    h2 {
+      margin: 0 0 14px;
+      color: var(--ink);
+      font-size: 18px;      /* 섹션 헤더 18px, 번호 매김 — 01-direction-c.md §6 */
+      letter-spacing: -.01em;
+    }
+    .section-note {
+      max-width: 680px;
+      margin: 0 0 20px;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+
+    /* ---- 가이드 목차(홈 재정의) — 반론 §4: 조항 색인이 아니라 가이드 주제 목차 ---- */
+    .guide-list { border-top: 1px solid var(--border); }
+    .guide-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 20px;
+      padding: 16px 0;
+      border-bottom: 1px solid #E4E4E7;
+    }
+    .guide-row a.guide-title {
+      color: var(--citation);
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .guide-row p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+    .guide-path {
+      grid-column: 1 / -1;
+      color: var(--ink-soft);
+      font-size: 12px;
+    }
+    .article-tags { display: flex; flex-wrap: wrap; gap: 6px; align-self: start; }
+    .article-tag {
+      padding: 2px 7px;
+      border: 1px solid var(--border);
+      color: var(--citation);
+      font-size: 11px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    /* ---- 제공 범위 — 카드 아님. 클릭 불가능한 항목은 인라인 텍스트 + 미검증 칩 ---- */
+    .scope-list { display: flex; flex-direction: column; gap: 10px; }
+    .scope-row {
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 8px 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #E4E4E7;
+      font-size: 15px;
+    }
+    .scope-row:last-child { border-bottom: 0; }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 3px 8px;
+      border: 1px solid;
+      border-radius: var(--radius-chip);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .chip.verified { background: var(--verified-bg); border-color: var(--verified); color: var(--verified); }
+    .chip.unverified { background: var(--unverified-bg); border-color: var(--unverified); color: var(--unverified); }
+    .scope-row a {
+      color: var(--citation);
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .scope-row .scope-reason { color: var(--ink-soft); font-size: 13px; }
+
+    /* ---- 판정 도구 — 2단 마진노트 레이아웃(본문 640 + 근거 320 + gap 80, 최대폭 1040) ---- */
+    .doc-grid {
+      display: grid;
+      grid-template-columns: 640px 320px;
+      gap: 0 80px;
+      align-items: start;
+    }
+
+    .time-note { color: var(--ink-soft); font-size: 14px; margin: 0 0 20px; }
+
+    .form-block { border-top: 2px solid var(--ink); padding-top: 16px; margin-top: 28px; }
+    .form-block:first-of-type { margin-top: 0; }
+    .form-step-label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--citation);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .form-block h3 { margin: 0 0 16px; font-size: 16px; color: var(--ink); }
+
+    .field-row { margin-bottom: 16px; }
+    .field-row label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .field-row input, .field-row select {
+      width: 100%;
+      min-height: 44px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 16px;      /* iOS 자동확대 방지 — 반론 §2 신규 명시 */
+    }
+    .field-row input { text-align: right; font-variant-numeric: tabular-nums; }
+    .field-row input:focus, .field-row select:focus {
+      outline: 3px solid rgba(30,58,95,.28);
+      outline-offset: 1px;
+    }
+    .field-row .field-hint { margin: 6px 0 0; color: var(--ink-soft); font-size: 14px; }
+
+    .sum-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 4px;
+      padding: 10px 12px;
+      background: var(--panel);
+      font-size: 14px;
+    }
+    .sum-line strong { font-variant-numeric: tabular-nums; }
+
+    /* ---- 근거 패널(마진노트) — 데스크톱: 오른쪽 컬럼 상시 노출 / 모바일: 접힌 각주 ---- */
+    .margin-notes { display: flex; flex-direction: column; gap: 14px; }
+    .note {
+      padding: 14px;
+      border-left: 3px solid var(--citation);
+      background: var(--panel);
+    }
+    .note-label {
+      display: inline-block;
+      margin-bottom: 6px;
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .note-quote {
+      margin: 0 0 8px;
+      padding-left: 10px;
+      border-left: 2px solid var(--border);
+      color: var(--ink);
+      font-size: 15px;      /* 인용 법령 원문 15px monospace */
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      line-height: 1.6;
+    }
+    .note-explain { margin: 0 0 8px; color: var(--ink-soft); font-size: 14px; }
+    .note-meta { margin: 0 0 8px; color: var(--ink-soft); font-size: 11px; }
+    .note a.note-link {
+      color: var(--citation);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    details.mobile-notes { display: none; }
+    details.mobile-notes > summary {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      margin: 10px 0 18px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      color: var(--citation);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+    }
+    details.mobile-notes > summary::-webkit-details-marker { display: none; }
+    details.mobile-notes .margin-notes { margin-top: 10px; }
+
+    .judge-btn {
+      min-height: 48px;
+      width: 100%;
+      margin-top: 24px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .judge-btn:hover { background: #303030; }
+
+    .privacy-note { margin: 10px 0 0; color: var(--ink-soft); font-size: 14px; }
+
+    /* ---- 결과 화면 — ADR-001 순서: 헤징 결론(무색) → 입력요약 → 단계별 근거 → 상세 계산 ---- */
+    .result { display: none; margin-top: 32px; border-top: 3px solid var(--ink); padding-top: 20px; }
+    .result.visible { display: block; }
+
+    .verdict {
+      margin: 0;
+      color: var(--ink);        /* 판정 결론 텍스트: 별도 색상 없이 기본 텍스트색과 동일 — 색으로 확신을 표현하지 않음 */
+      font-size: 17px;
+      line-height: 1.7;
+    }
+    .verdict strong { font-weight: 800; }
+    .verdict-authority {
+      margin: 8px 0 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .input-summary {
+      margin: 18px 0 0;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+    .input-summary strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+    .evidence-table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    .evidence-table caption {
+      text-align: left;
+      margin-bottom: 8px;
+      color: var(--ink);
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .evidence-table th, .evidence-table td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .evidence-table th { color: var(--ink-soft); font-weight: 700; font-size: 12px; }
+    .evidence-table td.mark { font-family: ui-monospace, monospace; font-weight: 800; }
+    .evidence-table td .cite {
+      display: inline-block;
+      margin-top: 3px;
+      color: var(--citation);
+      font-size: 12px;
+      font-family: ui-monospace, monospace;
+    }
+
+    details.calc-detail { margin-top: 20px; }
+    details.calc-detail > summary {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      color: var(--citation);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      list-style: none;
+    }
+    details.calc-detail > summary::-webkit-details-marker { display: none; }
+    .calc-box {
+      margin-top: 10px;
+      padding: 14px;
+      background: var(--panel);
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.9;
+      font-variant-numeric: tabular-nums;
+      white-space: pre-wrap;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .result-actions button, .result-actions a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--ink);
+      background: var(--bg);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .basis-line {
+      margin: 18px 0 0;
+      color: var(--ink-soft);
+      font-size: 14px;      /* 각주/출처 표기 — 반론 수정: 13px → 14px */
+    }
+    .basis-line a { color: var(--citation); text-decoration: underline; text-underline-offset: 3px; }
+
+    .related-guides {
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid #E4E4E7;
+      font-size: 14px;
+    }
+    .related-guides a { color: var(--citation); text-decoration: underline; text-underline-offset: 3px; }
+
+    footer { padding: 32px 0 60px; }
+    footer p { max-width: 680px; color: var(--ink-soft); font-size: 13px; }
+    .footer-meta { margin-top: 10px; display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .preview-chip {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 30;
+      padding: 8px 12px;
+      border: 1px solid var(--ink);
+      background: #FFFFFF;
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    @media print {
+      .brand-bar, .topbar, .preview-chip, .result-actions, .guide-list, .section:not(.print-keep) { display: none !important; }
+      body { font-size: 12pt; }
+    }
+
+    @media (max-width: 980px) {
+      .doc-grid { grid-template-columns: 1fr; }
+      .margin-notes.desktop-only { display: none; }
+      details.mobile-notes { display: block; }
+      .evidence-table { display: block; overflow-x: auto; }
+    }
+
+    @media (max-width: 620px) {
+      .shell { width: min(100% - 24px, 1040px); }
+      .brand-bar-note { display: none; }
+      h1 { font-size: 20px; }
+      .guide-row { grid-template-columns: 1fr; }
+      .preview-chip { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="brand-bar">
+    <div class="shell brand-bar-inner">
+      <span class="brand-bar-name">사대보험</span>
+      <span class="brand-bar-badge">민간 서비스</span>
+      <span class="brand-bar-note">국민건강보험공단 등 공식 기관이 아닙니다</span>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="shell nav">
+      <a class="wordmark" href="#top">
+        <span class="wordmark-mark" aria-hidden="true">✓</span>
+        사대보험
+      </a>
+      <nav class="nav-links" aria-label="주요 메뉴">
+        <a href="#guides">가이드 목차</a>
+        <a href="#judge">피부양자 판정</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="shell doc-header">
+      <span class="doc-label">건강보험 · 피부양자</span>
+      <h1>피부양자 자격 판정 — 근거와 검증 이력을 함께 확인합니다</h1>
+      <p class="doc-lede">
+        관계·소득·재산 정보를 입력하면 적용된 조항과 계산 과정을 함께 보여드립니다.
+        결론만이 아니라 그 결론이 어떻게 나왔는지 스스로 확인할 수 있도록 만들었습니다.
+      </p>
+      <div class="doc-meta">
+        <span>기준연도 <strong>2026년</strong></span>
+        <span>적용 법령 <strong>국민건강보험법 시행규칙</strong></span>
+        <span>서비스 성격 <strong>민간 참고용 · 공식 판정 아님</strong></span>
+      </div>
+    </div>
+
+    <section class="section" id="guides" aria-labelledby="guides-title">
+      <div class="shell">
+        <span class="section-num">1</span>
+        <h2 id="guides-title">가이드 목차</h2>
+        <p class="section-note">
+          조항 번호로 색인하지 않고, 실제로 검색하는 요건 이름을 표제로 삼았습니다.
+          각 가이드 문단에는 근거 조항으로 가는 앵커가 달려 있고, 판정 도구의 근거 패널에서도
+          같은 조항으로 되돌아올 수 있습니다.
+        </p>
+        <div class="guide-list">
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">재산세 과세표준 확인하는 방법</a>
+            <div class="article-tags">
+              <span class="article-tag">시행령 제41조</span>
+            </div>
+            <p>공시가격과 재산세 과세표준은 다릅니다. 피부양자 판정에서 가장 많이 틀리는 지점입니다.</p>
+            <p class="guide-path">/health-insurance/guides/property-tax-base/#재산과세표준-5.4억원-기준</p>
+          </div>
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">사업자등록 전에 반드시 계산해야 하는 것</a>
+            <div class="article-tags">
+              <span class="article-tag">별표1의2 제2호</span>
+            </div>
+            <p>사업자등록 여부에 따라 사업소득 허용 기준이 완전히 달라집니다.</p>
+            <p class="guide-path">/health-insurance/guides/before-business-registration/#사업소득-요건</p>
+          </div>
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">피부양자 자격상실 시점과 소급 부과</a>
+            <div class="article-tags"><span class="article-tag">시행규칙 별표1</span></div>
+            <p>자격을 상실하는 시점과 그 이후 지역보험료가 소급 부과되는 구조를 설명합니다.</p>
+            <p class="guide-path">/health-insurance/guides/losing-eligibility/</p>
+          </div>
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">임의계속가입이 유리한 경우</a>
+            <div class="article-tags"><span class="article-tag">국민건강보험법</span></div>
+            <p>재산이 많고 퇴직 전 보수가 낮을수록 임의계속가입이 유리한 이유를 숫자로 설명합니다.</p>
+            <p class="guide-path">/health-insurance/guides/when-voluntary-continuation-wins/</p>
+          </div>
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">연금 수령이 피부양자 자격에 미치는 영향</a>
+            <div class="article-tags"><span class="article-tag">별표1의2 제1호</span></div>
+            <p>공적연금은 합산되고 개인연금은 제외됩니다. 이 구분이 판정 결과를 바꿉니다.</p>
+            <p class="guide-path">/health-insurance/guides/pension-impact/</p>
+          </div>
+          <div class="guide-row">
+            <a class="guide-title" href="#judge">11월 건강보험 자격 일괄 재산정이란</a>
+            <div class="article-tags"><span class="article-tag">국민건강보험법</span></div>
+            <p>매년 11월 공단이 피부양자 자격을 일괄 재산정하는 절차와 대비 방법입니다.</p>
+            <p class="guide-path">/health-insurance/guides/november-reassessment/</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="scope-title">
+      <div class="shell">
+        <span class="section-num">2</span>
+        <h2 id="scope-title">지금 확인할 수 있는 범위</h2>
+        <p class="section-note">검증이 끝난 항목만 실제로 계산을 제공합니다. 미검증 항목은 카드가 아니라 텍스트로만 존재하며 어디에서도 클릭할 수 없습니다.</p>
+        <div class="scope-list">
+          <div class="scope-row">
+            <span class="chip verified">대조완료</span>
+            <a href="#judge">피부양자 자격판정</a>
+            <span class="scope-reason">부양·소득·재산 3단 판정. 60등급 재산점수표를 참조하지 않아 별도 검증 대상과 무관합니다.</span>
+          </div>
+          <div class="scope-row">
+            <span class="chip unverified">공단 대조 미완료</span>
+            <span>지역가입자 보험료 계산</span>
+            <span class="scope-reason">재산 0원 구간 등급, 전세·월세 환산 공식이 아직 공단 모의계산과 대조되지 않아 링크를 제공하지 않습니다.</span>
+          </div>
+          <div class="scope-row">
+            <span class="chip unverified">공단 대조 미완료</span>
+            <span>임의계속가입 비교</span>
+            <span class="scope-reason">지역보험료 계산과 동일한 미검증 수치를 사용하므로 함께 비공개합니다.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="judge" aria-labelledby="judge-title">
+      <div class="shell">
+        <span class="section-num">3</span>
+        <h2 id="judge-title">피부양자 자격 확인</h2>
+        <p class="time-note">입력 항목마다 오른쪽(모바일에서는 펼치는 목록)에 적용 조항과 근거를 함께 표시합니다. 입력값은 이 화면에서만 계산되며 저장하거나 전송하지 않습니다.</p>
+
+        <form id="judge-form">
+          <div class="doc-grid">
+            <div>
+              <section class="form-block">
+                <span class="form-step-label">1단계</span>
+                <h3>부양요건 — 누구를 피부양자로 등록하나요?</h3>
+                <div class="field-row">
+                  <label for="relation">가입자와의 관계</label>
+                  <select id="relation">
+                    <option value="parent">직계존속 (부모·조부모)</option>
+                    <option value="spouse">배우자</option>
+                    <option value="child">직계비속 (자녀·손자녀)</option>
+                    <option value="sibling">형제자매</option>
+                  </select>
+                </div>
+                <div class="field-row">
+                  <label for="cohabit">동거 여부</label>
+                  <select id="cohabit">
+                    <option value="yes">동거</option>
+                    <option value="no">비동거</option>
+                  </select>
+                </div>
+                <div class="field-row">
+                  <label for="married">혼인 여부</label>
+                  <select id="married">
+                    <option value="no">미혼</option>
+                    <option value="yes">기혼</option>
+                  </select>
+                </div>
+
+                <details class="mobile-notes">
+                  <summary>근거 보기 (부양요건, 2)</summary>
+                  <div class="margin-notes">
+                    <div class="note">
+                      <span class="note-label">법령 원문 인용 · [별표1의2 제3호]</span>
+                      <p class="note-quote">"형제자매는 원칙적으로 피부양자 인정 범위에서 제외한다. 다만 30세 미만이거나 65세 이상, 또는 장애인이면서 미혼인 경우는 예외로 한다."</p>
+                      <span class="note-label">[사대보험] 해설</span>
+                      <p class="note-explain">형제자매를 등록하려는 경우 나이·장애 여부·혼인 여부가 함께 충족돼야 인정됩니다.</p>
+                      <span class="note-meta">시행규칙 별표1의2 · 2026.1.1 시행 (편집 시점 기준, 원문은 링크에서 확인)</span>
+                      <a class="note-link" href="https://law.go.kr/LSW/flDownload.do?gubun=&amp;flSeq=28368278" target="_blank" rel="noopener">원문 보기 →</a>
+                    </div>
+                    <div class="note">
+                      <span class="note-label">법령 원문 인용 · [별표1]</span>
+                      <p class="note-quote">"직계존속·직계비속은 동거하지 않는 경우에도 일정 요건 충족 시 인정한다."</p>
+                      <span class="note-label">[사대보험] 해설</span>
+                      <p class="note-explain">비동거 직계존속은 동거하는 형제자매가 없거나, 있어도 그 형제자매에게 소득이 없으면 인정됩니다.</p>
+                      <span class="note-meta">시행규칙 별표1 · 2026.1.1 시행</span>
+                      <a class="note-link" href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">원문 보기 →</a>
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <section class="form-block">
+                <span class="form-step-label">2단계</span>
+                <h3>소득요건 — 연간 소득은 얼마인가요?</h3>
+                <div class="field-row">
+                  <label for="business-income">사업소득 <span class="mono">(연간)</span></label>
+                  <input id="business-income" inputmode="numeric" placeholder="0" aria-describedby="business-hint">
+                  <p class="field-hint" id="business-hint">사업자등록 여부와 함께 판정됩니다.</p>
+                </div>
+                <div class="field-row">
+                  <label for="wage-income">근로소득 <span class="mono">(연간)</span></label>
+                  <input id="wage-income" inputmode="numeric" placeholder="0">
+                </div>
+                <div class="field-row">
+                  <label for="pension-income">공적연금소득 <span class="mono">(개인연금 제외)</span></label>
+                  <input id="pension-income" inputmode="numeric" placeholder="0">
+                </div>
+                <div class="field-row">
+                  <label for="financial-income">금융소득 <span class="mono">(이자+배당)</span></label>
+                  <input id="financial-income" inputmode="numeric" placeholder="0">
+                </div>
+                <div class="field-row">
+                  <label for="registered">사업자등록</label>
+                  <select id="registered">
+                    <option value="no">없음</option>
+                    <option value="yes">있음</option>
+                  </select>
+                </div>
+                <div class="sum-line" aria-live="polite">
+                  <span>현재 입력한 합산소득</span>
+                  <strong id="income-total">0만원</strong>
+                </div>
+
+                <details class="mobile-notes">
+                  <summary>근거 보기 (소득요건, 2)</summary>
+                  <div class="margin-notes">
+                    <div class="note">
+                      <span class="note-label">법령 원문 인용 · [별표1의2 제2호]</span>
+                      <p class="note-quote">"사업·근로·연금·금융·기타소득의 연간 합계액이 2천만원을 초과하는 경우 피부양자에서 제외한다."</p>
+                      <span class="note-label">[사대보험] 해설</span>
+                      <p class="note-explain">2,000만 1원부터 탈락입니다. 월 기준이 아니라 연 합산 기준입니다.</p>
+                      <span class="note-meta">시행규칙 별표1의2 · 2026.1.1 시행</span>
+                      <a class="note-link" href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">원문 보기 →</a>
+                    </div>
+                    <div class="note">
+                      <span class="note-label">법령 원문 인용</span>
+                      <p class="note-quote">"사업자등록을 한 자는 사업소득이 발생하는 경우 피부양자에서 제외한다."</p>
+                      <span class="note-label">[사대보험] 해설</span>
+                      <p class="note-explain">사업자등록이 있으면 사업소득이 1원이라도 있으면 탈락합니다. 등록이 없으면 연 500만원까지 허용됩니다.</p>
+                      <span class="note-meta">시행규칙 별표1의2 · 2026.1.1 시행</span>
+                      <a class="note-link" href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">원문 보기 →</a>
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <section class="form-block">
+                <span class="form-step-label">3단계</span>
+                <h3>재산요건 — 재산세 과세표준을 확인하세요</h3>
+                <div class="field-row">
+                  <label for="property">재산세 과세표준 <span class="mono">(실거래가 아님)</span></label>
+                  <input id="property" inputmode="numeric" placeholder="0" aria-describedby="property-hint">
+                  <p class="field-hint" id="property-hint">재산세 고지서 또는 위택스에서 확인할 수 있습니다. 공시가격이 아닙니다.</p>
+                </div>
+
+                <details class="mobile-notes">
+                  <summary>근거 보기 (재산요건, 1)</summary>
+                  <div class="margin-notes">
+                    <div class="note">
+                      <span class="note-label">법령 원문 인용 · [시행령 제41조]</span>
+                      <p class="note-quote">"재산세 과세표준의 합이 5억4천만원 이하인 경우 인정하고, 9억원을 초과하는 경우 제외한다. 5억4천만원 초과 9억원 이하는 연소득 1천만원 이하인 경우에 한해 인정한다."</p>
+                      <span class="note-label">[사대보험] 해설</span>
+                      <p class="note-explain">과표 5.4억 이하는 소득만 맞으면 통과, 5.4억~9억은 연소득 1,000만원 이하일 때만 통과, 9억 초과는 소득과 무관하게 탈락합니다.</p>
+                      <span class="note-meta">시행령 제41조 · 2026.1.1 시행</span>
+                      <a class="note-link" href="https://law.go.kr/LSW/flDownload.do?gubun=&amp;flSeq=28368278" target="_blank" rel="noopener">원문 보기 →</a>
+                    </div>
+                  </div>
+                </details>
+              </section>
+
+              <button class="judge-btn" type="submit">2026년 기준으로 자격 확인하기</button>
+              <p class="privacy-note">입력 내용은 이 화면에서만 계산되며 저장하거나 전송하지 않습니다.</p>
+
+              <section class="result" id="result" role="status" aria-live="polite" tabindex="-1">
+                <p class="verdict" id="verdict-text">
+                  제출하신 조건과 2026년 기준을 적용하면, 피부양자 자격 요건을 <strong id="verdict-strong">충족하는 것으로 계산됩니다.</strong>
+                </p>
+                <p class="verdict-authority">이 결과는 참고용 모의 계산이며, 최종 판정은 국민건강보험공단 심사에 따릅니다.</p>
+
+                <div class="input-summary" id="input-summary-text">
+                  확인에 사용한 입력값이 여기에 표시됩니다.
+                </div>
+
+                <table class="evidence-table">
+                  <caption>단계별 판정 근거</caption>
+                  <thead>
+                    <tr><th style="width:70px">결과</th><th style="width:90px">요건</th><th>적용 내용</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="mark">충족</td>
+                      <td>부양요건</td>
+                      <td>선택한 관계와 동거 조건을 충족합니다. <span class="cite">[별표1의2 제3호]</span></td>
+                    </tr>
+                    <tr id="income-row">
+                      <td class="mark" id="income-mark">충족</td>
+                      <td>소득요건</td>
+                      <td id="income-message">연간 합산소득이 기준 이내입니다. <span class="cite">[별표1의2 제2호]</span></td>
+                    </tr>
+                    <tr id="property-row">
+                      <td class="mark" id="property-mark">충족</td>
+                      <td>재산요건</td>
+                      <td id="property-message">재산세 과세표준이 기준 이내입니다. <span class="cite">[시행령 제41조]</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <details class="calc-detail">
+                  <summary>계산 과정 전체 펼쳐보기</summary>
+                  <div class="calc-box" id="calc-box"></div>
+                </details>
+
+                <div class="result-actions">
+                  <a href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">근거 조항 원문 보기</a>
+                  <button type="button" id="print-btn">이 결과 인쇄 · PDF 저장</button>
+                  <a href="#judge" id="retry-link">입력 내용 다시 확인하기</a>
+                </div>
+
+                <p class="basis-line">
+                  적용 기준 · 국민건강보험법 시행규칙 별표 1의2 · 2026년 기준 · 최종 판정은 <a href="https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&amp;articleNo=10945798" target="_blank" rel="noopener">국민건강보험공단</a>에서 확인하세요.
+                </p>
+
+                <div class="related-guides">
+                  관련 가이드 ·
+                  <a href="#judge">재산세 과세표준 확인하는 방법</a> ·
+                  <a href="#judge">사업자등록 전에 반드시 계산해야 하는 것</a> ·
+                  <a href="#judge">피부양자 자격상실 시점과 소급 부과</a>
+                </div>
+              </section>
+            </div>
+
+            <aside class="margin-notes desktop-only" aria-label="근거 패널">
+              <div class="note">
+                <span class="note-label">법령 원문 인용 · [별표1의2 제2호]</span>
+                <p class="note-quote">"사업·근로·연금·금융·기타소득의 연간 합계액이 2천만원을 초과하는 경우 피부양자에서 제외한다."</p>
+                <span class="note-label">[사대보험] 해설</span>
+                <p class="note-explain">입력 중인 항목의 근거가 이 자리에 계속 표시됩니다. 접지 않고 상시 노출합니다.</p>
+                <span class="note-meta">시행규칙 별표1의2 · 2026.1.1 시행 (편집 시점 기준, 원문은 링크에서 확인)</span>
+                <a class="note-link" href="https://www.law.go.kr/flDownload.do?flSeq=96554199" target="_blank" rel="noopener">원문 보기 →</a>
+              </div>
+              <div class="note">
+                <span class="note-label">법령 원문 인용 · [시행령 제41조]</span>
+                <p class="note-quote">"재산세 과세표준의 합이 5억4천만원 이하인 경우 인정하고, 9억원을 초과하는 경우 제외한다."</p>
+                <span class="note-label">[사대보험] 해설</span>
+                <p class="note-explain">재산요건 입력란 옆에도 같은 방식으로 조항이 이어집니다.</p>
+                <span class="note-meta">시행령 제41조 · 2026.1.1 시행</span>
+                <a class="note-link" href="https://law.go.kr/LSW/flDownload.do?gubun=&amp;flSeq=28368278" target="_blank" rel="noopener">원문 보기 →</a>
+              </div>
+            </aside>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <span class="chip verified">대조완료</span>
+      <p>
+        이 미리보기의 판정 로직은 디자인 체험용 근사치이며 실제 <code class="mono">src/lib/dependent/judge.ts</code>와 다를 수 있습니다.
+        본 페이지 자체는 법적 효력이 없고, 실제 서비스에서는 검증된 판정 로직과 최신 기준을 연결해야 합니다.
+      </p>
+      <div class="footer-meta">
+        <span>기준 · 2026년</span>
+        <span>디자인 콘셉트 미리보기 2 — mandate C(반론본) + ADR-001 기준</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="preview-chip">DESIGN PREVIEW 2 · 토론 채택안(ADR-001) 기준</div>
+
+  <script>
+    const INCOME_LIMIT = 20000000;
+    const PROPERTY_SAFE = 540000000;
+    const PROPERTY_UPPER = 900000000;
+    const PROPERTY_INCOME_SUBLIMIT = 10000000;
+
+    const moneyInputs = [
+      document.querySelector('#business-income'),
+      document.querySelector('#wage-income'),
+      document.querySelector('#pension-income'),
+      document.querySelector('#financial-income'),
+      document.querySelector('#property')
+    ];
+
+    function digits(value) {
+      return Number(String(value).replace(/[^0-9]/g, '')) || 0;
+    }
+
+    function formatInput(input) {
+      const value = digits(input.value);
+      input.value = value ? value.toLocaleString('ko-KR') : '';
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const ids = ['business-income', 'wage-income', 'pension-income', 'financial-income'];
+      const total = ids.reduce((sum, id) => sum + digits(document.getElementById(id).value), 0);
+      document.querySelector('#income-total').textContent =
+        Math.round(total / 10000).toLocaleString('ko-KR') + '만원';
+    }
+
+    moneyInputs.forEach((input) => {
+      input.addEventListener('input', () => formatInput(input));
+    });
+
+    function manwon(v) { return Math.round(v / 10000).toLocaleString('ko-KR'); }
+
+    document.querySelector('#judge-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const incomeIds = ['business-income', 'wage-income', 'pension-income', 'financial-income'];
+      const totalIncome = incomeIds.reduce((sum, id) => sum + digits(document.getElementById(id).value), 0);
+      const businessIncome = digits(document.querySelector('#business-income').value);
+      const property = digits(document.querySelector('#property').value);
+      const registered = document.querySelector('#registered').value === 'yes';
+
+      const incomeOverLimit = totalIncome > INCOME_LIMIT;
+      const businessBlocked = registered && businessIncome > 0;
+      const incomeFailed = incomeOverLimit || businessBlocked;
+
+      let propertyTier = '5.4억 이하';
+      let propertyFailed = false;
+      if (property > PROPERTY_UPPER) {
+        propertyTier = '9억 초과';
+        propertyFailed = true;
+      } else if (property > PROPERTY_SAFE) {
+        propertyTier = '5.4억 초과 ~ 9억 이하';
+        propertyFailed = totalIncome > PROPERTY_INCOME_SUBLIMIT;
+      }
+
+      const failed = incomeFailed || propertyFailed;
+
+      const result = document.querySelector('#result');
+      const verdictStrong = document.querySelector('#verdict-strong');
+      const incomeMark = document.querySelector('#income-mark');
+      const propertyMark = document.querySelector('#property-mark');
+      const incomeMessage = document.querySelector('#income-message');
+      const propertyMessage = document.querySelector('#property-message');
+      const inputSummaryText = document.querySelector('#input-summary-text');
+      const calcBox = document.querySelector('#calc-box');
+
+      verdictStrong.textContent = failed ? '충족하지 않는 것으로 계산됩니다.' : '충족하는 것으로 계산됩니다.';
+
+      incomeMark.textContent = incomeFailed ? '미충족' : '충족';
+      propertyMark.textContent = propertyFailed ? '미충족' : '충족';
+
+      if (businessBlocked) {
+        incomeMessage.innerHTML = '사업자등록 상태에서 사업소득이 있어 소득요건을 충족하지 못합니다. <span class="cite">[별표1의2 제2호]</span>';
+      } else if (incomeOverLimit) {
+        incomeMessage.innerHTML = '합산소득이 2,000만원을 ' + manwon(totalIncome - INCOME_LIMIT) + '만원 초과합니다. <span class="cite">[별표1의2 제2호]</span>';
+      } else {
+        incomeMessage.innerHTML = '연간 합산소득 ' + manwon(totalIncome) + '만원으로 2,000만원 이내입니다. <span class="cite">[별표1의2 제2호]</span>';
+      }
+
+      if (propertyFailed) {
+        propertyMessage.innerHTML = '재산세 과세표준 구간(' + propertyTier + ')에서 요건을 충족하지 못합니다. <span class="cite">[시행령 제41조]</span>';
+      } else {
+        propertyMessage.innerHTML = '재산세 과세표준 구간(' + propertyTier + ')에서 요건을 충족합니다. <span class="cite">[시행령 제41조]</span>';
+      }
+
+      inputSummaryText.innerHTML =
+        '확인에 사용한 입력 · 연간 합산소득 <strong>' + manwon(totalIncome) + '만원</strong> · ' +
+        '재산세 과세표준 <strong>' + manwon(property) + '만원</strong> · ' +
+        '사업자등록 <strong>' + (registered ? '있음' : '없음') + '</strong>';
+
+      calcBox.textContent =
+        '합산소득 = 사업 ' + manwon(businessIncome) + '만 + 근로 + 연금 + 금융 = ' + manwon(totalIncome) + '만원\n' +
+        '소득 기준 2,000만원 대비: ' + (incomeOverLimit ? '초과' : '이내') + '\n' +
+        '사업자등록 ' + (registered ? '있음 → 사업소득 0원 초과 시 즉시 탈락' : '없음 → 사업소득 500만원까지 허용') + '\n' +
+        '재산세 과세표준 = ' + manwon(property) + '만원 → 구간: ' + propertyTier + '\n' +
+        (property > PROPERTY_SAFE && property <= PROPERTY_UPPER
+          ? '이 구간은 연소득 1,000만원 이하일 때만 인정 (현재 ' + manwon(totalIncome) + '만원)\n'
+          : '') +
+        '최종 판정: ' + (failed ? '요건 미충족으로 계산됨' : '요건 충족으로 계산됨');
+
+      result.classList.add('visible');
+      result.focus({ preventScroll: true });
+      result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.querySelector('#print-btn').addEventListener('click', () => window.print());
+  </script>
+</body>
+</html>

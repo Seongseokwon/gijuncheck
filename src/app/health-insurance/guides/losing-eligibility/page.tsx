@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   title: TITLE,
   description:
     '피부양자 자격상실은 사유 발생일로부터 14일 이내 신고가 원칙이며, 늦으면 상실일로 소급해 지역보험료가 부과됩니다. ' +
-    '반대로 자격 취득은 90일 이내 신고 시 소급 인정됩니다. ' +
+    `반대로 임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 소급 인정됩니다. ` +
     '상실 사유별 시점과 소급 부과를 줄이는 방법을 정리했습니다.',
   alternates: { canonical: PATH },
 };
@@ -59,8 +59,8 @@ const FAQ: FaqItem[] = [
       '특히 매년 11월에 자격을 일괄 재산정하므로 이때 확인되어 소급 부과되는 사례가 많습니다.',
   },
   {
-    q: '퇴직해서 피부양자로 들어가는 경우도 기한이 있나요?',
-    a: `있지만 방향이 반대입니다. 자격 취득은 퇴사일로부터 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내에 신고하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않아도 됩니다. 기한을 넘기면 신고일부터 인정되어 그 전 기간의 지역보험료를 부담하게 됩니다.`,
+    q: '퇴직 후 임의계속가입을 신청하는 경우도 기한이 있나요?',
+    a: `있지만 방향이 반대입니다. 임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않아도 됩니다. 기한을 넘기면 신청일부터 인정되어 그 전 기간의 지역보험료를 부담하게 됩니다.`,
   },
   {
     q: '소급 부과된 금액이 과하다고 생각되면 어떻게 하나요?',
@@ -119,12 +119,12 @@ export default function Page() {
             head={['구분', '신고 기한', '늦으면']}
             rows={[
               [
-                <strong key="a">자격 취득</strong>,
-                `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내`,
+                <strong key="a">임의계속가입 신청</strong>,
+                VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE,
                 '소급 인정을 못 받아 그 기간 지역보험료를 부담 (내가 손해)',
               ],
               [
-                <strong key="b">자격 상실</strong>,
+                <strong key="b">피부양자 자격상실 신고</strong>,
                 '14일 이내',
                 '상실일로 소급 부과 (한꺼번에 청구)',
               ],
@@ -234,9 +234,9 @@ export default function Page() {
 
           <P>
             <strong>셋째, 퇴직자라면 임의계속가입을 먼저 계산합니다.</strong>{' '}
-            지역가입자 보험료보다 임의계속가입이 싼 경우가 많고, 퇴직 후{' '}
-            {VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내에 신고하면
-            퇴사일로 소급 인정됩니다. 이 기한을 놓치면 그 기간은 지역보험료로
+            지역가입자 보험료보다 임의계속가입이 싼 경우가 많고,{' '}
+            {VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고하면 퇴사일로
+            소급 인정됩니다. 이 기한을 놓치면 그 기간은 지역보험료로
             확정됩니다.
           </P>
 

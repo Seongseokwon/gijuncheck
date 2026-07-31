@@ -57,7 +57,16 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <Analytics />
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+      <body className="min-h-screen bg-canvas text-slate-900 antialiased">
+        {/*
+          상시 노출 신원 고지. legal-risk 비평(02-critique-legal.md)이 공통으로
+          지적한 "공공기관 오인" 리스크에 대응한다. design-preview/index3.html
+          .service-notice 와 동일한 문구·색(ADR-002).
+        */}
+        <div className="border-b border-amber-200 bg-amber-50 px-4 py-1.5 text-center text-xs font-semibold text-amber-900">
+          민간 정보 서비스 · 국민건강보험공단의 공식 판정 화면이 아닙니다
+        </div>
+
         {/*
           최종 도메인이 아닐 때만 보이는 배너.
           지금 어떤 상태로 배포됐는지 눈으로 확인할 수 있어야 한다.
@@ -69,21 +78,36 @@ export default function RootLayout({
           </div>
         )}
 
-        <header className="border-b border-slate-200 bg-white">
-          <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
-            <a href={ROUTES.home.path} className="text-lg font-bold">
+        <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-6 px-4 py-4">
+            <a
+              href={ROUTES.home.path}
+              className="inline-flex items-center gap-2 text-lg font-extrabold tracking-tight text-brand-950"
+            >
+              <span
+                className="grid h-8 w-8 place-items-center rounded-[10px] bg-brand-900 text-sm text-white"
+                aria-hidden
+              >
+                ✓
+              </span>
               {SITE.name}
             </a>
-            <nav className="hidden gap-4 text-sm text-slate-600 sm:flex">
+            <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
               {TOOL_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
                 <a
                   key={k}
                   href={ROUTES[k].path}
-                  className="hover:text-slate-900"
+                  className="min-h-[44px] inline-flex items-center hover:text-brand-900"
                 >
                   {NAV_LABEL[k]}
                 </a>
               ))}
+              <a
+                href={ROUTES.dependent.path}
+                className="min-h-[44px] inline-flex items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
+              >
+                내 자격 확인
+              </a>
             </nav>
           </div>
         </header>
@@ -91,7 +115,7 @@ export default function RootLayout({
         <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
 
         <footer className="mt-16 border-t border-slate-200 bg-white">
-          <div className="mx-auto max-w-3xl px-4 py-6 text-xs leading-relaxed text-slate-500">
+          <div className="mx-auto max-w-3xl px-4 py-6 text-sm leading-relaxed text-slate-600">
             <p>
               본 사이트의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
               최종 확인은 국민건강보험공단(1577-1000)에 문의하시기 바랍니다.
@@ -104,7 +128,7 @@ export default function RootLayout({
                 <a
                   key={k}
                   href={ROUTES[k].path}
-                  className="underline hover:text-slate-700"
+                  className="underline hover:text-brand-900"
                 >
                   {ROUTES[k].label}
                 </a>

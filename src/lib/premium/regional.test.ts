@@ -375,15 +375,15 @@ describe('퇴직 후 비교', () => {
     expect(r.notes[0]).toContain('12개월 이상');
   });
 
-  it('90일 소급 안내가 항상 포함된다', () => {
+  it('신청기한 소급 안내가 항상 포함된다', () => {
     const r = compareAfterRetirement({
       income: noIncome,
       propertyAmount: 0,
       avgMonthlyWage: 3_000_000,
       insuredMonthsInLookback: 24,
     });
-    expect(r.notes.join(' ')).toContain('90일');
-    expect(r.applyDeadlineDays).toBe(90);
+    expect(r.notes.join(' ')).toContain('납부기한으로부터 2개월');
+    expect(r.applyDeadlineRule).toContain('2개월');
     expect(r.maxMonths).toBe(36);
   });
 

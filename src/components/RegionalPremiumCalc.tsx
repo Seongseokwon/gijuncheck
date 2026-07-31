@@ -160,7 +160,7 @@ export default function RegionalPremiumCalc() {
         <section
           role="status"
           aria-live="polite"
-          className="space-y-4 rounded-lg border border-slate-300 bg-white p-5"
+          className="space-y-4 rounded-lg border border-slate-200 bg-white p-5"
         >
           <h2 className="text-base font-semibold">월 보험료</h2>
 
@@ -208,7 +208,7 @@ export default function RegionalPremiumCalc() {
           {ROUTES.voluntaryContinuation.ready && (
             <a
               href={`${ROUTES.voluntaryContinuation.path}?property=${property}`}
-              className="block rounded-md bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
+              className="block min-h-[44px] rounded-md bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
             >
               임의계속가입이 더 싸지 않을까요 →
             </a>
@@ -216,7 +216,7 @@ export default function RegionalPremiumCalc() {
 
           <div className="space-y-1 border-t border-slate-100 pt-3">
             {result.basis.map((b) => (
-              <p key={b} className="text-xs text-slate-400">
+              <p key={b} className="text-sm text-slate-600">
                 근거 · {b}
               </p>
             ))}

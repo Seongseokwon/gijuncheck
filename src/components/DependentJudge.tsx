@@ -20,16 +20,30 @@ import {
   Select,
   SubmitButton,
 } from './ui';
-import { emptyInput, judgeDependent, toManwon } from '@/lib/dependent/judge';
+import { emptyInput, judgeDependent, toEok, toManwon } from '@/lib/dependent/judge';
 import {
   RELATION_LABEL,
   STEP_LABEL,
   type DependentInput,
+  type JudgeStep,
   type Relation,
 } from '@/lib/dependent/types';
 import { DISCLAIMER } from '@/lib/constants/2026';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
+
+/**
+ * 근거 조항 원문 링크.
+ *
+ * 출처는 docs/01-상세기획서.md 부록·design-preview/index3.html 이 이미 쓰던
+ * 법제처 URL을 그대로 재사용한다(ADR-002 — 근거는 실제 링크로 연결한다).
+ * step 으로 매핑해 judge.ts 의 BASIS 문구가 바뀌어도 깨지지 않게 한다.
+ */
+const BASIS_URL: Record<JudgeStep, string> = {
+  support: 'https://law.go.kr/LSW/flDownload.do?gubun=&flSeq=28368278',
+  income: 'https://www.law.go.kr/flDownload.do?flSeq=96554199',
+  property: 'https://www.law.go.kr/flDownload.do?flSeq=96554199',
+};
 
 const INCOME_FIELDS: Array<{
   key: keyof DependentInput['income'];
@@ -203,23 +217,36 @@ export default function DependentJudge() {
         </SubmitButton>
       </Card>
 
-      {/* ---------- 결과 ---------- */}
+      {/*
+        ---------- 결과 ----------
+        완전 무채색 판정 (docs/design-decisions/ADR-001·ADR-002).
+        인정/탈락을 emerald/rose 색으로 구분하지 않는다. 구분은 ✓/✕ 기호와
+        텍스트로만 전달한다 — 법적 리스크 비평이 "색이 결론을 곁눈질만으로
+        확신시킨다"고 지적한 지점을 없앤 것이다.
+      */}
       {submitted && (
         <section
           // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
           role="status"
           aria-live="polite"
-          className={
-            'rounded-lg border p-5 ' +
-            (result.eligible
-              ? 'border-emerald-200 bg-emerald-50'
-              : 'border-rose-200 bg-rose-50')
-          }
+          className="rounded-lg border border-slate-200 bg-slate-50 p-5"
         >
-          <p className="text-lg font-bold text-slate-900">
+          <p className="text-lg font-bold text-brand-950">
             {result.eligible
               ? '피부양자 자격이 인정될 것으로 보입니다'
-              : `${STEP_LABEL[result.failedAt!]}에서 탈락합니다`}
+              : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
+          </p>
+
+          {/* 입력값 요약 — 결론과 같은 시야에 둔다 (ADR-001 결과 화면 순서 결정) */}
+          <p className="mt-2 text-sm text-slate-600">
+            확인에 사용한 입력 · 합산소득{' '}
+            <strong className="font-semibold text-slate-900">
+              {toManwon(result.totalIncome)}
+            </strong>{' '}
+            · 재산세 과세표준{' '}
+            <strong className="font-semibold text-slate-900">
+              {toEok(input.propertyTaxBase)}
+            </strong>
           </p>
 
           <ol className="mt-4 space-y-3">
@@ -230,10 +257,7 @@ export default function DependentJudge() {
               >
                 <div className="flex items-center gap-2">
                   <span
-                    className={
-                      'inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-white ' +
-                      (s.passed ? 'bg-emerald-500' : 'bg-rose-500')
-                    }
+                    className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-900 text-xs font-bold text-white"
                     aria-hidden
                   >
                     {s.passed ? '✓' : '✕'}
@@ -248,7 +272,17 @@ export default function DependentJudge() {
                 <p className="mt-2 text-sm leading-relaxed text-slate-700">
                   {s.message}
                 </p>
-                <p className="mt-1 text-xs text-slate-400">근거 · {s.basis}</p>
+                <p className="mt-1 text-sm text-slate-600">
+                  근거 ·{' '}
+                  <a
+                    href={BASIS_URL[s.step]}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-700 underline underline-offset-2 hover:text-accent-600"
+                  >
+                    {s.basis}
+                  </a>
+                </p>
               </li>
             ))}
           </ol>
@@ -261,13 +295,13 @@ export default function DependentJudge() {
           {!result.eligible && ROUTES.regionalPremium.ready && (
             <a
               href={`${ROUTES.regionalPremium.path}?income=${result.totalIncome}&property=${input.propertyTaxBase}`}
-              className="mt-4 block rounded-md bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-slate-800"
+              className="mt-4 block min-h-[44px] rounded-md bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
             >
               그러면 보험료는 얼마인가요 →
             </a>
           )}
 
-          <p className="mt-4 text-xs leading-relaxed text-slate-500">
+          <p className="mt-4 text-sm leading-relaxed text-slate-600">
             {DISCLAIMER}
           </p>
         </section>

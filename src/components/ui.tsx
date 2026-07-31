@@ -22,14 +22,19 @@ export { won } from '@/lib/format';
  * 금액을 계속 입력하는 도구라 확대가 반복되면 매우 거슬린다.
  * 모바일에서는 16px(text-base), 넓은 화면에서만 14px(text-sm) 로 되돌린다.
  *
+ * 테두리를 border-slate-500 로 쓰는 이유 (border-slate-300 아님):
+ * docs/design-debate/00-brief.md 의 대비 기준선 표가 border-slate-300 on white 를
+ * 1.48:1(비텍스트 UI 기준 3:1 미달)로 이미 확인했다. slate-500 은 4.01:1 로 통과한다.
+ * design-preview/index3.html 에서 같은 문제를 같은 방식으로 고쳤다(ADR-002).
+ *
  * 색을 명시하는 이유:
  * 기기가 다크모드면 iOS Safari 가 폼 컨트롤 색을 자체 보정해
  * 비활성처럼 회색으로 보인다. globals.css 의 color-scheme 과 함께 막는다.
  */
 export const inputCls =
-  'w-full rounded-md border border-slate-300 bg-white px-3 py-2 ' +
-  'text-base text-slate-900 placeholder:text-slate-400 sm:text-sm ' +
-  'focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900';
+  'w-full rounded-md border border-slate-500 bg-white px-3 py-2 ' +
+  'text-base text-slate-900 placeholder:text-slate-500 sm:text-sm ' +
+  'focus:border-accent-700 focus:outline-none focus:ring-1 focus:ring-accent-700';
 
 export function Field({
   label,
@@ -44,7 +49,12 @@ export function Field({
     <label className="block">
       <span className="block text-sm font-medium text-slate-700">
         {label}
-        {hint && <span className="ml-1 text-xs text-slate-400">{hint}</span>}
+        {/*
+          text-slate-600 인 이유: slate-400(2.56:1)·slate-500(4.01:1, 14px 미만에서
+          4.5:1 기준 미달)는 본문 대비 기준을 통과하지 못한다. slate-600(5.85:1)부터
+          통과한다 — 00-brief.md 대비표 및 index3.html(ADR-002)과 동일한 결론.
+        */}
+        {hint && <span className="ml-1 text-xs text-slate-600">{hint}</span>}
       </span>
       <div className="mt-1">{children}</div>
     </label>
@@ -194,9 +204,9 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <section className="space-y-5 rounded-lg border border-slate-200 bg-white p-5">
+    <section className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
       {title && (
-        <h2 className="text-base font-semibold text-slate-900">{title}</h2>
+        <h2 className="text-base font-semibold text-brand-950">{title}</h2>
       )}
       {children}
     </section>
@@ -214,7 +224,7 @@ export function SubmitButton({
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-md bg-slate-900 px-4 py-3 text-sm font-semibold text-white hover:bg-slate-800"
+      className="w-full min-h-[48px] rounded-md bg-brand-900 px-4 py-3 text-sm font-semibold text-white hover:bg-brand-800"
     >
       {children}
     </button>
@@ -228,7 +238,7 @@ export function SubmitButton({
 export function ReferenceOnlyNotice({ crossChecked }: { crossChecked: boolean }) {
   if (crossChecked) return null;
   return (
-    <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">
+    <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-relaxed text-amber-900">
       <strong className="font-semibold">참고용</strong> · 법령 기준으로 계산했으나
       국민건강보험공단 모의계산과의 대조 검증이 아직 완료되지 않았습니다. 실제
       고지 금액과 차이가 있을 수 있습니다.
@@ -252,7 +262,7 @@ export function ResultRow({
     <div className="flex items-baseline justify-between gap-4 py-1.5">
       <span className="text-sm text-slate-600">
         {label}
-        {hint && <span className="ml-1 text-xs text-slate-400">{hint}</span>}
+        {hint && <span className="ml-1 text-sm text-slate-600">{hint}</span>}
       </span>
       <span
         className={

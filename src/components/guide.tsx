@@ -221,7 +221,7 @@ export function ToolCta({
   return (
     <a
       href={route.path}
-      className="block rounded-lg border border-slate-900 bg-slate-900 p-4 transition hover:bg-slate-800"
+      className="block rounded-lg border border-brand-900 bg-brand-900 p-4 transition hover:bg-brand-800"
     >
       <p className="text-sm font-semibold text-white">{route.label} →</p>
       <p className="mt-1 text-xs leading-relaxed text-slate-300">
@@ -295,7 +295,7 @@ export function RelatedList({ keys }: { keys: readonly RouteKey[] }) {
                   {r.label}
                 </a>
               ) : (
-                <span className="text-slate-400">{r.label} (준비 중)</span>
+                <span className="text-slate-500">{r.label} (준비 중)</span>
               )}
             </li>
           );

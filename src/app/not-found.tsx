@@ -20,7 +20,7 @@ export default function NotFound() {
   return (
     <div className="space-y-8">
       <section>
-        <p className="text-sm font-semibold text-slate-400">404</p>
+        <p className="text-sm font-semibold text-slate-500">404</p>
         <h1 className="mt-1 text-2xl font-bold leading-snug">
           찾으시는 페이지가 없습니다
         </h1>

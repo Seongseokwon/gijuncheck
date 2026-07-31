@@ -232,8 +232,11 @@ export interface ComparisonResult {
   totalSaving: number;
   /** 최대 유지 개월 */
   maxMonths: number;
-  /** 신고 기한 (일) */
-  applyDeadlineDays: number;
+  /**
+   * 신청기한 안내 문구.
+   * 고정 일수가 아니라 "최초 고지 납부기한 + 2개월"이라 숫자로 못 박지 않는다.
+   */
+  applyDeadlineRule: string;
   notes: string[];
 }
 
@@ -258,7 +261,7 @@ export function compareAfterRetirement(params: {
   });
 
   const notes: string[] = [
-    `임의계속가입은 퇴직 후 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내에 신고하면 퇴사일로 소급 인정됩니다.`,
+    `임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 퇴사일로 소급 인정됩니다.`,
     `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월까지 직장가입자 자격을 유지할 수 있습니다.`,
     '임의계속가입자는 재산이 보험료에 반영되지 않고, 피부양자를 등재할 수 있습니다.',
   ];
@@ -276,7 +279,7 @@ export function compareAfterRetirement(params: {
       monthlySaving: 0,
       totalSaving: 0,
       maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
-      applyDeadlineDays: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS,
+      applyDeadlineRule: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE,
       notes,
     };
   }
@@ -291,7 +294,7 @@ export function compareAfterRetirement(params: {
     monthlySaving,
     totalSaving: monthlySaving * VOLUNTARY_CONTINUATION.MAX_MONTHS,
     maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
-    applyDeadlineDays: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS,
+    applyDeadlineRule: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE,
     notes,
   };
 }

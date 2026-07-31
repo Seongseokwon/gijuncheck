@@ -4,7 +4,11 @@
  * 지역가입자 vs 임의계속가입 비교
  *
  * 이 도구의 핵심은 금액 두 개를 나란히 놓고 유리한 쪽을 명확히 말해주는 것.
- * 그리고 "90일 이내 신고" 안내 — 이 한 줄이 실제로 돈을 아껴준다.
+ * 그리고 신청기한 안내 — 이 한 줄이 실제로 돈을 아껴준다.
+ *
+ * 신청기한은 "퇴직 후 90일"이 아니다. 2026년 기준 올바른 기한은
+ * VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE 참조 — 고정 일수가 아니라
+ * 최초 지역보험료 납부기한부터 2개월이므로 숫자로 카운트다운하지 않는다.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -105,7 +109,7 @@ export default function VoluntaryComparison() {
         <div>
           <h3 className="text-sm font-semibold text-slate-900">
             퇴직 후 연간 소득{' '}
-            <span className="font-normal text-slate-400">
+            <span className="font-normal text-slate-600">
               (근로·연금은 50% 반영)
             </span>
           </h3>
@@ -161,7 +165,7 @@ export default function VoluntaryComparison() {
               </div>
             </section>
           ) : (
-            <section className="space-y-4 rounded-lg border border-slate-300 bg-white p-5">
+            <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-5">
               <p className="text-lg font-bold text-slate-900">
                 {voluntaryWins ? '임의계속가입' : '지역가입자'}가 월{' '}
                 {won(Math.abs(result.monthlySaving))} 유리합니다
@@ -239,25 +243,26 @@ export default function VoluntaryComparison() {
                 </div>
               )}
 
-              <div className="rounded-md border border-slate-900 bg-slate-900 px-4 py-3">
+              <div className="rounded-md border border-brand-900 bg-brand-900 px-4 py-3">
                 <p className="text-sm font-semibold text-white">
-                  퇴직 후 {result.applyDeadlineDays}일 이내에 신고하세요
+                  {result.applyDeadlineRule} 신고하세요
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-slate-300">
+                <p className="mt-1 text-sm leading-relaxed text-slate-300">
                   기한 내 신고하면 퇴사일로 소급 인정됩니다. 놓치면 그 기간의
-                  지역보험료를 그대로 내야 합니다.
+                  지역보험료를 그대로 내야 합니다. 첫 지역보험료 고지서를
+                  받으면 그 납부기한부터 2개월을 세면 됩니다.
                 </p>
               </div>
 
               <ul className="space-y-1.5 border-t border-slate-100 pt-3">
                 {result.notes.slice(1).map((n) => (
-                  <li key={n} className="text-xs leading-relaxed text-slate-500">
+                  <li key={n} className="text-sm leading-relaxed text-slate-600">
                     · {n}
                   </li>
                 ))}
               </ul>
 
-              <p className="text-xs leading-relaxed text-slate-500">
+              <p className="text-sm leading-relaxed text-slate-600">
                 {DISCLAIMER}
               </p>
             </section>

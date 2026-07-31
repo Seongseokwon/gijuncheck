@@ -115,7 +115,7 @@ export default function Page() {
                     {g.label}
                   </a>
                 ) : (
-                  <span className="text-slate-400">{g.label} (준비 중)</span>
+                  <span className="text-slate-500">{g.label} (준비 중)</span>
                 )}
               </li>
             ))}

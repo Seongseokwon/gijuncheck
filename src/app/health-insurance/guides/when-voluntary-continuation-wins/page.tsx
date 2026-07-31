@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   description:
     `임의계속가입은 퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 중 직장가입 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상이면 신청할 수 있고, ` +
     `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 유지됩니다. 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ` +
-    `퇴직 후 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내 신고 시 소급 인정됩니다.`,
+    `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정됩니다.`,
   alternates: { canonical: PATH },
 };
 
@@ -43,7 +43,7 @@ const TOC: TocItem[] = [
   { id: 'what', label: '임의계속가입이란' },
   { id: 'why', label: '왜 싸지는가 — 재산이 빠진다' },
   { id: 'when', label: '유리한 경우 · 불리한 경우' },
-  { id: 'apply', label: '신청 조건과 90일 기한' },
+  { id: 'apply', label: '신청 조건과 신청기한' },
   { id: 'after', label: '36개월이 끝나면' },
 ];
 
@@ -61,7 +61,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: '언제까지 신청해야 하나요?',
-    a: `퇴직 후 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내입니다. 기한 내 신고하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않습니다. 놓치면 그 기간은 지역보험료로 확정됩니다.`,
+    a: `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE}입니다. "퇴직 후 90일"로 알려진 경우가 많은데 낡은 기준입니다. 기한 내 신고하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않습니다. 놓치면 그 기간은 지역보험료로 확정됩니다.`,
   },
   {
     q: '임의계속가입자도 피부양자를 등재할 수 있나요?',
@@ -208,8 +208,8 @@ export default function Page() {
           </P>
         </Section>
 
-        <Section id="apply" title="신청 조건과 90일 기한">
-          <P>조건은 하나이고, 기한은 짧습니다.</P>
+        <Section id="apply" title="신청 조건과 신청기한">
+          <P>조건은 하나이고, 기한은 생각보다 헷갈립니다.</P>
 
           <Ol>
             <li>
@@ -219,24 +219,28 @@ export default function Page() {
               합니다. 여러 직장을 합산해서 계산합니다.
             </li>
             <li>
-              <strong>신청 기한</strong> — 퇴직 후{' '}
-              {VOLUNTARY_CONTINUATION.APPLY_DEADLINE_DAYS}일 이내입니다.
+              <strong>신청 기한</strong> — {VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE}
+              입니다. 퇴직일로부터 며칠이라는 고정된 기한이 아닙니다.
             </li>
           </Ol>
 
-          <Callout tone="warn" title="90일이 이 글에서 가장 중요한 숫자입니다">
-            기한 내 신고하면 <strong>퇴사일로 소급 인정</strong>되어 그 기간의
-            지역보험료를 내지 않습니다. 기한을 넘기면 그 기간은 지역보험료로
-            확정되고 되돌릴 수 없습니다.
+          <Callout tone="warn" title="&ldquo;퇴직 후 90일&rdquo;은 낡은 안내입니다">
+            신청기한은 퇴직일이 아니라 <strong>지역가입자로 전환된 뒤 처음
+            받는 지역보험료 고지서의 납부기한</strong>을 기준으로, 그 납부기한부터
+            2개월이 지나기 전까지입니다. 기한 내 신청하면{' '}
+            <strong>퇴사일로 소급 인정</strong>되어 그 기간의 지역보험료를
+            내지 않습니다. 기한을 넘기면 그 기간은 지역보험료로 확정되고
+            되돌릴 수 없습니다.
             <br />
             <br />
-            퇴직 직후에는 정신이 없어 놓치기 쉽습니다. 퇴직이 정해지면 캘린더에
-            먼저 적어두는 편이 안전합니다.
+            첫 지역보험료 고지서를 받는 순간이 기준점입니다. 퇴직이 정해지면
+            "고지서가 오면 바로 납부기한을 확인한다"를 캘린더에 적어두는 편이
+            안전합니다.
           </Callout>
 
           <P>
             신청은 국민건강보험공단 지사 방문, 우편, 팩스, 또는 홈페이지·앱으로 할
-            수 있습니다. 정확한 서류와 절차는 공단(1577-1000)에 확인하세요.
+            수 있습니다. 정확한 기한과 서류·절차는 공단(1577-1000)에 확인하세요.
           </P>
         </Section>
 
