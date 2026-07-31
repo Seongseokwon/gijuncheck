@@ -95,6 +95,7 @@ export default function RootLayout({
               <a href="/#guides" className="min-h-[44px] inline-flex items-center hover:text-brand-900">가이드</a>
               <a href="/#journey" className="min-h-[44px] inline-flex items-center hover:text-brand-900">이용 방법</a>
               <a href="/#judge" className="min-h-[44px] inline-flex items-center hover:text-brand-900">피부양자 판정</a>
+              <a href={ROUTES.verificationPolicy.path} className="min-h-[44px] inline-flex items-center hover:text-brand-900">검증 원칙</a>
               <a
                 href="/#judge"
                 className="min-h-[44px] inline-flex items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
@@ -117,6 +118,12 @@ export default function RootLayout({
               기준 · {SITE.baseYear}년 · 최종 확인 {SITE.lastVerified}
             </p>
             <nav className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
+              <a
+                href={ROUTES.verificationPolicy.path}
+                className="underline hover:text-brand-900"
+              >
+                {ROUTES.verificationPolicy.label}
+              </a>
               {POLICY_KEYS.filter((k) => ROUTES[k].ready).map((k) => (
                 <a
                   key={k}

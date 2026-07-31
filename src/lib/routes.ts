@@ -98,6 +98,13 @@ export const ROUTES = {
     ready: true,
   },
 
+  verificationPolicy: {
+    path: '/verification-policy/',
+    label: '검증 원칙',
+    priority: 0.5,
+    ready: true,
+  },
+
   // ---- 국민연금 ----
   pensionEarlyVsDeferred: {
     path: '/national-pension/early-vs-deferred/',

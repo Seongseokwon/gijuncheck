@@ -40,9 +40,11 @@ import { track } from '@/lib/analytics';
  * step 으로 매핑해 judge.ts 의 BASIS 문구가 바뀌어도 깨지지 않게 한다.
  */
 const BASIS_URL: Record<JudgeStep, string> = {
-  support: 'https://law.go.kr/LSW/flDownload.do?gubun=&flSeq=28368278',
-  income: 'https://www.law.go.kr/flDownload.do?flSeq=96554199',
-  property: 'https://www.law.go.kr/flDownload.do?flSeq=96554199',
+  // flDownload 링크는 과거 특정 시점의 별표 파일을 열 수 있다. 결과 화면에서는
+  // 시행일·개정 이력을 확인할 수 있는 현행 법령 본문으로 연결한다.
+  support: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+  income: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+  property: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
 };
 
 const INCOME_FIELDS: Array<{
