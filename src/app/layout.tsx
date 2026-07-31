@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     // public/og.png 를 미리 만들어 두고 참조한다.
     images: [
       {
-        url: '/og.png',
+        url: SITE.ogImage,
         width: 1200,
         height: 630,
         alt: SITE.description,
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     // 이미지가 크게 나오는 카드. 도구 사이트는 이게 클릭률이 좋다
     card: 'summary_large_image',
-    images: ['/og.png'],
+    images: [SITE.ogImage],
   },
   // 최종 도메인이 아니면 전 페이지 noindex. src/lib/site.ts 참조
   robots: SITE.indexable
