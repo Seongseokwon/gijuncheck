@@ -27,6 +27,8 @@ const LEAD =
   '사업자등록을 하면 세금이 유리해진다는 말은 절반만 맞습니다. ' +
   '건강보험 피부양자였던 사람에게는 등록 즉시 자격이 사라지고, ' +
   '매달 나가는 보험료가 새로 생깁니다. 이 금액을 먼저 계산해야 판단이 됩니다.';
+const ANSWER =
+  '사업자등록 전에는 등록으로 줄어드는 세금과 새로 생길 건강보험료를 함께 계산해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -116,7 +118,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="trap" title="사업자등록의 숨은 비용">
           <P>

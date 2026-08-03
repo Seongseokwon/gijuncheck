@@ -28,6 +28,8 @@ const LEAD =
   '피부양자에서 탈락하면 보험료가 그때부터 나오는 것이 아니라 ' +
   '자격을 잃은 날로 소급해서 부과될 수 있습니다. ' +
   '신고가 늦으면 몇 달치가 한 번에 청구되므로, 시점을 아는 것이 금액을 줄이는 방법입니다.';
+const ANSWER =
+  '피부양자 자격은 사유 발생일을 기준으로 상실될 수 있고, 신고가 늦으면 지역보험료가 소급 부과될 수 있습니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -107,7 +109,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="direction" title="소급은 양방향이다 — 취득과 상실의 차이">
           <P>

@@ -29,6 +29,8 @@ const LEAD =
   '피부양자 자격과 건강보험료를 계산할 때 쓰는 재산 금액은 공시가격이 아니라 ' +
   '재산세 과세표준입니다. 이 둘을 혼동하면 판정 결과가 완전히 달라집니다. ' +
   '차이가 왜 생기는지, 내 과세표준을 어디서 확인하는지 정리했습니다.';
+const ANSWER =
+  '건강보험 판정에 입력할 재산은 공시가격이 아니라 재산세 과세표준이며, 고지서나 위택스에서 확인해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -111,7 +113,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="why" title="왜 이걸 먼저 확인해야 하나">
           <P>

@@ -29,6 +29,8 @@ const LEAD =
   '퇴직하면 자동으로 지역가입자가 되지만, 신청하면 최대 36개월간 ' +
   '직장가입자 자격을 유지할 수 있습니다. 재산이 보험료에 반영되지 않기 때문에 ' +
   '집이 있는 퇴직자에게는 금액 차이가 큽니다. 다만 모두에게 유리한 것은 아닙니다.';
+const ANSWER =
+  '임의계속가입은 신청 조건과 기한을 충족할 때 선택할 수 있으며, 재산이 많은 퇴직자는 지역보험료와 실제 금액을 비교해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -113,7 +115,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="what" title="임의계속가입이란">
           <P>

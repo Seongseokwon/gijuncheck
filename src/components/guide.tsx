@@ -75,10 +75,12 @@ export interface TocItem {
 export function GuideHeader({
   title,
   lead,
+  answer,
   toc,
 }: {
   title: string;
   lead: string;
+  answer: string;
   toc: TocItem[];
 }) {
   return (
@@ -86,6 +88,11 @@ export function GuideHeader({
       <p className="text-sm font-extrabold text-accent-700">건강보험 가이드</p>
       <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-brand-950 sm:text-4xl">{title}</h1>
       <p className="mt-5 text-base leading-8 text-slate-600">{lead}</p>
+
+      <div className="mt-6 rounded-2xl border border-accent-200 bg-accent-50 p-5">
+        <p className="text-sm font-extrabold text-accent-800">한 줄 답변</p>
+        <p className="mt-2 text-base font-bold leading-7 text-brand-950">{answer}</p>
+      </div>
 
       <nav className="mt-7 rounded-2xl bg-canvas p-5">
         <p className="text-sm font-extrabold text-brand-950">이 글의 순서</p>

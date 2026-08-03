@@ -27,6 +27,8 @@ const TITLE = '11월 건강보험 자격 일괄 재산정이란';
 const LEAD =
   '매년 11월이 되면 건강보험료가 바뀌고 피부양자 자격상실 통보가 몰립니다. ' +
   '작년 소득이 지금 반영되기 때문입니다. 왜 11월인지, 통보를 받으면 무엇을 확인해야 하는지 정리했습니다.';
+const ANSWER =
+  '11월에는 전년도 소득과 6월 1일 기준 재산 자료가 반영되므로, 통보받은 자격과 보험료를 자료 기준일과 함께 확인해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -107,7 +109,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="why" title="왜 11월인가">
           <P>

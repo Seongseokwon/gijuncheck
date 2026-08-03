@@ -27,6 +27,8 @@ const LEAD =
   '연금을 받기 시작하면 건강보험 자격이 바뀔 수 있습니다. ' +
   '중요한 것은 자격 판정과 보험료 계산에서 연금을 보는 방식이 서로 다르다는 점입니다. ' +
   '이 차이를 모르면 계산이 두 배로 틀어집니다.';
+const ANSWER =
+  '공적연금은 피부양자 판정에서 다른 소득과 합산되므로, 연금 개시 전 합산소득과 탈락 후 보험료를 함께 계산해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -109,7 +111,7 @@ export default function Page() {
       />
 
       <article className="mx-auto max-w-3xl space-y-10 px-4 py-10 sm:py-14">
-        <GuideHeader title={TITLE} lead={LEAD} toc={TOC} />
+        <GuideHeader title={TITLE} lead={LEAD} answer={ANSWER} toc={TOC} />
 
         <Section id="twofaces" title="같은 연금, 다른 두 기준">
           <P>
