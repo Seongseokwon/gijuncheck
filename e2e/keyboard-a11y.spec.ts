@@ -25,6 +25,11 @@ test('키보드만으로 관계 선택 → 소득 입력 → 제출 → 결과 �
   await expect(submitButton).toBeFocused();
   await page.keyboard.press('Enter');
 
+  const zeroValueDialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  await expect(zeroValueDialog).toBeVisible();
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Enter');
+
   const result = page.getByRole('status');
   await expect(result).toBeVisible();
 
@@ -49,6 +54,9 @@ test('탈락 시 이어지는 CTA(지역보험료 계산)가 연결된다 — �
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await page.getByLabel('근로소득').fill('30000000'); // 소득요건 초과로 탈락시킴
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+  await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
+    .getByRole('button', { name: '확인하고 판정하기' })
+    .click();
 
   await expect(page.getByRole('status')).toContainText('탈락할 것으로 보입니다');
   await expect(page.getByRole('link', { name: /보험료는 얼마인가요/ })).toHaveAttribute(

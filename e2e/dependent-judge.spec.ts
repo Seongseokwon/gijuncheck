@@ -27,6 +27,10 @@ async function setCohabiting(page: Page, cohabiting: boolean) {
 
 async function submit(page: Page) {
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+  const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  if (await dialog.isVisible()) {
+    await dialog.getByRole('button', { name: '확인하고 판정하기' }).click();
+  }
 }
 
 function result(page: Page) {
@@ -163,6 +167,26 @@ test('결과 화면에 확신 수준을 표시한다', async ({ page }) => {
 
 test('제출 전에는 결과 영역이 렌더링되지 않는다', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveCount(0);
+});
+
+test('0원 입력 항목이 있으면 확인 후 판정을 진행한다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+
+  const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('사업소득 · 0원');
+  await expect(page.getByRole('status')).toHaveCount(0);
+
+  await dialog.getByRole('button', { name: '입력 수정하기' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('status')).toHaveCount(0);
+
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+  await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
+    .getByRole('button', { name: '확인하고 판정하기' })
+    .click();
+  await expect(page.getByRole('status')).toBeVisible();
 });
 
 test('결과 화면도 뷰포트 폭을 넘어 가로 스크롤을 만들지 않는다', async ({ page }) => {

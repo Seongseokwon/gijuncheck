@@ -7,7 +7,7 @@
  * 스타일을 바꿀 일이 생기면 이 파일만 고친다.
  */
 
-import type { ReactNode } from 'react';
+import { useEffect, useId, type ReactNode } from 'react';
 import { toKoreanAmount } from '@/lib/format';
 
 // won() 을 이 파일에 정의하면 안 된다. 'use client' 모듈의 함수는
@@ -300,6 +300,85 @@ export function SubmitButton({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * 0원 입력 누락 여부를 제출 직전에 확인하는 모달.
+ * 0원은 유효한 입력일 수 있으므로 오류로 막지 않고, 사용자가 확인한 뒤 진행하게 한다.
+ */
+export function ZeroValueConfirmModal({
+  fields,
+  onCancel,
+  onConfirm,
+}: {
+  fields: string[];
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const titleId = useId();
+  const descriptionId = useId();
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCancel();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [onCancel]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand-950/55 p-4 sm:items-center">
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-7"
+      >
+        <h2 id={titleId} className="text-xl font-extrabold tracking-tight text-brand-950">
+          0원 입력 항목을 확인해 주세요
+        </h2>
+        <p id={descriptionId} className="mt-3 text-sm leading-6 text-slate-700">
+          다음 항목이 0원으로 입력되어 있습니다. 실제로 소득이나 재산이 없는 경우에는
+          그대로 진행해도 됩니다. 입력을 빠뜨린 항목이라면 수정해 주세요.
+        </p>
+
+        <ul className="mt-4 space-y-2 rounded-xl bg-canvas p-4 text-sm font-semibold text-slate-800">
+          {fields.map((field) => (
+            <li key={field} className="flex gap-2">
+              <span aria-hidden>·</span>
+              <span>{field} · 0원</span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            autoFocus
+            className="min-h-[48px] rounded-xl border border-slate-400 px-4 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50"
+          >
+            입력 수정하기
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-sm font-bold text-white hover:bg-brand-800"
+          >
+            확인하고 판정하기
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 

@@ -54,6 +54,9 @@ test('피부양자 판정 이벤트는 결과 범주만 기록하고 원본 입�
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await page.getByLabel('근로소득').fill('1234567');
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+  await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
+    .getByRole('button', { name: '확인하고 판정하기' })
+    .click();
 
   const captured = await events(page);
   const start = captured.find((event) => event.name === 'judge_start');

@@ -21,6 +21,7 @@ import {
   NumberInput,
   Select,
   SubmitButton,
+  ZeroValueConfirmModal,
 } from './ui';
 import { emptyInput, judgeDependent, toEok, toManwon } from '@/lib/dependent/judge';
 import { INCOME, PROPERTY } from '@/lib/constants/2026';
@@ -65,6 +66,7 @@ const INCOME_FIELDS: Array<{
 export default function DependentJudge() {
   const [input, setInput] = useState<DependentInput>(emptyInput);
   const [submitted, setSubmitted] = useState(false);
+  const [showZeroValueConfirm, setShowZeroValueConfirm] = useState(false);
   const judgeStarted = useRef(false);
 
   const result = useMemo(() => judgeDependent(input), [input]);
@@ -104,6 +106,35 @@ export default function DependentJudge() {
     ((step === 'income' &&
       (input.businessRegistered || result.totalIncome >= INCOME.TOTAL_LIMIT)) ||
       (step === 'property' && input.propertyTaxBase >= PROPERTY.SAFE_LIMIT));
+
+  const zeroValueFields = [
+    ...INCOME_FIELDS.filter((field) => input.income[field.key] === 0).map(
+      (field) => field.label,
+    ),
+    ...(input.propertyTaxBase === 0 ? ['재산세 과세표준'] : []),
+  ];
+
+  const completeJudge = () => {
+    recordJudgeStart();
+    setSubmitted(true);
+    // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
+    // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
+    track('judge_complete', {
+      eligible: result.eligible,
+      failed_at: result.failedAt,
+      relation: input.relation,
+      business_registered: input.businessRegistered,
+    });
+  };
+
+  const requestJudge = () => {
+    if (zeroValueFields.length > 0) {
+      setShowZeroValueConfirm(true);
+      return;
+    }
+
+    completeJudge();
+  };
 
   return (
     <div className="space-y-8">
@@ -233,7 +264,7 @@ export default function DependentJudge() {
           </p>
         </FormSection>
 
-        <FormSection number="3" title="사업자등록과 재산을 확인해주세요">
+        <FormSection number="3" title="사업자등록과 재산을 확인해 주세요">
           <div className="grid gap-5 sm:grid-cols-2">
           <Field label="사업자등록">
             <Select
@@ -257,18 +288,7 @@ export default function DependentJudge() {
 
         <div className="px-5 py-6 sm:px-7 sm:py-7">
           <SubmitButton
-            onClick={() => {
-              recordJudgeStart();
-              setSubmitted(true);
-              // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
-              // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
-              track('judge_complete', {
-                eligible: result.eligible,
-                failed_at: result.failedAt,
-                relation: input.relation,
-                business_registered: input.businessRegistered,
-              });
-            }}
+            onClick={requestJudge}
           >
             내 자격 판정하기
           </SubmitButton>
@@ -277,6 +297,17 @@ export default function DependentJudge() {
           </p>
         </div>
       </FormCard>
+
+      {showZeroValueConfirm && (
+        <ZeroValueConfirmModal
+          fields={zeroValueFields}
+          onCancel={() => setShowZeroValueConfirm(false)}
+          onConfirm={() => {
+            setShowZeroValueConfirm(false);
+            completeJudge();
+          }}
+        />
+      )}
 
       {/*
         ---------- 결과 ----------
