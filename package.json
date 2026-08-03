@@ -16,7 +16,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm test && npm run build"
+    "verify": "npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "verify:e2e": "npm run build && npm run test:e2e"
   },
   "dependencies": {
     "next": "^15.1.0",

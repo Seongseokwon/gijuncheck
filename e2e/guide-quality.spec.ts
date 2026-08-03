@@ -25,3 +25,31 @@ for (const key of GUIDE_KEYS) {
     expect(await internalLinks.count(), `${route.path} 내부 링크`).toBeGreaterThan(0);
   });
 }
+
+/**
+ * 검색 유입이 많은 대표 가이드는 모바일에서 표·목록·출처 블록까지 한 번 더 본다.
+ * 6편 전체를 모든 뷰포트에서 반복하지 않고, 레이아웃이 긴 두 편을 대표 샘플로 고정한다.
+ */
+const MOBILE_GUIDE_KEYS = ['guidePropertyTaxBase', 'guideLosingEligibility'] as const;
+
+for (const key of MOBILE_GUIDE_KEYS) {
+  const route = ROUTES[key];
+
+  test(`${route.path} — 모바일 대표 가이드 렌더링`, async ({ page, isMobile }) => {
+    test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+    await page.goto(route.path);
+
+    const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+      scrollWidth: document.documentElement.scrollWidth,
+      clientWidth: document.documentElement.clientWidth,
+    }));
+    expect(
+      scrollWidth,
+      `${route.path} 모바일 가로 스크롤 발생 (${scrollWidth} > ${clientWidth})`,
+    ).toBeLessThanOrEqual(clientWidth + 1);
+
+    await expect(page.locator('article h1')).toBeVisible();
+    await expect(page.getByText('근거 · 출처', { exact: true })).toBeVisible();
+    expect(await page.locator('article a[target="_blank"]').count()).toBeGreaterThan(0);
+  });
+}

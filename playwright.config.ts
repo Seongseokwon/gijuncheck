@@ -5,7 +5,9 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * 정적 export(out/) 를 대상으로 한다. `npm run build` 로 만든 out/ 을
  * serve 로 띄우고 그 위에서 테스트한다 — dev 서버(next dev)와는 번들링
- * 결과가 달라 실제 배포 산출물을 봐야 의미가 있다.
+ * 결과가 달라 실제 배포 산출물을 봐야 의미가 있다. 기본값은 항상 새 서버를
+ * 띄워 방금 만든 out/을 사용한다. 기존 서버 재사용이 꼭 필요하면
+ * `REUSE_E2E_SERVER=true`를 명시한다.
  */
 export default defineConfig({
   testDir: './e2e',
@@ -22,7 +24,7 @@ export default defineConfig({
   webServer: {
     command: 'npx serve out -l 4173',
     url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: process.env.REUSE_E2E_SERVER === 'true',
     timeout: 30_000,
   },
 
