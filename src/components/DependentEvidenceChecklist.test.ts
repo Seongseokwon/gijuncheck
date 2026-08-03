@@ -10,8 +10,12 @@ describe('buildEvidenceChecklist', () => {
     expect(data.items.map((item) => item.category)).toEqual(['관계', '소득', '재산']);
     expect(data.items[0].title).toBe('혼인·가족관계 확인');
     expect(data.items[0].detail).toContain('주민등록등본');
+    expect(data.items[0].linkLabel).toBe('가족관계등록부 증명서 발급(필요 시)');
     expect(data.questions[0]).toContain('추가 서류');
     expect(data.guides).toHaveLength(4);
+    expect(data.application.actor).toBe('직장가입자 또는 임의계속가입자');
+    expect(data.application.retroactiveDays).toBe(90);
+    expect(data.application.exception).toContain('천재지변·질병·사고');
   });
 
   it('changes the question and evidence detail when income is the failed step', () => {
