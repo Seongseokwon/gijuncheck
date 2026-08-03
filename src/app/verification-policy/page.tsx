@@ -102,8 +102,8 @@ export default function VerificationPolicyPage() {
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">임의계속가입 비교</td>
-                <td className="px-5 py-4 leading-6">지역보험료 계산 기준을 함께 사용하므로, 위 대조가 끝날 때까지 비교 결과를 제공하지 않습니다.</td>
-                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">비공개</span></td>
+                <td className="px-5 py-4 leading-6">법령·공단 안내의 자격·신청기한·보험료 산식과 대표 사례를 대조한 참고 비교입니다. 실제 고지액은 공단 자료 반영 결과를 확인해야 합니다.</td>
+                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-accent-100 px-3 py-1 text-xs font-bold text-accent-700">검증된 참고 비교</span></td>
               </tr>
             </tbody>
           </table>

@@ -54,17 +54,28 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
   );
 });
 
-test('홈 — 검증된 지역보험료는 접근 가능하고 임의계속가입만 준비 중이다', async ({ page }) => {
+test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async ({ page }) => {
   await page.goto('/');
   await expect(
     page.locator(`a[href="${ROUTES.regionalPremium.path}"]`),
   ).toHaveCount(1);
-  await expect(page.getByText('공단 대조 미완료')).toHaveCount(1);
+  await expect(
+    page.locator(`a[href="${ROUTES.voluntaryContinuation.path}"]`),
+  ).toHaveCount(1);
+  await expect(page.getByText('공단 대조 미완료')).toHaveCount(0);
   const disabledCards = page.locator('[aria-disabled="true"]');
-  await expect(disabledCards).toHaveCount(1);
-  for (const card of await disabledCards.all()) {
-    await expect(card.locator('a')).toHaveCount(0);
-  }
+  await expect(disabledCards).toHaveCount(0);
+});
+
+test('임의계속가입 비교 — 자격 충족 시 보험료와 신청기한을 보여준다', async ({ page }) => {
+  await page.goto(ROUTES.voluntaryContinuation.path);
+  await page.getByLabel(/^퇴직 전 12개월 보수월액 평균/).fill('4000000');
+  await page.getByLabel(/^퇴직 전 18개월 중 직장가입 개월수/).fill('12');
+  await page.getByRole('button', { name: '어느 쪽이 유리한지 비교하기' }).click();
+
+  await expect(page.getByRole('status')).toContainText('임의계속가입');
+  await expect(page.getByRole('status')).toContainText('보수월액보험료 50% 경감');
+  await expect(page.getByRole('status')).toContainText('납부기한으로부터 2개월');
 });
 
 test('검증 원칙 페이지가 정상 로드된다', async ({ page }) => {

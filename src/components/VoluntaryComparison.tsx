@@ -113,8 +113,17 @@ export default function VoluntaryComparison() {
         </FormSection>
 
         <FormSection number="2" title="퇴직 후 소득을 입력해주세요">
-          <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">근로·연금소득은 50%, 사업·금융소득은 100% 반영합니다.</p>
-          <div className="grid gap-5 sm:grid-cols-3">
+          <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
+            보수 외 소득은 연 2,000만원 초과분만 추가 반영합니다. 근로·연금소득은
+            50%, 사업·금융·기타소득은 100% 반영합니다.
+          </p>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <Field label="근로소득 (50%)">
+              <MoneyInput
+                value={income.wage}
+                onChange={(v) => set('wage', v)}
+              />
+            </Field>
             <Field label="연금소득 (50%)">
               <MoneyInput
                 value={income.pension}
@@ -133,7 +142,18 @@ export default function VoluntaryComparison() {
                 onChange={(v) => set('financial', v)}
               />
             </Field>
+            <Field label="기타소득 (100%)" hint="과세자료 기준">
+              <MoneyInput
+                value={income.other}
+                onChange={(v) => set('other', v)}
+              />
+            </Field>
           </div>
+          <p className="mt-4 text-xs leading-5 text-slate-500">
+            보수 외 소득은 공단이 국세청 자료로 확인하는 종합과세 대상 소득 기준과
+            달라질 수 있습니다. 비과세·일부 분리과세 소득은 실제 부과에서 제외될 수
+            있으므로 최종 금액은 공단 고지서를 확인하세요.
+          </p>
         </FormSection>
 
         <div className="px-5 py-6 sm:px-7 sm:py-7">
@@ -224,8 +244,13 @@ export default function VoluntaryComparison() {
                     {won(voluntary!.total)}
                   </p>
                   <p className="mt-2 text-sm text-slate-600">
-                    재산 미반영 · 보수월액의 절반 부담
+                    재산 미반영 · 보수월액보험료 50% 경감
                   </p>
+                  {(voluntary!.nonWageIncomePortion ?? 0) > 0 && (
+                    <p className="mt-1 text-sm text-slate-600">
+                      보수 외 소득보험료 추가 {won(voluntary!.nonWageIncomePortion ?? 0)}
+                    </p>
+                  )}
                 </div>
               </div>
 

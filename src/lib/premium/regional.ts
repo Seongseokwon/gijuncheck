@@ -77,6 +77,8 @@ export function incomeBaseForPremium(income: Income): IncomeBase {
 export interface PremiumBreakdown {
   /** 소득 기준 보험료 (원/월) */
   incomePortion: number;
+  /** 임의계속가입자에게 별도로 더해지는 보수 외 소득월액보험료 (원/월) */
+  nonWageIncomePortion?: number;
   /** 재산 기준 보험료 (원/월) */
   propertyPortion: number;
   /** 적용된 재산 부과점수 */
@@ -169,6 +171,7 @@ export function calculateRegionalPremium(
 
   return {
     incomePortion,
+    nonWageIncomePortion: 0,
     propertyPortion,
     propertyScore: property.score,
     propertyGrade: property.grade,
@@ -193,14 +196,54 @@ export function calculateRegionalPremium(
  */
 export function calculateVoluntaryPremium(
   avgMonthlyWage: number,
+  income: Income = {
+    business: 0,
+    wage: 0,
+    pension: 0,
+    financial: 0,
+    other: 0,
+  },
 ): PremiumBreakdown {
-  const full = avgMonthlyWage * RATE.HEALTH;
-  const beforeLimit = Math.round(full / 2); // 본인 부담 50%
-  const { health, limitApplied } = applyLimit(beforeLimit);
+  const fullWagePremium = Math.min(
+    avgMonthlyWage * RATE.HEALTH,
+    VOLUNTARY_CONTINUATION.REMUNERATION_PREMIUM_UPPER,
+  );
+  const wagePremium = Math.floor(fullWagePremium / 2); // 보수월액보험료 50% 경감
+  const annualIncome =
+    income.business +
+    income.wage +
+    income.pension +
+    income.financial +
+    income.other;
+  const excessIncome = Math.max(
+    0,
+    annualIncome - VOLUNTARY_CONTINUATION.NON_WAGE_INCOME_THRESHOLD,
+  );
+  const fullIncome = income.business + income.financial + income.other;
+  const halfIncome = income.wage + income.pension;
+  const reflectedExcessIncome =
+    annualIncome > 0
+      ? excessIncome * ((fullIncome + halfIncome * INCOME_REFLECTION.HALF) / annualIncome)
+      : 0;
+  const nonWagePremium = Math.min(
+    Math.floor((reflectedExcessIncome / 12) * RATE.HEALTH),
+    VOLUNTARY_CONTINUATION.NON_WAGE_PREMIUM_UPPER,
+  );
+  const beforeLimit = wagePremium + nonWagePremium;
+  const healthBeforeFloor = Math.max(beforeLimit, PREMIUM_LIMIT.LOWER);
+  const health = roundPremiumUnit(healthBeforeFloor);
+  const limitApplied =
+    healthBeforeFloor > beforeLimit
+      ? 'lower'
+      : fullWagePremium === VOLUNTARY_CONTINUATION.REMUNERATION_PREMIUM_UPPER ||
+          nonWagePremium === VOLUNTARY_CONTINUATION.NON_WAGE_PREMIUM_UPPER
+        ? 'upper'
+        : null;
   const longTermCare = longTermCareOf(health);
 
   return {
-    incomePortion: health,
+    incomePortion: wagePremium,
+    nonWageIncomePortion: nonWagePremium,
     propertyPortion: 0,
     propertyScore: 0,
     propertyGrade: null, // 재산을 반영하지 않으므로 등급 개념이 없다
@@ -212,7 +255,12 @@ export function calculateVoluntaryPremium(
     // 재산점수표에 의존하지 않으므로 등급표 검증 상태와 무관하다
     verified: true,
     crossChecked: true,
-    basis: [BASIS.RATE, BASIS.PREMIUM_LIMIT],
+    basis: [
+      BASIS.RATE,
+      BASIS.PREMIUM_LIMIT,
+      BASIS.VOLUNTARY_CONTINUATION,
+      BASIS.NON_WAGE_INCOME,
+    ],
   };
 }
 
@@ -297,7 +345,10 @@ export function compareAfterRetirement(params: {
     };
   }
 
-  const voluntary = calculateVoluntaryPremium(params.avgMonthlyWage);
+  const voluntary = calculateVoluntaryPremium(
+    params.avgMonthlyWage,
+    params.income,
+  );
   const monthlySaving = regional.total - voluntary.total;
 
   return {

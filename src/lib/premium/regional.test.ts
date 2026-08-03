@@ -361,6 +361,46 @@ describe('임의계속가입 보험료', () => {
     expect(r.verified).toBe(true);
     expect(r.crossChecked).toBe(true);
   });
+
+  it('보수 외 소득이 연 2,000만원 이하면 추가 보험료가 없다', () => {
+    const r = calculateVoluntaryPremium(
+      4_000_000,
+      income({ business: 20_000_000 }),
+    );
+    expect(r.nonWageIncomePortion).toBe(0);
+    expect(r.health).toBe(143_800);
+  });
+
+  it('보수 외 소득 초과분은 종류별 반영률을 적용해 추가한다', () => {
+    const r = calculateVoluntaryPremium(
+      4_000_000,
+      income({ business: 30_000_000 }),
+    );
+    expect(r.nonWageIncomePortion).toBe(
+      Math.floor((10_000_000 / 12) * RATE.HEALTH),
+    );
+    expect(r.healthBeforeLimit).toBe(143_800 + r.nonWageIncomePortion!);
+    expect(r.health).toBe(Math.floor(r.healthBeforeLimit / 10) * 10);
+  });
+
+  it('근로·연금소득은 보수 외 소득 추가분에서 50%만 반영한다', () => {
+    const r = calculateVoluntaryPremium(
+      4_000_000,
+      income({ business: 30_000_000, pension: 10_000_000 }),
+    );
+    expect(r.nonWageIncomePortion).toBe(
+      Math.floor((17_500_000 / 12) * RATE.HEALTH),
+    );
+  });
+
+  it('보수월액·보수 외 소득 보험료는 각각의 직장가입자 상한을 적용한다', () => {
+    const r = calculateVoluntaryPremium(
+      200_000_000,
+      income({ business: 1_000_000_000 }),
+    );
+    expect(r.health).toBe(9_183_480);
+    expect(r.limitApplied).toBe('upper');
+  });
 });
 
 /* ------------------------------------------------------------------ */

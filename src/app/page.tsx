@@ -6,9 +6,9 @@ const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
   dependent:
     '관계·소득·재산을 순서대로 확인하고, 어느 요건에서 왜 걸리는지 근거 조항까지 보여줍니다.',
   regionalPremium:
-    '지역가입자 보험료 기준의 공단 대조가 끝난 뒤 계산 기능을 공개합니다.',
+    '2026년 공단 모의계산 대조를 마친 지역가입자 보험료를 참고 계산합니다.',
   voluntaryContinuation:
-    '지역보험료 기준 검증이 끝난 뒤 임의계속가입 비교 기능을 공개합니다.',
+    '현행 법령·공단 안내와 보험료 산식을 적용해 지역가입자와 비교합니다.',
 };
 
 const SCENARIOS = [
@@ -217,7 +217,7 @@ export default function Home() {
                 <li key={key} className="relative border-t border-slate-200 first:border-t-0 lg:border-l lg:border-t-0 lg:first:border-l-0">
                   {tool.ready ? (
                     <TrackedLink
-                      href={key === 'regionalPremium' ? tool.path : '#judge'}
+                      href={key === 'dependent' ? '#judge' : tool.path}
                       location="tool"
                       className="block min-h-[224px] p-7 transition hover:bg-slate-50"
                     >

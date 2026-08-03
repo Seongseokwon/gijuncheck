@@ -133,6 +133,12 @@ export const VOLUNTARY_CONTINUATION = {
   LOOKBACK_MONTHS: 18,
   /** 최대 유지 가능 기간 (개월) */
   MAX_MONTHS: 36,
+  /** 보수 외 소득월액보험료가 시작되는 연간 보수 외 소득 기준 */
+  NON_WAGE_INCOME_THRESHOLD: 20_000_000,
+  /** 직장가입자 보수월액보험료 상한 (경감 전, 원/월) */
+  REMUNERATION_PREMIUM_UPPER: 9_183_480,
+  /** 직장가입자 소득월액보험료 상한 (원/월) */
+  NON_WAGE_PREMIUM_UPPER: 4_591_740,
   /**
    * 신청기한.
    *
@@ -161,6 +167,9 @@ export const BASIS = {
   RATE: '국민건강보험공단 2026년도 보험료율 고시',
   PROPERTY_SCORE: '국민건강보험법 시행령 별표 4 (재산보험료부과점수 산정방법)',
   PREMIUM_LIMIT: '보건복지부 월별 건강보험료액의 상한과 하한에 관한 고시',
+  VOLUNTARY_CONTINUATION:
+    '국민건강보험법 제110조 및 보건복지부 보험료 경감고시 제9조',
+  NON_WAGE_INCOME: '국민건강보험법 제71조 및 시행령 제41조',
 } as const;
 
 export const DISCLAIMER =

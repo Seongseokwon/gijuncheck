@@ -51,8 +51,8 @@ export const ROUTES = {
     path: '/health-insurance/voluntary-continuation/',
     label: '임의계속가입 비교',
     priority: 0.8,
-    /** 지역보험료는 검증됐지만 임의계속가입 자체의 공식 대조 전까지 비공개 */
-    ready: false,
+    /** 2026-08-03 법령·공단 산식·대표 사례 대조 완료 */
+    ready: true,
   },
 
   // ---- 건강보험 가이드 ----
