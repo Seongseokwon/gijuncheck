@@ -7,11 +7,10 @@
  */
 
 /**
- * 최종 서비스 도메인 (사대보험.kr 의 퓨니코드).
- * new URL('https://사대보험.kr').hostname 으로 뽑은 값.
- * 도메인을 바꾸면 이 값도 반드시 다시 뽑아서 넣을 것.
+ * 최종 서비스 도메인.
+ * 도메인을 바꾸면 이 값도 반드시 다시 넣을 것.
  */
-const PRODUCTION_URL = 'https://xn--vk1bu2qt3cr52a.kr';
+const PRODUCTION_URL = 'https://gijuncheck.kr';
 
 /**
  * 배포 URL 오버라이드.
