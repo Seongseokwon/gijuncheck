@@ -33,9 +33,9 @@ for (const route of PAGES) {
   });
 }
 
-test('홈 — 상단 CTA(피부양자 자격 확인하기)가 판정 섹션으로 스크롤된다', async ({ page }) => {
+test('홈 — 상단 CTA(피부양자 등록 전 기준 확인하기)가 판정 섹션으로 스크롤된다', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: '피부양자 자격 확인하기' }).click();
+  await page.getByRole('link', { name: '피부양자 등록 전 기준 확인하기' }).click();
   await expect(page.locator('#judge')).toBeInViewport();
 });
 

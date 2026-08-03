@@ -16,21 +16,25 @@ import {
   Field,
   FormCard,
   FormSection,
+  InfoTooltip,
   MoneyInput,
   NumberInput,
   Select,
   SubmitButton,
 } from './ui';
 import { emptyInput, judgeDependent, toEok, toManwon } from '@/lib/dependent/judge';
+import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import {
   RELATION_LABEL,
   STEP_LABEL,
   type DependentInput,
+  type JudgeStep,
   type Relation,
 } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
+import { getConfidenceSummary, RELATION_GUIDANCE, STEP_GUIDANCE } from '@/lib/dependent/guidance';
 import DependentEvidenceChecklist from './DependentEvidenceChecklist';
 
 /**
@@ -93,13 +97,20 @@ export default function DependentJudge() {
     !input.cohabiting &&
     (input.relation === 'linealAscendant' ||
       input.relation === 'spouseAscendant');
+  const relationGuidance = RELATION_GUIDANCE[input.relation];
+  const confidence = getConfidenceSummary(input, result);
+  const needsStepConfirmation = (step: JudgeStep) =>
+    confidence.level === 'verify' &&
+    ((step === 'income' &&
+      (input.businessRegistered || result.totalIncome >= INCOME.TOTAL_LIMIT)) ||
+      (step === 'property' && input.propertyTaxBase >= PROPERTY.SAFE_LIMIT));
 
   return (
     <div className="space-y-8">
       {/* ---------- 입력 ---------- */}
       <FormCard
-        title="피부양자 자격 확인"
-        description="관계·소득·재산 정보를 차례로 입력하면 적용 기준과 근거를 함께 확인할 수 있습니다."
+        title="피부양자 등록 전 기준 확인"
+        description="관계·소득·재산 정보를 차례로 입력하면 등록 전에 확인할 기준과 근거를 함께 볼 수 있습니다."
       >
         <FormSection number="1" title="누구를 피부양자로 등록하나요?">
           <div className="grid gap-5 sm:grid-cols-2">
@@ -174,6 +185,32 @@ export default function DependentJudge() {
             </Field>
           )}
           </div>
+
+          <aside
+            className="mt-5 rounded-xl border border-accent-200 bg-accent-50/60 p-4"
+            aria-live="polite"
+            aria-label={`${relationGuidance.title} 관계별 먼저 확인할 기준`}
+          >
+            <div className="flex items-start gap-2">
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-brand-950">
+                  {relationGuidance.title} 관계별 먼저 확인할 기준
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-700">
+                  {relationGuidance.summary}
+                </p>
+              </div>
+              <InfoTooltip>
+                관계 요건을 먼저 확인하는 이유는 가족관계·동거·혼인 상태에 따라 다음 소득·재산
+                단계로 넘어갈 수 있는 범위가 달라지기 때문입니다.
+              </InfoTooltip>
+            </div>
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed text-slate-700">
+              {relationGuidance.checks.map((check) => (
+                <li key={check}>{check}</li>
+              ))}
+            </ul>
+          </aside>
         </FormSection>
 
         <FormSection number="2" title="연간 소득을 입력해주세요">
@@ -256,11 +293,18 @@ export default function DependentJudge() {
           className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
         >
           <div className="border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
-          <p className="text-xl font-extrabold tracking-tight text-brand-950">
-            {result.eligible
-              ? '피부양자 자격이 인정될 것으로 보입니다'
-              : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-xl font-extrabold tracking-tight text-brand-950">
+              {result.eligible
+                ? '피부양자 자격이 인정될 것으로 보입니다'
+                : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
+            </p>
+            <span className="rounded-full border border-slate-400 bg-white px-3 py-1 text-xs font-bold text-slate-700">
+              {confidence.label}
+            </span>
+          </div>
+
+          <p className="mt-3 text-sm leading-relaxed text-slate-700">{confidence.detail}</p>
 
           <p className="mt-4 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-700">
             입력한 조건과 2026년 기준으로 계산한 참고 결과입니다.{' '}
@@ -299,11 +343,21 @@ export default function DependentJudge() {
                     {STEP_LABEL[s.step]}
                     <span className="sr-only">
                       {s.passed ? ' 통과' : ' 탈락'}
+                      {needsStepConfirmation(s.step) ? ' 추가 확인 필요' : ''}
                     </span>
                   </span>
+                  {needsStepConfirmation(s.step) && (
+                    <span className="rounded-full border border-slate-400 px-2 py-0.5 text-xs font-semibold text-slate-600">
+                      추가 확인
+                    </span>
+                  )}
+                  <InfoTooltip>{STEP_GUIDANCE[s.step].why}</InfoTooltip>
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-slate-700">
                   {s.message}
+                </p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  다음 확인 · {STEP_GUIDANCE[s.step].next}
                 </p>
                 <p className="mt-1 text-sm text-slate-600">
                   근거 ·{' '}

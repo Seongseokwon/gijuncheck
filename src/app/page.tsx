@@ -66,7 +66,7 @@ export default function Home() {
                 location="hero"
                 className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-brand-900 px-7 font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-brand-800 hover:shadow-lg"
               >
-                피부양자 자격 확인하기
+                피부양자 등록 전 기준 확인하기
                 <span aria-hidden>→</span>
               </TrackedLink>
               <a
@@ -287,12 +287,12 @@ export default function Home() {
       >
         <div className={shell}>
           <div className="max-w-3xl">
-            <p className="text-sm font-bold text-accent-700">피부양자 판정</p>
+            <p className="text-sm font-bold text-accent-700">피부양자 등록 전 기준 확인</p>
             <h2
               id="judge-title"
               className="mt-3 text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl"
             >
-              내 조건으로 직접 확인해보세요
+              등록 전에 내 조건을 확인해보세요
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
               입력값은 브라우저 안에서만 계산되며 서버로 전송하거나 저장하지

@@ -52,6 +52,12 @@ test.describe('관계 유형별 조건부 입력', () => {
     await expect(page.getByLabel('만 나이')).toHaveCount(0);
     await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toHaveCount(0);
   });
+
+  test('관계를 바꾸면 관계별 먼저 확인할 기준이 바뀐다', async ({ page }) => {
+    await selectRelation(page, '형제자매');
+    await expect(page.getByText('형제자매 관계별 먼저 확인할 기준')).toBeVisible();
+    await expect(page.locator('body')).toContainText('재산 기준도 일반 관계보다 엄격합니다');
+  });
 });
 
 test.describe('소득요건 경계값 — 합산소득 2,000만원', () => {
@@ -143,6 +149,16 @@ test('결과 화면에 입력값 요약(합산소득·재산세 과세표준)이
   await page.getByLabel('재산세 과세표준').fill('100000000');
   await submit(page);
   await expect(result(page)).toContainText('1,200만원');
+});
+
+test('결과 화면에 확신 수준을 표시한다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await submit(page);
+  await expect(result(page)).toContainText('기준상 가능성이 높음');
+
+  await page.getByRole('textbox', { name: /재산세 과세표준/ }).fill(String(PROPERTY_SAFE_LIMIT));
+  await submit(page);
+  await expect(result(page)).toContainText('추가 확인 필요');
 });
 
 test('제출 전에는 결과 영역이 렌더링되지 않는다', async ({ page }) => {
