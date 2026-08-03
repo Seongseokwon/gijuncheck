@@ -1,0 +1,153 @@
+import { test, expect, type Page } from '@playwright/test';
+import { ROUTES } from '../src/lib/routes';
+
+/**
+ * P0-2 "판정기의 관계 유형, 소득 경계, 재산 경계, 오류 메시지, 결과의 근거 링크를 손으로 점검한다"
+ * 를 자동화한다.
+ *
+ * 경계값은 src/lib/constants/2026.ts 를 따른다. 연도가 바뀌어 그 파일의 값이
+ * 바뀌면 아래 리터럴도 함께 갱신해야 한다 (파일 자체를 import 하지 않는 이유는
+ * playwright 가 tsconfig paths(@/) 를 해석하지 못해서다).
+ */
+const INCOME_TOTAL_LIMIT = 20_000_000; // INCOME.TOTAL_LIMIT
+const PROPERTY_SAFE_LIMIT = 540_000_000; // PROPERTY.SAFE_LIMIT
+const PROPERTY_HARD_LIMIT = 900_000_000; // PROPERTY.HARD_LIMIT
+
+test.beforeEach(async ({ page }) => {
+  await page.goto(ROUTES.dependent.path);
+});
+
+async function selectRelation(page: Page, label: string) {
+  await page.getByLabel('가입자와의 관계').selectOption({ label });
+}
+
+async function setCohabiting(page: Page, cohabiting: boolean) {
+  await page.getByLabel('동거 여부').selectOption({ label: cohabiting ? '동거' : '비동거' });
+}
+
+async function submit(page: Page) {
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+}
+
+function result(page: Page) {
+  return page.getByRole('status');
+}
+
+test.describe('관계 유형별 조건부 입력', () => {
+  test('형제자매를 선택하면 나이 입력이 나타난다', async ({ page }) => {
+    await expect(page.getByLabel('만 나이')).toHaveCount(0);
+    await selectRelation(page, '형제자매');
+    await expect(page.getByLabel('만 나이')).toBeVisible();
+  });
+
+  test('비동거 직계존속을 선택하면 형제자매 소득 여부 입력이 나타난다', async ({ page }) => {
+    await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toHaveCount(0);
+    await selectRelation(page, '직계존속 (부모·조부모)');
+    await setCohabiting(page, false);
+    await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toBeVisible();
+  });
+
+  test('배우자를 선택하면 나이·형제자매소득 입력이 모두 없다', async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await expect(page.getByLabel('만 나이')).toHaveCount(0);
+    await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toHaveCount(0);
+  });
+});
+
+test.describe('소득요건 경계값 — 합산소득 2,000만원', () => {
+  test('정확히 2,000만원이면 소득요건을 통과한다', async ({ page }) => {
+    await selectRelation(page, '배우자'); // 부양요건은 항상 통과, 소득요건만 본다
+    await page.getByLabel('근로소득').fill(String(INCOME_TOTAL_LIMIT));
+    await submit(page);
+    await expect(result(page)).toContainText('인정될 것으로 보입니다');
+  });
+
+  test('2,000만원을 1원이라도 초과하면 소득요건에서 탈락한다', async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await page.getByLabel('근로소득').fill(String(INCOME_TOTAL_LIMIT + 1));
+    await submit(page);
+    await expect(result(page)).toContainText('소득요건에서 탈락할 것으로 보입니다');
+    await expect(result(page)).toContainText('초과합니다');
+  });
+});
+
+test.describe('사업자등록 특례', () => {
+  test('사업자등록이 있으면 사업소득 1원만 있어도 탈락한다', async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await page.getByLabel('사업자등록').selectOption({ label: '있음' });
+    await page.getByLabel('사업소득').fill('1');
+    await submit(page);
+    await expect(result(page)).toContainText('소득요건에서 탈락할 것으로 보입니다');
+    await expect(result(page)).toContainText('사업자등록이 있는 경우 사업소득이 발생하면');
+  });
+
+  test('사업자등록이 없으면 사업소득 500만원까지는 통과한다', async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await page.getByLabel('사업자등록').selectOption({ label: '없음' });
+    await page.getByLabel('사업소득').fill('5000000');
+    await submit(page);
+    await expect(result(page)).toContainText('인정될 것으로 보입니다');
+  });
+});
+
+test.describe('재산요건 경계값', () => {
+  test(`재산세 과세표준 ${PROPERTY_SAFE_LIMIT.toLocaleString()}원(5.4억)이면 통과한다`, async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await page.getByLabel('재산세 과세표준').fill(String(PROPERTY_SAFE_LIMIT));
+    await submit(page);
+    await expect(result(page)).toContainText('인정될 것으로 보입니다');
+  });
+
+  test(`재산세 과세표준이 ${PROPERTY_HARD_LIMIT.toLocaleString()}원(9억)을 초과하면 소득이 없어도 탈락한다`, async ({ page }) => {
+    await selectRelation(page, '배우자');
+    await page.getByLabel('재산세 과세표준').fill(String(PROPERTY_HARD_LIMIT + 1));
+    await submit(page);
+    await expect(result(page)).toContainText('재산요건에서 탈락할 것으로 보입니다');
+    await expect(result(page)).toContainText('소득이 없어도 탈락합니다');
+  });
+});
+
+test('결과의 근거 링크는 새 탭으로 열리고 법제처 원문을 가리킨다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await submit(page);
+
+  const basisLinks = result(page).getByRole('link');
+  const count = await basisLinks.count();
+  expect(count, '판정 결과에 근거 링크가 최소 1개 있어야 한다').toBeGreaterThan(0);
+
+  for (let i = 0; i < count; i++) {
+    const link = basisLinks.nth(i);
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(link).toHaveAttribute('rel', /noopener/);
+    const href = await link.getAttribute('href');
+    expect(href, '근거 링크 href').toMatch(/^https:\/\/www\.law\.go\.kr\//);
+  }
+});
+
+test('결과 화면에 입력값 요약(합산소득·재산세 과세표준)이 결론과 같은 화면에 보인다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await page.getByLabel('근로소득').fill('12000000');
+  await page.getByLabel('재산세 과세표준').fill('100000000');
+  await submit(page);
+  await expect(result(page)).toContainText('1,200만원');
+});
+
+test('제출 전에는 결과 영역이 렌더링되지 않는다', async ({ page }) => {
+  await expect(page.getByRole('status')).toHaveCount(0);
+});
+
+test('결과 화면도 뷰포트 폭을 넘어 가로 스크롤을 만들지 않는다', async ({ page }) => {
+  await selectRelation(page, '형제자매'); // 필드 수가 가장 많은 관계 — 오버플로가 가장 잘 드러남
+  await setCohabiting(page, true);
+  await page.getByLabel('만 나이').fill('40');
+  await submit(page);
+  await expect(result(page)).toBeVisible();
+
+  const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(scrollWidth, `결과 화면이 뷰포트(${clientWidth}px)보다 넓게 렌더링됨`).toBeLessThanOrEqual(
+    clientWidth + 1,
+  );
+});
