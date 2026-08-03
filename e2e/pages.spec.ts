@@ -57,10 +57,10 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
 test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.locator(`a[href="${ROUTES.regionalPremium.path}"]`),
+    page.locator(`#journey a[href="${ROUTES.regionalPremium.path}"]`),
   ).toHaveCount(1);
   await expect(
-    page.locator(`a[href="${ROUTES.voluntaryContinuation.path}"]`),
+    page.locator(`#journey a[href="${ROUTES.voluntaryContinuation.path}"]`),
   ).toHaveCount(1);
   await expect(page.getByText('공단 대조 미완료')).toHaveCount(0);
   const disabledCards = page.locator('[aria-disabled="true"]');

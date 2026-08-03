@@ -53,3 +53,44 @@ for (const key of MOBILE_GUIDE_KEYS) {
     expect(await page.locator('article a[target="_blank"]').count()).toBeGreaterThan(0);
   });
 }
+
+test('모바일 FAQ 해시 진입 시 sticky header에 가리지 않는다', async ({ page, isMobile }) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+  await page.goto(`${ROUTES.guidePensionImpact.path}#faq-1`);
+
+  const measurements = await page.evaluate(() => {
+    const header = document.querySelector<HTMLElement>('body > header');
+    const target = document.getElementById('faq-1');
+    return {
+      headerHeight: header?.offsetHeight ?? 0,
+      targetTop: target?.getBoundingClientRect().top ?? -1,
+    };
+  });
+
+  expect(measurements.headerHeight).toBeGreaterThan(0);
+  expect(measurements.targetTop).toBeGreaterThanOrEqual(measurements.headerHeight);
+});
+
+test('모바일 홈에 가로 스크롤이 없다', async ({ page, isMobile }) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+  await page.goto(ROUTES.home.path);
+
+  const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+
+  expect(scrollWidth).toBeLessThanOrEqual(clientWidth + 1);
+});
+
+test('FAQ 해시 대상에 :target 강조가 적용된다', async ({ page, isMobile }) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+  await page.goto(`${ROUTES.guidePensionImpact.path}#faq-1`);
+
+  const colors = await page.evaluate(() => ({
+    target: getComputedStyle(document.getElementById('faq-1')!).backgroundColor,
+    normal: getComputedStyle(document.getElementById('faq-2')!).backgroundColor,
+  }));
+
+  expect(colors.target).not.toBe(colors.normal);
+});

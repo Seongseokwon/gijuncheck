@@ -19,6 +19,7 @@ import { SITE } from '@/lib/site';
 export interface FaqItem {
   q: string;
   a: string;
+  id?: string;
 }
 
 /**
@@ -123,7 +124,7 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="scroll-mt-24 space-y-4">
+    <section id={id} className="scroll-mt-44 sm:scroll-mt-24 space-y-4">
       <h2 className="text-2xl font-extrabold tracking-tight text-brand-950">{title}</h2>
       {children}
     </section>
@@ -240,13 +241,14 @@ export function ToolCta({
 
 export function FaqSection({ items }: { items: FaqItem[] }) {
   return (
-    <section id="faq" className="scroll-mt-24">
+    <section id="faq" className="scroll-mt-44 sm:scroll-mt-24">
       <h2 className="text-2xl font-extrabold tracking-tight text-brand-950">자주 묻는 질문</h2>
       <dl className="mt-6 space-y-4">
-        {items.map(({ q, a }) => (
+        {items.map(({ q, a, id }, i) => (
           <div
             key={q}
-            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+            id={id ?? `faq-${i + 1}`}
+            className="scroll-mt-44 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm target:bg-accent-50 sm:scroll-mt-24"
           >
             <dt className="text-base font-extrabold text-brand-950">{q}</dt>
             <dd className="mt-3 text-base leading-7 text-slate-600">{a}</dd>

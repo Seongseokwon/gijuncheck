@@ -1,4 +1,5 @@
 import DependentJudge from '@/components/DependentJudge';
+import ScenarioIcon from '@/components/ScenarioIcon';
 import TrackedLink from '@/components/TrackedLink';
 import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 
@@ -35,6 +36,38 @@ const GUIDE_DESCRIPTION: Partial<Record<(typeof GUIDE_KEYS)[number], string>> = 
   guidePensionImpact: '공적연금은 합산되고 개인연금은 제외됩니다. 이 구분이 판정 결과를 바꿉니다.',
   guideNovemberReassessment: '매년 11월 자격을 일괄 재산정하는 절차와 대비 방법입니다.',
 };
+
+const POPULAR_QUESTIONS = [
+  {
+    question: '사업자등록만 하고 소득이 없으면 자격이 유지되나요?',
+    routeKey: 'guideBusinessRegistration',
+    anchor: 'faq-1',
+  },
+  {
+    question: '재산세 과세표준은 어디서 확인하나요?',
+    routeKey: 'guidePropertyTaxBase',
+    anchor: 'faq-3',
+  },
+  {
+    question: '국민연금을 받으면 피부양자 자격을 잃나요?',
+    routeKey: 'guidePensionImpact',
+    anchor: 'faq-1',
+  },
+  {
+    question: '11월에 건강보험료가 왜 바뀌나요?',
+    routeKey: 'guideNovemberReassessment',
+    anchor: 'faq-1',
+  },
+  {
+    question: '피부양자 자격상실은 언제까지 신고해야 하나요?',
+    routeKey: 'guideLosingEligibility',
+    anchor: 'faq-1',
+  },
+  {
+    question: '피부양자에서 탈락하면 보험료가 얼마인가요?',
+    routeKey: 'regionalPremium',
+  },
+] as const;
 
 const shell = 'mx-auto w-full max-w-[1120px] px-4';
 
@@ -144,10 +177,10 @@ export default function Home() {
                 className="group min-h-[190px] rounded-[18px] border border-slate-200 bg-white p-[22px] shadow-sm transition hover:-translate-y-0.5 hover:border-accent-700 hover:shadow-[0_12px_28px_rgba(16,42,67,.08)]"
               >
                 <span
-                  className="grid h-[42px] w-[42px] place-items-center rounded-[11px] bg-canvas text-[19px] font-bold text-brand-900 transition group-hover:bg-accent-100 group-hover:text-accent-700"
+                  className="grid h-[42px] w-[42px] place-items-center rounded-[11px] bg-canvas text-brand-900 transition group-hover:bg-accent-100 group-hover:text-accent-700"
                   aria-hidden
                 >
-                  {mark}
+                  <ScenarioIcon mark={mark} />
                 </span>
                 <h3 className="mt-6 text-base font-bold tracking-[-.02em] text-brand-950">{title}</h3>
                 <p className="mt-2 text-sm leading-[1.55] text-slate-600">{description}</p>
@@ -243,7 +276,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="guides" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24" aria-labelledby="guides-title">
+      <section id="guides" className="scroll-mt-44 bg-white py-16 sm:scroll-mt-24 sm:py-20 lg:py-24" aria-labelledby="guides-title">
         <div className={shell}>
           <div className="max-w-3xl">
             <p className="text-sm font-bold text-accent-700">근거가 되는 가이드</p>
@@ -256,6 +289,31 @@ export default function Home() {
             <p className="mt-4 text-lg leading-8 text-slate-600">
               판정 결과에서도 관련 가이드와 법령 근거로 다시 연결됩니다.
             </p>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-canvas p-5" aria-labelledby="popular-questions-title">
+            <p className="text-sm font-bold text-accent-700">질문으로 찾기</p>
+            <h3 id="popular-questions-title" className="mt-2 text-xl font-bold text-brand-950">
+              자주 찾는 질문
+            </h3>
+            <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+              {POPULAR_QUESTIONS.map((item) => {
+                const route = ROUTES[item.routeKey];
+                const href = `${route.path}${'anchor' in item ? `#${item.anchor}` : ''}`;
+
+                return (
+                  <li key={item.question}>
+                    <a
+                      href={href}
+                      className="inline-flex min-h-[44px] w-full items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold leading-6 text-brand-900 transition hover:border-accent-700 hover:text-accent-700"
+                    >
+                      <span>{item.question}</span>
+                      <span aria-hidden>→</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
           <div className="mt-10 grid gap-[14px] sm:grid-cols-2 lg:grid-cols-3">
@@ -282,7 +340,7 @@ export default function Home() {
 
       <section
         id="judge"
-        className="scroll-mt-20 bg-canvas py-16 sm:py-20 lg:py-24"
+        className="scroll-mt-44 bg-canvas py-16 sm:scroll-mt-20 sm:py-20 lg:py-24"
         aria-labelledby="judge-title"
       >
         <div className={shell}>

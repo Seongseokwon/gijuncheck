@@ -48,6 +48,7 @@ const TOC: TocItem[] = [
 
 const FAQ: FaqItem[] = [
   {
+    id: 'faq-1',
     q: '국민연금을 받으면 피부양자 자격을 잃나요?',
     a: `연금액에 따라 다릅니다. 공적연금은 피부양자 자격 판정에서 총연금액 전액이 합산소득에 들어갑니다. 다른 소득과 합해 연 ${toManwon(
       INCOME.TOTAL_LIMIT,
