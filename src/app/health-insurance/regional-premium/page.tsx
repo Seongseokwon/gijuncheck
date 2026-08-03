@@ -3,6 +3,7 @@ import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
 import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { toPercent, won } from '@/lib/format';
+import TrustSignal from '@/components/TrustSignal';
 
 export const metadata: Metadata = {
   title: '지역가입자 보험료 계산 — 2026년 요율 7.19% 반영',
@@ -85,6 +86,10 @@ export default function Page() {
             기준입니다. 소득 종류별 반영률과 재산 60등급, 상한·하한까지 적용해
             계산합니다.
           </p>
+          <TrustSignal
+            status="공단 모의계산 13건 대조 완료"
+            detail="국민건강보험공단 모의계산 대표 사례와 대조한 참고 계산입니다. 실제 고지액·개별 심사 결과를 대신하지 않습니다."
+          />
         </header>
 
         <RegionalPremiumCalc />

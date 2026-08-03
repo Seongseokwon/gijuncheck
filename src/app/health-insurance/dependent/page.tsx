@@ -3,6 +3,7 @@ import DependentJudge from '@/components/DependentJudge';
 import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/dependent/judge';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+import TrustSignal from '@/components/TrustSignal';
 
 export const metadata: Metadata = {
   title: '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정',
@@ -81,6 +82,10 @@ export default function Page() {
             부양요건 · 소득요건 · 재산요건을 순서대로 판정합니다. 탈락하면 어느
             단계에서 왜 걸리는지 근거 조항과 함께 보여줍니다.
           </p>
+          <TrustSignal
+            status="공개 기준 8건 대조 완료"
+            detail="공단이 공개한 자격 기준을 재현한 참고 판정입니다. 공단 로그인 심사 결과나 개인별 최종 처리는 포함하지 않습니다."
+          />
         </header>
 
         <DependentJudge />

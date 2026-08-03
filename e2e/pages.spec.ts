@@ -63,6 +63,26 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
   );
 });
 
+test('세 도구 상단에 기준일과 검증 범위를 표시한다', async ({ page }) => {
+  const signals = [
+    ['/health-insurance/dependent/', '공개 기준 8건 대조 완료'],
+    ['/health-insurance/regional-premium/', '공단 모의계산 13건 대조 완료'],
+    ['/health-insurance/voluntary-continuation/', '법령·공단 산식 기반 참고 비교'],
+  ] as const;
+
+  for (const [path, status] of signals) {
+    await page.goto(path);
+    const signal = page.getByRole('region', { name: '검증 범위와 기준일' });
+    await expect(signal).toContainText('2026년 기준');
+    await expect(signal).toContainText('최종 확인 2026-08-03');
+    await expect(signal).toContainText(status);
+    await expect(signal.getByRole('link', { name: /검증 원칙과 범위/ })).toHaveAttribute(
+      'href',
+      '/verification-policy/',
+    );
+  }
+});
+
 test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async ({ page }) => {
   await page.goto('/');
   await expect(

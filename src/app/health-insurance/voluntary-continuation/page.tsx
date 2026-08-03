@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import VoluntaryComparison from '@/components/VoluntaryComparison';
 import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+import TrustSignal from '@/components/TrustSignal';
 
 export const metadata: Metadata = {
   title: '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인',
@@ -81,6 +82,11 @@ export default function Page() {
             있습니다. 재산이 보험료에 반영되지 않아 더 싼 경우가 많은데, 모르고
             넘어가는 사람이 많습니다.
           </p>
+          <TrustSignal
+            tone="reference"
+            status="법령·공단 산식 기반 참고 비교"
+            detail="현행 법령·공단 안내·보험료 산식을 반영한 비교입니다. 개인별 공단 고지액을 그대로 복제한 계산은 아닙니다."
+          />
         </header>
 
         <VoluntaryComparison />

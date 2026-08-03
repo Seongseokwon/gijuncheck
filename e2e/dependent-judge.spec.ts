@@ -164,6 +164,16 @@ test('결과 화면에 입력값 요약(합산소득·재산세 과세표준)이
   await expect(result(page)).toContainText('1,200만원');
 });
 
+test('결과 상단에서 확인 자료와 공단 문의 질문으로 바로 이동할 수 있다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await submit(page);
+
+  await expect(
+    result(page).getByRole('link', { name: /확인 자료·공단 문의 질문 보기/ }),
+  ).toHaveAttribute('href', '#evidence-checklist-title');
+  await expect(result(page).locator('#evidence-checklist-title')).toBeVisible();
+});
+
 test('결과 화면에 확신 수준을 표시한다', async ({ page }) => {
   await selectRelation(page, '배우자');
   await submit(page);

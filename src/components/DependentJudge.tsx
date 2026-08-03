@@ -356,6 +356,13 @@ export default function DependentJudge() {
             </strong>
           </p>
 
+          <a
+            href="#evidence-checklist-title"
+            className="mt-4 inline-flex min-h-[40px] items-center rounded-lg border border-slate-400 bg-white px-3 py-2 text-sm font-bold text-brand-900 underline underline-offset-4 hover:border-accent-700 hover:text-accent-700"
+          >
+            확인 자료·공단 문의 질문 보기 ↓
+          </a>
+
           </div>
           <ol className="min-w-0 space-y-4 px-5 py-6 sm:px-7">
             {result.steps.map((s) => (
