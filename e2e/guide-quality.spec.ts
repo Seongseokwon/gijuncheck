@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { GUIDE_KEYS, ROUTES } from '../src/lib/routes';
+import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '../src/lib/routes';
+import { SITE } from '../src/lib/site';
 
 /**
  * P1-3 가이드 품질 표면을 고정한다.
@@ -37,6 +38,57 @@ for (const key of GUIDE_KEYS) {
     expect(await internalLinks.count(), `${route.path} 내부 링크`).toBeGreaterThan(0);
   });
 }
+
+test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되어 있다', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-1440', '뷰포트와 무관한 JSON-LD 검사');
+
+  const readGraph = async () =>
+    page.evaluate(() => {
+      const script = document.querySelector('script[type="application/ld+json"]');
+      if (!script?.textContent) return [];
+      const json = JSON.parse(script.textContent) as {
+        '@graph'?: Array<Record<string, unknown>>;
+      };
+      return json['@graph'] ?? [];
+    });
+
+  const expectedAuthorUrl = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
+  const expectedImage = new URL(SITE.ogImage, SITE.url).toString();
+
+  for (const key of GUIDE_KEYS) {
+    await page.goto(ROUTES[key].path);
+    const graph = await readGraph();
+    const article = graph.find((node) => node['@type'] === 'Article');
+    const breadcrumb = graph.find((node) => node['@type'] === 'BreadcrumbList');
+
+    expect(article, `${ROUTES[key].path} Article`).toMatchObject({
+      author: {
+        '@type': 'Person',
+        name: SITE.authorName,
+        url: expectedAuthorUrl,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: SITE.name,
+        url: SITE.url,
+      },
+      image: [expectedImage],
+    });
+    expect(breadcrumb, `${ROUTES[key].path} BreadcrumbList`).toBeDefined();
+    expect(breadcrumb?.itemListElement).toHaveLength(2);
+  }
+
+  for (const key of TOOL_KEYS) {
+    await page.goto(ROUTES[key].path);
+    const graph = await readGraph();
+    const breadcrumb = graph.find((node) => node['@type'] === 'BreadcrumbList');
+
+    expect(breadcrumb, `${ROUTES[key].path} BreadcrumbList`).toBeDefined();
+    expect(breadcrumb?.itemListElement).toHaveLength(2);
+  }
+});
 
 /**
  * 검색 유입이 많은 대표 가이드는 모바일에서 표·목록·출처 블록까지 한 번 더 본다.

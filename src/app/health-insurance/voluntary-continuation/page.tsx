@@ -2,6 +2,7 @@ import VoluntaryComparison from '@/components/VoluntaryComparison';
 import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 import TrustSignal from '@/components/TrustSignal';
 
 const TITLE = '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인';
@@ -47,6 +48,13 @@ const jsonLd = {
       operatingSystem: 'Web',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
     },
+    breadcrumbJsonLd([
+      { name: '기준체크', path: ROUTES.home.path },
+      {
+        name: ROUTES.voluntaryContinuation.label,
+        path: ROUTES.voluntaryContinuation.path,
+      },
+    ]),
     {
       '@type': 'FAQPage',
       mainEntity: FAQ.map(({ q, a }) => ({

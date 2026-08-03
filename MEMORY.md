@@ -33,6 +33,9 @@
 - 2026-08-04 SEO P0: `src/app/sitemap.ts`의 빌드 시각 기반 `lastmod`를 제거하고
   `SITE.lastVerified`를 사용하도록 안정화했다. 실제 기준 확인일을 바꿀 때만
   `src/lib/site.ts`의 날짜를 갱신한다.
+- 2026-08-04 SEO P1: 가이드 Article JSON-LD에 `author`·`publisher`·`image`를 추가하고,
+  가이드 6편과 도구 3개에 `BreadcrumbList`를 추가했다. FAQPage는 화면에 실제 표시되는
+  FAQ를 설명하는 보조 데이터로 유지하며 일반 사이트의 FAQ 리치 결과 노출을 전제로 하지 않는다.
 
 ## 검증 기준선
 
@@ -42,7 +45,8 @@
 - `npm test`: 6개 파일, 136개 통과
 - `npm run build`: 통과
 - 페이지별 OG metadata·sitemap E2E: 6개 통과, 12개 의도적 스킵
-- `npx playwright test`: 279개 중 250개 통과, 29개 스킵, 0개 실패
+- 구조화 데이터 E2E: 1개 통과, 2개 의도적 스킵
+- `npx playwright test`: 300개 중 261개 통과, 39개 스킵, 0개 실패
 
 0원 모달 관련 E2E는 `e2e/dependent-judge.spec.ts`에 있다. 모달 표시 순서, 수정/확인 동작, 전체 viewport backdrop, 중앙 정렬, blur를 확인한다. Vercel Speed Insights 요청은 `e2e/pages.spec.ts`에서 로컬 모킹한다.
 
@@ -51,6 +55,7 @@
 - 공통 레이아웃·canonical·OG·robots·네이버 소유확인·GA4·Speed Insights: `src/app/layout.tsx`
 - 페이지별 OG metadata 생성: `src/lib/metadata.ts`
 - sitemap 생성과 안정적인 `lastmod`: `src/app/sitemap.ts`, `src/lib/site.ts`의 `lastVerified`
+- 구조화 데이터: `src/lib/structured-data.ts`, `src/components/guide.tsx`
 - 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
 - 판정 제출 흐름: `src/components/DependentJudge.tsx`
 - 이벤트 이름·허용 파라미터: `src/lib/analytics.ts`
@@ -85,7 +90,7 @@
 3. Vercel Speed Insights에서 Core Web Vitals 데이터가 누적되는지 확인하고 GA4와 역할을 분리한다.
 4. 실제 스크린리더로 판정 입력·결과·근거 링크를 한 번 점검한다.
 5. 국민건강보험공단 로그인 모의계산은 2026-08-03 부모·배우자 관계 조회 결과를 부분 확인했다. 로그인 사용자의 현재 자료를 조회하는 방식이라 D01·D02 합성 경계값의 공식 대조로 승격하지 않았고, 임의 금액 입력이 필요한 D03·D04는 미확인 상태다. 임의입력 가능한 공단 경로 또는 실제 처리 결과를 확보하면 `docs/03-검증기록.md`의 D01~D04 표를 추가 갱신한다.
-6. BreadcrumbList·Article author/publisher 보강을 검토한다.
+6. 페이지별 OG 이미지를 도입할지 검토한다. 현재는 색인 안정화 이후로 미룬다.
 
 ## 작업 시작 순서
 

@@ -11,6 +11,7 @@
 import type { ReactNode } from 'react';
 import { ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 
 /* ------------------------------------------------------------------ */
 /* 구조화 데이터                                                       */
@@ -23,8 +24,9 @@ export interface FaqItem {
 }
 
 /**
- * Article + FAQPage JSON-LD.
- * FAQPage 는 검색 결과에서 자리를 넓게 차지하므로 가이드마다 3개 이상 넣는다.
+ * Article + BreadcrumbList + FAQPage JSON-LD.
+ * FAQPage는 검색 결과 노출을 보장하지 않으므로, 화면에 실제 표시되는 FAQ를
+ * 검색엔진과 다른 해석기가 이해하도록 돕는 보조 데이터로만 유지한다.
  */
 export function guideJsonLd({
   title,
@@ -48,10 +50,25 @@ export function guideJsonLd({
         headline: title,
         description,
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+        image: [new URL(SITE.ogImage, SITE.url).toString()],
+        author: {
+          '@type': 'Person',
+          name: SITE.authorName,
+          url: new URL(ROUTES.verificationPolicy.path, SITE.url).toString(),
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: SITE.name,
+          url: SITE.url,
+        },
         datePublished: published,
         dateModified: SITE.lastVerified,
         inLanguage: 'ko',
       },
+      breadcrumbJsonLd([
+        { name: SITE.name, path: ROUTES.home.path },
+        { name: title, path },
+      ]),
       {
         '@type': 'FAQPage',
         mainEntity: faq.map(({ q, a }) => ({

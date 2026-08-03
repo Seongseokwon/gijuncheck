@@ -3,6 +3,7 @@ import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/dependent/judge';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 import TrustSignal from '@/components/TrustSignal';
 
 const TITLE = '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정';
@@ -19,7 +20,7 @@ export const metadata = createPageMetadata({
   path: ROUTES.dependent.path,
 });
 
-/** 검색 결과에서 자리를 넓게 차지하도록 FAQ 구조화 데이터를 넣는다 */
+/** 화면에 실제 표시되는 FAQ를 검색엔진이 이해할 수 있도록 구조화한다 */
 const FAQ = [
   {
     q: '피부양자 소득 기준은 얼마인가요?',
@@ -55,6 +56,10 @@ const jsonLd = {
       operatingSystem: 'Web',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
     },
+    breadcrumbJsonLd([
+      { name: '기준체크', path: ROUTES.home.path },
+      { name: ROUTES.dependent.label, path: ROUTES.dependent.path },
+    ]),
     {
       '@type': 'FAQPage',
       mainEntity: FAQ.map(({ q, a }) => ({

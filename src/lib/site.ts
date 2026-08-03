@@ -32,6 +32,9 @@ export const SITE = {
   /** 서비스 운영 주체 — 공단 등 공공기관으로 오인되지 않도록 명시한다. */
   operatorName: '기준체크 운영자(개인 운영)',
 
+  /** Article 구조화 데이터에 표시할 콘텐츠 작성 주체명 */
+  authorName: '기준체크 운영자',
+
   url: override || PRODUCTION_URL,
 
   /**

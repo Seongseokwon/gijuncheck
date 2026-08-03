@@ -2,6 +2,7 @@ import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
 import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
+import { breadcrumbJsonLd } from '@/lib/structured-data';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 
@@ -54,6 +55,10 @@ const jsonLd = {
       operatingSystem: 'Web',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
     },
+    breadcrumbJsonLd([
+      { name: '기준체크', path: ROUTES.home.path },
+      { name: ROUTES.regionalPremium.label, path: ROUTES.regionalPremium.path },
+    ]),
     {
       '@type': 'FAQPage',
       mainEntity: FAQ.map(({ q, a }) => ({
