@@ -15,6 +15,15 @@ for (const route of PAGES) {
     page.on('console', (msg) => {
       if (msg.type() === 'error') consoleErrors.push(msg.text());
     });
+    // Vercel이 운영 환경에서 제공하는 수집 엔드포인트는 로컬 정적 서버에는 없다.
+    // 해당 경로만 모킹하고, 나머지 리소스 오류는 기존처럼 검출한다.
+    await page.route('**/_vercel/speed-insights/**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/javascript',
+        body: '',
+      }),
+    );
 
     const response = await page.goto(route.path);
     expect(response?.status(), `${route.path} HTTP 상태`).toBeLessThan(400);

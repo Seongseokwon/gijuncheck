@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import Analytics from '@/components/Analytics';
 import { POLICY_KEYS, ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
@@ -61,6 +62,7 @@ export default function RootLayout({
     <html lang="ko">
       <Analytics />
       <body className="min-h-screen bg-canvas text-slate-900 antialiased">
+        <SpeedInsights />
         {/*
           상시 노출 신원 고지. legal-risk 비평(02-critique-legal.md)이 공통으로
           지적한 "공공기관 오인" 리스크에 대응한다. design-preview/index3.html
