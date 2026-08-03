@@ -1,0 +1,85 @@
+# 기준체크 작업 인계 메모
+
+최종 갱신: 2026-08-03
+
+이 파일은 다른 세션에서 기준체크 작업을 이어갈 때 먼저 읽는 현재 상태 메모다. 법령·보험료율·공단 안내는 변경될 수 있으므로, 실제 기준을 수정할 때는 반드시 공식 출처와 `docs/03-검증기록.md`를 함께 확인한다.
+
+## 프로젝트 한눈에 보기
+
+- 서비스: 기준체크 — 건강보험 피부양자 자격과 퇴직 후 보험료 선택을 확인하는 민간 참고 도구
+- Production: `https://gijuncheck.kr`
+- 임시 Vercel 주소: 최종 도메인으로 리다이렉트되도록 설정됨
+- 기술: Next.js 15 App Router, TypeScript, Tailwind, `output: 'export'`, 정적 SSG
+- Node: `>=20.9.0`
+- 주요 경로 레지스트리: `src/lib/routes.ts`
+- 공식 출처·기준 수치: `src/lib/constants/2026.ts`, `src/lib/dependent/sources.ts`, 관련 가이드
+
+## 현재 완료 상태
+
+- P0 공개 기반·출처·책임 범위 완료
+- P1 검색 등록·색인 요청, GA4 연결, 가이드 품질, 피부양자 차별화, 증빙·신청 체크리스트 완료
+- P2-1 지역보험료 계산기 공식 모의계산 13건 대조 완료
+- P2-2 임의계속가입 비교의 현행 법령·공단 안내·보험료 고시·대표 사례 대조 완료
+- Google Search Console과 네이버 서치어드바이저 등록·sitemap 제출·핵심 4개 URL 수집/색인 요청 완료. 실제 색인 완료 여부는 대기 중
+- GA4 Production 연결 및 핵심 이벤트 실시간 확인 완료
+- `@vercel/speed-insights`를 `src/app/layout.tsx`에 추가하고 Production 배포 완료. 실제 데이터 누적은 Vercel에서 운영 확인 필요
+- 0원 입력 항목 확인 모달 추가 완료. 0원은 오류로 막지 않고, 입력 수정 또는 확인 후 판정 진행
+- 0원 모달은 `createPortal`로 `document.body`에 렌더링하며 `fixed inset-0`, `z-[100]`, 중앙 정렬, `backdrop-blur-sm`을 사용한다. 최신 배포 후 헤더까지 backdrop이 덮이고 모달이 중앙에 표시되는 것을 사용자 확인
+- 모바일 주요 메뉴, FAQ 앵커, 홈 인기 질문 링크, 문맥 부자연스러운 안내 문구 정비 완료
+
+## 검증 기준선
+
+최근 `npm run verify` 결과:
+
+- `npm run typecheck`: 통과
+- `npm test`: 6개 파일, 136개 통과
+- `npm run build`: 통과
+- `npx playwright test`: 279개 중 250개 통과, 29개 스킵, 0개 실패
+
+0원 모달 관련 E2E는 `e2e/dependent-judge.spec.ts`에 있다. 모달 표시 순서, 수정/확인 동작, 전체 viewport backdrop, 중앙 정렬, blur를 확인한다. Vercel Speed Insights 요청은 `e2e/pages.spec.ts`에서 로컬 모킹한다.
+
+## 중요한 코드 위치
+
+- 공통 레이아웃·canonical·OG·robots·네이버 소유확인·GA4·Speed Insights: `src/app/layout.tsx`
+- 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
+- 판정 제출 흐름: `src/components/DependentJudge.tsx`
+- 이벤트 이름·허용 파라미터: `src/lib/analytics.ts`
+- 공개 여부와 sitemap 대상: `src/lib/routes.ts`
+- 지역보험료 산식: `src/lib/premium/regional.ts`
+- 피부양자 판정 산식: `src/lib/dependent/judge.ts`
+- 공식 대조 사례와 운영 상태: `docs/03-검증기록.md`
+- 실행 순서: `docs/02-다음작업-타임라인.md`, `docs/04-실행-우선순위.md`
+- 자동 QA와 외부 수동 확인: `docs/06-QA-전수점검.md`
+
+## 분석·개인정보 원칙
+
+- GA4 이벤트에는 원본 소득·재산·나이·개인 입력값을 넣지 않는다.
+- 집계용 이벤트만 허용한다: `home_cta_click`, `judge_start`, `judge_complete`, `premium_calculate`, `voluntary_compare`.
+- 판정 입력값은 브라우저에서만 처리하고 서버 저장·전송하지 않는다.
+- 정책 문구와 실제 코드가 달라지면 코드·개인정보처리방침·검증기록을 함께 갱신한다.
+
+## 작업 규칙
+
+- `ready: false` 기능은 홈 메뉴·sitemap·검색 색인 대상에 공개하지 않는다.
+- 경로 문자열을 새로 직접 쓰지 말고 `ROUTES`에서 가져온다.
+- 제도 변경은 공식 출처 확인 → 상수/코드 → 화면 문구 → 단위/E2E 테스트 → 검증기록 → 배포 순서로 처리한다.
+- 계산 결과는 공단의 개별 심사·고지액이 아닌 참고 결과로 표현한다.
+- `docs/07-질문검색-설계.md`의 검색 엔진·LLM·검색 인덱스·동의어 사전·`/search?q=` 페이지를 만들지 않는 범위를 유지한다.
+- 문구 수정 시 “퇴직 후 90일” 같은 낡은 고정 일수 안내가 다시 들어가지 않는지 확인한다. 현재 임의계속가입 신청기한은 최초 지역보험료 납부기한부터 2개월 규칙으로 표시한다.
+
+## 아직 남은 운영 작업
+
+1. Google Search Console과 네이버 서치어드바이저에서 요청한 URL의 색인 상태·제외 사유·선택 canonical을 1주 단위로 확인한다.
+2. 임시 Vercel 주소가 검색 결과에 남아 있지 않은지 확인한다.
+3. Vercel Speed Insights에서 Core Web Vitals 데이터가 누적되는지 확인하고 GA4와 역할을 분리한다.
+4. 실제 스크린리더로 판정 입력·결과·근거 링크를 한 번 점검한다.
+5. 국민건강보험공단 로그인 모의계산 또는 실제 처리 결과를 확보하면 `docs/03-검증기록.md`의 D01~D04 표를 갱신한다.
+6. 가이드 6편의 공식 링크·기준연도·최종 확인일·내부 링크·FAQ를 제도 변경 때마다 재점검한다.
+
+## 작업 시작 순서
+
+1. `git status --short`로 기존 변경을 먼저 확인한다.
+2. 이 파일과 `docs/04-실행-우선순위.md`, `docs/06-QA-전수점검.md`의 현재 상태를 읽는다.
+3. 관련 코드와 테스트를 함께 확인하고, 변경 후 `npm run verify`를 실행한다.
+4. 공식 기준이 바뀐 경우 `docs/03-검증기록.md`에 확인일·출처·대조 결과를 남긴다.
+5. 운영 상태가 바뀌면 이 파일과 실행 타임라인을 함께 갱신한다.
