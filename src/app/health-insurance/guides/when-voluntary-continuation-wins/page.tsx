@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -19,6 +18,7 @@ import {
 import { RATE, VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
 import { toEok, toPercent, wonExact } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideVoluntaryContinuation.path;
@@ -32,14 +32,17 @@ const LEAD =
 const ANSWER =
   '임의계속가입은 신청 조건과 기한을 충족할 때 선택할 수 있으며, 재산이 많은 퇴직자는 지역보험료와 실제 금액을 비교해야 합니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  `임의계속가입은 퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 중 직장가입 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상이면 신청할 수 있고, ` +
+  `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 유지됩니다. 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ` +
+  `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정됩니다.`;
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    `임의계속가입은 퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 중 직장가입 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상이면 신청할 수 있고, ` +
-    `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 유지됩니다. 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ` +
-    `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정됩니다.`,
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'what', label: '임의계속가입이란' },

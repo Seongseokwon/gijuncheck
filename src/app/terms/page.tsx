@@ -1,12 +1,12 @@
-import type { Metadata } from 'next';
 import { ROUTES } from '@/lib/routes';
+import { createPageMetadata } from '@/lib/metadata';
 import { SITE } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: ROUTES.terms.label,
+  path: ROUTES.terms.path,
   robots: { index: false, follow: true },
-  alternates: { canonical: ROUTES.terms.path },
-};
+});
 
 export default function Page() {
   return (

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -17,6 +16,7 @@ import {
 } from '@/components/guide';
 import { INCOME } from '@/lib/constants/2026';
 import { toManwon, won } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideBusinessRegistration.path;
@@ -30,16 +30,19 @@ const LEAD =
 const ANSWER =
   '사업자등록 전에는 등록으로 줄어드는 세금과 새로 생길 건강보험료를 함께 계산해야 합니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  `사업자등록을 하면 사업소득이 1원만 있어도 건강보험 피부양자 자격을 잃습니다. ` +
+  `등록하지 않으면 사업소득 ${toManwon(
+    INCOME.BUSINESS_LIMIT_UNREGISTERED,
+  )}까지 유지됩니다. ` +
+  `등록으로 얻는 절세액과 새로 생기는 건강보험료를 비교하는 방법을 정리했습니다.`;
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    `사업자등록을 하면 사업소득이 1원만 있어도 건강보험 피부양자 자격을 잃습니다. ` +
-    `등록하지 않으면 사업소득 ${toManwon(
-      INCOME.BUSINESS_LIMIT_UNREGISTERED,
-    )}까지 유지됩니다. ` +
-    `등록으로 얻는 절세액과 새로 생기는 건강보험료를 비교하는 방법을 정리했습니다.`,
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'trap', label: '사업자등록의 숨은 비용' },

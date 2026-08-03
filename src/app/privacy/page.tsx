@@ -1,13 +1,13 @@
-import type { Metadata } from 'next';
 import { ROUTES } from '@/lib/routes';
+import { createPageMetadata } from '@/lib/metadata';
 import { SITE } from '@/lib/site';
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: ROUTES.privacy.label,
+  path: ROUTES.privacy.path,
   // 색인 가치가 없고, 도구·가이드 페이지의 색인 예산을 나눠 갖지 않게 한다
   robots: { index: false, follow: true },
-  alternates: { canonical: ROUTES.privacy.path },
-};
+});
 
 export default function Page() {
   const analyticsConfigured = Boolean(process.env.NEXT_PUBLIC_GA_ID?.trim());

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -18,6 +17,7 @@ import {
 } from '@/components/guide';
 import { INCOME, PROPERTY, VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideLosingEligibility.path;
@@ -31,14 +31,17 @@ const LEAD =
 const ANSWER =
   '피부양자 자격은 사유 발생일을 기준으로 상실될 수 있고, 신고가 늦으면 지역보험료가 소급 부과될 수 있습니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  '피부양자 자격상실은 사유 발생일로부터 14일 이내 신고가 원칙이며, 늦으면 상실일로 소급해 지역보험료가 부과됩니다. ' +
+  `반대로 임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 소급 인정됩니다. ` +
+  '상실 사유별 시점과 소급 부과를 줄이는 방법을 정리했습니다.';
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    '피부양자 자격상실은 사유 발생일로부터 14일 이내 신고가 원칙이며, 늦으면 상실일로 소급해 지역보험료가 부과됩니다. ' +
-    `반대로 임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 소급 인정됩니다. ` +
-    '상실 사유별 시점과 소급 부과를 줄이는 방법을 정리했습니다.',
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'direction', label: '소급은 양방향이다 — 취득과 상실의 차이' },

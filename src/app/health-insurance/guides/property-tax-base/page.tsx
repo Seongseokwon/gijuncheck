@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -20,6 +19,7 @@ import { PROPERTY, RATE } from '@/lib/constants/2026';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { toEok, wonExact } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guidePropertyTaxBase.path;
@@ -33,14 +33,17 @@ const LEAD =
 const ANSWER =
   '건강보험 판정에 입력할 재산은 공시가격이 아니라 재산세 과세표준이며, 고지서나 위택스·서울시 ETAX에서 확인해야 합니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  '건강보험 피부양자 재산요건과 지역가입자 보험료는 재산세 과세표준으로 판단합니다. ' +
+  '공시가격에 공정시장가액비율(주택 60%, 1세대 1주택 특례 43~45%, 토지·건축물 70%)을 곱한 금액입니다. ' +
+  '위택스에서 확인하는 절차와 환산 예시를 담았습니다.';
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    '건강보험 피부양자 재산요건과 지역가입자 보험료는 재산세 과세표준으로 판단합니다. ' +
-    '공시가격에 공정시장가액비율(주택 60%, 1세대 1주택 특례 43~45%, 토지·건축물 70%)을 곱한 금액입니다. ' +
-    '위택스에서 확인하는 절차와 환산 예시를 담았습니다.',
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'why', label: '왜 이걸 먼저 확인해야 하나' },

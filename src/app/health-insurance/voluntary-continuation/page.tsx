@@ -1,18 +1,20 @@
-import type { Metadata } from 'next';
 import VoluntaryComparison from '@/components/VoluntaryComparison';
 import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
+import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import TrustSignal from '@/components/TrustSignal';
 
-export const metadata: Metadata = {
-  title: '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인',
-  description:
-    '퇴직 후 지역가입자와 임의계속가입 중 어느 쪽이 유리한지 월 금액으로 비교합니다. ' +
-    '임의계속가입은 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. 보수 외 소득은 별도 보험료가 추가될 수 있습니다. ' +
-    `최대 36개월, ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정.`,
-  alternates: { canonical: ROUTES.voluntaryContinuation.path },
-  robots: { index: true, follow: true },
-};
+const TITLE = '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인';
+const DESCRIPTION =
+  '퇴직 후 지역가입자와 임의계속가입 중 어느 쪽이 유리한지 월 금액으로 비교합니다. ' +
+  '임의계속가입은 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. 보수 외 소득은 별도 보험료가 추가될 수 있습니다. ' +
+  `최대 36개월, ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정.`;
+
+export const metadata = createPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: ROUTES.voluntaryContinuation.path,
+});
 
 const FAQ = [
   {

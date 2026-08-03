@@ -1,15 +1,14 @@
-import type { Metadata } from 'next';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { BASIS } from '@/lib/constants/2026';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: '검증 원칙',
-  description:
-    '기준체크가 건강보험 정보를 확인하고, 테스트하며, 공개 범위를 결정하는 방법을 안내합니다.',
-  alternates: { canonical: ROUTES.verificationPolicy.path },
-};
+  description: '기준체크가 건강보험 정보를 확인하고, 테스트하며, 공개 범위를 결정하는 방법을 안내합니다.',
+  path: ROUTES.verificationPolicy.path,
+});
 
 const SOURCES = [DEPENDENT_SOURCES.support.law, DEPENDENT_SOURCES.support.nhis] as const;
 

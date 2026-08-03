@@ -1,6 +1,6 @@
 # 기준체크 작업 인계 메모
 
-최종 갱신: 2026-08-03
+최종 갱신: 2026-08-04
 
 이 파일은 다른 세션에서 기준체크 작업을 이어갈 때 먼저 읽는 현재 상태 메모다. 법령·보험료율·공단 안내는 변경될 수 있으므로, 실제 기준을 수정할 때는 반드시 공식 출처와 `docs/03-검증기록.md`를 함께 확인한다.
 
@@ -27,6 +27,9 @@
 - 0원 모달은 `createPortal`로 `document.body`에 렌더링하며 `fixed inset-0`, `z-[100]`, 중앙 정렬, `backdrop-blur-sm`을 사용한다. 최신 배포 후 헤더까지 backdrop이 덮이고 모달이 중앙에 표시되는 것을 사용자 확인
 - 세 도구 상단에 기준연도·최종 확인일·검증 범위를 표시하는 `TrustSignal`을 추가했고, 피부양자 결과 상단에서 확인 자료·공단 문의 질문으로 바로 이동할 수 있게 했다.
 - 모바일 주요 메뉴, FAQ 앵커, 홈 인기 질문 링크, 문맥 부자연스러운 안내 문구 정비 완료
+- 2026-08-04 SEO P0: 페이지별 canonical과 `og:url`이 자기 URL을 사용하도록 metadata 공통
+  생성 함수를 추가했다. 가이드는 OG type `article`, 도구·검증·정책 페이지는 `website`로
+  구분하며 title·description·Twitter metadata도 페이지별로 생성한다.
 
 ## 검증 기준선
 
@@ -35,6 +38,7 @@
 - `npm run typecheck`: 통과
 - `npm test`: 6개 파일, 136개 통과
 - `npm run build`: 통과
+- 페이지별 OG metadata E2E: 5개 통과, 10개 의도적 스킵
 - `npx playwright test`: 279개 중 250개 통과, 29개 스킵, 0개 실패
 
 0원 모달 관련 E2E는 `e2e/dependent-judge.spec.ts`에 있다. 모달 표시 순서, 수정/확인 동작, 전체 viewport backdrop, 중앙 정렬, blur를 확인한다. Vercel Speed Insights 요청은 `e2e/pages.spec.ts`에서 로컬 모킹한다.
@@ -42,6 +46,7 @@
 ## 중요한 코드 위치
 
 - 공통 레이아웃·canonical·OG·robots·네이버 소유확인·GA4·Speed Insights: `src/app/layout.tsx`
+- 페이지별 OG metadata 생성: `src/lib/metadata.ts`
 - 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
 - 판정 제출 흐름: `src/components/DependentJudge.tsx`
 - 이벤트 이름·허용 파라미터: `src/lib/analytics.ts`
@@ -76,6 +81,7 @@
 3. Vercel Speed Insights에서 Core Web Vitals 데이터가 누적되는지 확인하고 GA4와 역할을 분리한다.
 4. 실제 스크린리더로 판정 입력·결과·근거 링크를 한 번 점검한다.
 5. 국민건강보험공단 로그인 모의계산은 2026-08-03 부모·배우자 관계 조회 결과를 부분 확인했다. 로그인 사용자의 현재 자료를 조회하는 방식이라 D01·D02 합성 경계값의 공식 대조로 승격하지 않았고, 임의 금액 입력이 필요한 D03·D04는 미확인 상태다. 임의입력 가능한 공단 경로 또는 실제 처리 결과를 확보하면 `docs/03-검증기록.md`의 D01~D04 표를 추가 갱신한다.
+6. `sitemap.xml`의 `lastModified`를 실제 콘텐츠 확인일 기준으로 안정화하고, BreadcrumbList·Article author/publisher 보강을 검토한다.
 
 ## 작업 시작 순서
 

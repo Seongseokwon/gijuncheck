@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -17,6 +16,7 @@ import {
 } from '@/components/guide';
 import { INCOME, INCOME_REFLECTION } from '@/lib/constants/2026';
 import { toManwon } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guidePensionImpact.path;
@@ -30,14 +30,17 @@ const LEAD =
 const ANSWER =
   '공적연금은 피부양자 판정에서 다른 소득과 합산되므로, 연금 개시 전 합산소득과 탈락 후 보험료를 함께 계산해야 합니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  '공적연금은 피부양자 자격 판정에서 총연금액 전액이 합산되지만, 지역가입자 보험료 계산에서는 50%만 반영됩니다. ' +
+  '연금저축·IRP 등 사적연금은 어느 쪽에도 포함되지 않습니다. ' +
+  '연금 개시 시점이 자격에 미치는 영향을 정리했습니다.';
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    '공적연금은 피부양자 자격 판정에서 총연금액 전액이 합산되지만, 지역가입자 보험료 계산에서는 50%만 반영됩니다. ' +
-    '연금저축·IRP 등 사적연금은 어느 쪽에도 포함되지 않습니다. ' +
-    '연금 개시 시점이 자격에 미치는 영향을 정리했습니다.',
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'twofaces', label: '같은 연금, 다른 두 기준' },

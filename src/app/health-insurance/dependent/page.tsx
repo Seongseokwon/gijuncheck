@@ -1,20 +1,23 @@
-import type { Metadata } from 'next';
 import DependentJudge from '@/components/DependentJudge';
 import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/dependent/judge';
+import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import TrustSignal from '@/components/TrustSignal';
 
-export const metadata: Metadata = {
-  title: '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정',
-  description:
-    `2026년 기준 건강보험 피부양자 자격을 자동 판정합니다. 합산소득 ${toManwon(
-      INCOME.TOTAL_LIMIT,
-    )}, 재산세 과세표준 ${toEok(PROPERTY.SAFE_LIMIT)}·${toEok(
-      PROPERTY.HARD_LIMIT,
-    )} 구간, 사업자등록 여부, 관계별 부양요건까지 반영. 탈락 시 근거 조항을 함께 보여줍니다.`,
-  alternates: { canonical: ROUTES.dependent.path },
-};
+const TITLE = '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정';
+const DESCRIPTION =
+  `2026년 기준 건강보험 피부양자 자격을 자동 판정합니다. 합산소득 ${toManwon(
+    INCOME.TOTAL_LIMIT,
+  )}, 재산세 과세표준 ${toEok(PROPERTY.SAFE_LIMIT)}·${toEok(
+    PROPERTY.HARD_LIMIT,
+  )} 구간, 사업자등록 여부, 관계별 부양요건까지 반영. 탈락 시 근거 조항을 함께 보여줍니다.`;
+
+export const metadata = createPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: ROUTES.dependent.path,
+});
 
 /** 검색 결과에서 자리를 넓게 차지하도록 FAQ 구조화 데이터를 넣는다 */
 const FAQ = [

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import {
   Callout,
   FaqSection,
@@ -18,6 +17,7 @@ import {
 } from '@/components/guide';
 import { INCOME } from '@/lib/constants/2026';
 import { toManwon } from '@/lib/format';
+import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideNovemberReassessment.path;
@@ -30,13 +30,16 @@ const LEAD =
 const ANSWER =
   '11월에는 전년도 소득과 6월 1일 기준 재산 자료가 반영되므로, 통보받은 자격과 보험료를 자료 기준일과 함께 확인해야 합니다.';
 
-export const metadata: Metadata = {
+const DESCRIPTION =
+  '5월 종합소득세 신고 자료와 6월 1일 기준 재산세 과세자료가 취합되어 11월에 건강보험료가 재산정되고 피부양자 자격이 일괄 재검토됩니다. ' +
+  '재산 자료는 11월부터 다음 해 10월까지 적용됩니다. 통보를 받았을 때 확인할 순서를 정리했습니다.';
+
+export const metadata = createPageMetadata({
   title: TITLE,
-  description:
-    '5월 종합소득세 신고 자료와 6월 1일 기준 재산세 과세자료가 취합되어 11월에 건강보험료가 재산정되고 피부양자 자격이 일괄 재검토됩니다. ' +
-    '재산 자료는 11월부터 다음 해 10월까지 적용됩니다. 통보를 받았을 때 확인할 순서를 정리했습니다.',
-  alternates: { canonical: PATH },
-};
+  description: DESCRIPTION,
+  path: PATH,
+  type: 'article',
+});
 
 const TOC: TocItem[] = [
   { id: 'why', label: '왜 11월인가' },

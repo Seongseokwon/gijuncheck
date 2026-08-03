@@ -1,18 +1,21 @@
-import type { Metadata } from 'next';
 import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
 import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
+import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 
-export const metadata: Metadata = {
-  title: '지역가입자 보험료 계산 — 2026년 요율 7.19% 반영',
-  description:
-    '퇴직 후 지역가입자가 되면 월 보험료가 얼마인지 계산합니다. ' +
-    '근로·연금소득 50% 반영, 재산 60등급표, 기본공제 1억원, 상한·하한까지 적용. ' +
-    '임차보증금·월세 환산과 적용된 재산 등급·점수도 함께 보여줍니다.',
-  alternates: { canonical: ROUTES.regionalPremium.path },
-};
+const TITLE = '지역가입자 보험료 계산 — 2026년 요율 7.19% 반영';
+const DESCRIPTION =
+  '퇴직 후 지역가입자가 되면 월 보험료가 얼마인지 계산합니다. ' +
+  '근로·연금소득 50% 반영, 재산 60등급표, 기본공제 1억원, 상한·하한까지 적용. ' +
+  '임차보증금·월세 환산과 적용된 재산 등급·점수도 함께 보여줍니다.';
+
+export const metadata = createPageMetadata({
+  title: TITLE,
+  description: DESCRIPTION,
+  path: ROUTES.regionalPremium.path,
+});
 
 const FAQ = [
   {

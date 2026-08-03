@@ -46,10 +46,28 @@ test.describe('OG/canonical 메타데이터', () => {
     await expect(robots).toHaveAttribute('content', /index, ?follow|index,follow/);
   });
 
-  test('판정기 페이지의 canonical이 자기 자신을 가리킨다', async ({ page }) => {
-    await page.goto(ROUTES.dependent.path);
-    const canonical = page.locator('link[rel="canonical"]');
-    await expect(canonical).toHaveAttribute('href', `https://gijuncheck.kr${ROUTES.dependent.path}`);
+  test('공개·정책 페이지의 canonical과 og:url이 같은 자기 URL을 가리킨다', async ({ page }) => {
+    for (const route of ALL_ROUTES.filter((entry) => entry.ready)) {
+      await page.goto(route.path);
+      const expectedUrl = `https://gijuncheck.kr${route.path}`;
+
+      await expect(
+        page.locator('link[rel="canonical"]'),
+        `${route.path} canonical`,
+      ).toHaveAttribute('href', expectedUrl);
+      await expect(
+        page.locator('meta[property="og:url"]'),
+        `${route.path} og:url`,
+      ).toHaveAttribute('content', expectedUrl);
+      await expect(
+        page.locator('meta[property="og:title"]'),
+        `${route.path} og:title`,
+      ).toHaveAttribute('content', /.+/);
+      await expect(
+        page.locator('meta[property="og:description"]'),
+        `${route.path} og:description`,
+      ).toHaveAttribute('content', /.+/);
+    }
   });
 
   test('정책 페이지(약관·개인정보·문의)는 noindex 다', async ({ page }) => {
