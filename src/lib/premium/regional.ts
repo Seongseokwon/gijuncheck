@@ -25,7 +25,6 @@ import {
   VERIFIED_AGAINST_NHIS,
   propertyScoreDetail,
 } from '../constants/property-score-table';
-import { countableFinancialIncome } from '../dependent/judge';
 import type { Income } from '../dependent/types';
 
 /* ------------------------------------------------------------------ */
@@ -39,8 +38,6 @@ export interface IncomeBase {
   monthly: number;
   /** 반영률 적용 전 연간 합산소득 (원) — 화면에 대비로 보여주면 이해가 쉽다 */
   annualRaw: number;
-  /** 금융소득이 1,000만원 문턱을 넘지 못해 제외되었는지. 화면에 설명을 띄우는 데 쓴다 */
-  financialExcluded: boolean;
 }
 
 /**
@@ -49,14 +46,13 @@ export interface IncomeBase {
  *  - 이자·배당·사업·기타소득: 100%
  *  - 근로·연금소득: 50%
  *
- * 금융소득은 반영률을 적용하기 전에 1,000만원 문턱을 통과해야 한다.
- * 1,000만원 이하면 부과 대상에서 아예 빠진다.
+ * 지역보험료에서는 사업·이자·배당·기타소득이 모두 100% 반영된다.
+ * 금융소득 1,000만원 문턱은 피부양자 자격 판정 기준과 혼동하지 않는다.
  */
 export function incomeBaseForPremium(income: Income): IncomeBase {
-  const financial = countableFinancialIncome(income.financial);
-
   const full =
-    (income.business + financial + income.other) * INCOME_REFLECTION.FULL;
+    (income.business + income.financial + income.other) *
+    INCOME_REFLECTION.FULL;
   const half = (income.wage + income.pension) * INCOME_REFLECTION.HALF;
 
   const annualReflected = full + half;
@@ -71,7 +67,6 @@ export function incomeBaseForPremium(income: Income): IncomeBase {
     annualReflected,
     monthly: annualReflected / 12,
     annualRaw,
-    financialExcluded: income.financial > 0 && financial === 0,
   };
 }
 
@@ -86,7 +81,7 @@ export interface PremiumBreakdown {
   propertyPortion: number;
   /** 적용된 재산 부과점수 */
   propertyScore: number;
-  /** 적용된 재산 등급 (1~60). 재산을 반영하지 않는 경우 null */
+  /** 적용된 재산 등급 (0 또는 1~60). 재산을 반영하지 않는 경우 null */
   propertyGrade: number | null;
   /** 상한·하한 적용 전 건강보험료 (원/월) */
   healthBeforeLimit: number;
@@ -114,44 +109,62 @@ export function longTermCareRatio(): number {
 }
 
 function longTermCareOf(health: number): number {
-  return Math.round(health * longTermCareRatio());
+  return roundPremiumUnit(health * longTermCareRatio());
 }
 
-/** 건강보험료에 상한·하한을 적용한다 */
-function applyLimit(health: number): {
+/** 공단 모의계산처럼 건강보험료·장기요양보험료를 10원 단위로 절사한다. */
+function roundPremiumUnit(amount: number): number {
+  return Math.floor(amount / 10) * 10;
+}
+
+/** 소득보험료 하한과 전체 건강보험료 상한을 적용한다. */
+function applyLimit(health: number, propertyPortion = 0): {
   health: number;
   limitApplied: 'lower' | 'upper' | null;
 } {
-  if (health < PREMIUM_LIMIT.LOWER) {
-    return { health: PREMIUM_LIMIT.LOWER, limitApplied: 'lower' };
-  }
-  if (health > PREMIUM_LIMIT.UPPER) {
+  // 공단 계산기는 소득보험료 하한을 먼저 적용하고 재산보험료를 더한다.
+  // 따라서 재산이 있는 경우 하한은 총액에 덮어쓰지 않는다.
+  const healthWithIncomeFloor = Math.max(
+    health,
+    PREMIUM_LIMIT.LOWER + propertyPortion,
+  );
+  if (healthWithIncomeFloor > PREMIUM_LIMIT.UPPER) {
     return { health: PREMIUM_LIMIT.UPPER, limitApplied: 'upper' };
   }
-  return { health, limitApplied: null };
+  if (health < PREMIUM_LIMIT.LOWER + propertyPortion) {
+    return {
+      health: roundPremiumUnit(healthWithIncomeFloor),
+      limitApplied: 'lower',
+    };
+  }
+  return { health: roundPremiumUnit(healthWithIncomeFloor), limitApplied: null };
 }
 
 /**
  * 지역가입자 월 보험료
  *
  * @param income 연간 소득 내역. 종류별 반영률이 다르므로 항목을 분리해서 받는다.
- * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 + 전월세평가금액(30%).
- *                       전세·월세 환산은 미지원이므로 환산이 끝난 값을 넣어야 한다.
+ * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 + 전월세평가금액.
+ *                       전월세평가금액은 rentEvaluationAmount()로 계산한다.
  */
 export function calculateRegionalPremium(
   income: Income,
   propertyAmount: number,
 ): PremiumBreakdown {
   const base = incomeBaseForPremium(income);
-  const incomePortion = Math.round(base.monthly * RATE.HEALTH);
+  // 공단 모의계산은 구성 보험료를 원 단위에서 절사한 뒤 합산한다.
+  const incomePortion = Math.floor(base.monthly * RATE.HEALTH);
 
   const property = propertyScoreDetail(propertyAmount);
-  const propertyPortion = Math.round(
+  const propertyPortion = Math.floor(
     property.score * RATE.PROPERTY_POINT_VALUE,
   );
 
   const healthBeforeLimit = incomePortion + propertyPortion;
-  const { health, limitApplied } = applyLimit(healthBeforeLimit);
+  const { health, limitApplied } = applyLimit(
+    healthBeforeLimit,
+    propertyPortion,
+  );
   const longTermCare = longTermCareOf(health);
 
   return {

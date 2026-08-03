@@ -6,7 +6,7 @@
  * 주의할 점 두 가지
  *  - 소득은 종류별 반영률이 다르므로(근로·연금 50%) 항목을 분리해서 입력받는다.
  *    합쳐서 받으면 연금 수령자 보험료가 2배로 나온다.
- *  - 재산은 전세·월세 환산이 미지원이므로 "과세표준 합계"를 직접 받는다.
+ *  - 재산은 과세표준과 임차주택 전월세를 분리해 입력받고 공단 공식식으로 합산한다.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -26,6 +26,7 @@ import {
 } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
 import { DISCLAIMER } from '@/lib/constants/2026';
+import { rentEvaluationAmount } from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 
@@ -34,7 +35,7 @@ const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = 
   {
     key: 'financial',
     label: '금융소득',
-    hint: '이자 + 배당 · 1,000만원 이하면 제외',
+    hint: '이자 + 배당',
   },
   { key: 'other', label: '기타소득' },
 ];
@@ -55,6 +56,9 @@ const emptyIncome: Income = {
 export default function RegionalPremiumCalc() {
   const [income, setIncome] = useState<Income>(emptyIncome);
   const [property, setProperty] = useState(0);
+  const [rentEligible, setRentEligible] = useState(false);
+  const [rentDeposit, setRentDeposit] = useState(0);
+  const [monthlyRent, setMonthlyRent] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   /** 판정기에서 넘어왔는지. 퍼널이 작동하는지 보려고 이벤트에 담는다 */
   const [fromJudge, setFromJudge] = useState(false);
@@ -75,10 +79,15 @@ export default function RegionalPremiumCalc() {
     }
   }, []);
 
+  const rentAmount = useMemo(
+    () => (rentEligible ? rentEvaluationAmount(rentDeposit, monthlyRent) : 0),
+    [rentEligible, rentDeposit, monthlyRent],
+  );
+  const propertyAmount = property + rentAmount;
   const base = useMemo(() => incomeBaseForPremium(income), [income]);
   const result = useMemo(
-    () => calculateRegionalPremium(income, property),
-    [income, property],
+    () => calculateRegionalPremium(income, propertyAmount),
+    [income, propertyAmount],
   );
 
   const set = (key: keyof Income, v: number) =>
@@ -97,8 +106,9 @@ export default function RegionalPremiumCalc() {
             {' '}
             근로·연금소득은 50%
           </strong>
-          만 반영됩니다. 금융소득은 연 1,000만원을 넘을 때만 전액 반영되고, 그
-          이하면 부과 대상에서 빠집니다.
+          만 반영됩니다. 금융소득은 사업·기타소득과 함께 100% 반영됩니다. 연
+          1,000만원 문턱은 피부양자 자격 판정 기준이므로 지역보험료 계산에 섞지
+          않습니다.
         </p>
 
         <div className="grid gap-5 sm:grid-cols-3">
@@ -132,8 +142,8 @@ export default function RegionalPremiumCalc() {
 
         <FormSection number="2" title="재산을 입력해주세요">
         <Field
-          label="재산금액 합계"
-          hint="재산세 과세표준 + 전월세평가금액(30%)"
+          label="재산세 과세표준 합계"
+          hint="주택·건물·토지·선박·항공기 과세표준 합계"
         >
           <MoneyInput
             value={property}
@@ -142,10 +152,38 @@ export default function RegionalPremiumCalc() {
         </Field>
         <p className="text-sm leading-6 text-slate-600">
           실거래가나 공시가격이 아니라 <strong>재산세 과세표준</strong>입니다.
-          주택·건물을 소유하지 않은 경우에만 임차보증금·월세가 재산으로 평가되며,
-          그 경우 평가금액의 30%를 더해 입력하세요. 자동차는 2024년 2월부터
-          보험료에 반영되지 않습니다.
+          자동차는 2024년 2월부터 보험료에 반영되지 않습니다.
         </p>
+
+        <label className="mt-5 flex min-h-[48px] items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+          <input
+            type="checkbox"
+            checked={rentEligible}
+            onChange={(event) => setRentEligible(event.target.checked)}
+            className="h-5 w-5 accent-brand-900"
+          />
+          주택·건물을 소유하지 않고 임차 중입니다
+        </label>
+
+        {rentEligible && (
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <Field label="전세·월세 보증금">
+              <MoneyInput value={rentDeposit} onChange={setRentDeposit} />
+            </Field>
+            <Field label="월세">
+              <MoneyInput value={monthlyRent} onChange={setMonthlyRent} />
+            </Field>
+            <p className="sm:col-span-2 text-sm leading-6 text-slate-600">
+              공단 공식식에 따라 전월세 평가금액을{' '}
+              <strong className="font-semibold text-slate-700">
+                (보증금 + 월세 × 40) × 30%
+              </strong>{' '}
+              으로 계산해 과세표준에 더합니다. 현재 평가금액은{' '}
+              <strong className="font-semibold text-slate-700">{won(rentAmount)}</strong>
+              입니다.
+            </p>
+          </div>
+        )}
 
         </FormSection>
 
@@ -154,7 +192,7 @@ export default function RegionalPremiumCalc() {
           onClick={() => {
             setSubmitted(true);
             track('premium_calculate', {
-              has_property: property > 0,
+              has_property: propertyAmount > 0,
               limit_applied: result.limitApplied ?? 'none',
               from_judge: fromJudge,
             });
@@ -185,7 +223,9 @@ export default function RegionalPremiumCalc() {
             <ResultRow
               label="재산보험료"
               hint={
-                result.propertyGrade
+                result.propertyScore === 0
+                  ? '기본공제 후 0원 → 재산점수 0점'
+                  : result.propertyGrade
                   ? `${result.propertyGrade}등급 ${result.propertyScore}점 × 211.5원`
                   : undefined
               }
@@ -204,8 +244,9 @@ export default function RegionalPremiumCalc() {
 
           {result.limitApplied === 'lower' && (
             <p className="text-sm leading-6 text-slate-600">
-              계산 결과가 하한액보다 낮아 <strong>하한 보험료</strong>가
-              적용되었습니다. (계산값 {won(result.healthBeforeLimit)})
+              소득보험료 계산값이 하한액보다 낮아 <strong>소득 하한액</strong>을
+              적용한 뒤 재산보험료를 더했습니다. (하한 적용 전 합계{' '}
+              {won(result.healthBeforeLimit)})
             </p>
           )}
           {result.limitApplied === 'upper' && (
@@ -217,7 +258,7 @@ export default function RegionalPremiumCalc() {
 
           {ROUTES.voluntaryContinuation.ready && (
             <a
-              href={`${ROUTES.voluntaryContinuation.path}?property=${property}`}
+              href={`${ROUTES.voluntaryContinuation.path}?property=${propertyAmount}`}
               className="block min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
             >
               임의계속가입이 더 싸지 않을까요 →

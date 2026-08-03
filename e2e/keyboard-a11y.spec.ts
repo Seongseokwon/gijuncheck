@@ -44,15 +44,17 @@ test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더�
   await expect(tooltip).toHaveAttribute('aria-label', '도움말: 개인연금은 제외');
 });
 
-test('탈락 시 이어지는 CTA(보험료 계산)가 없다 — 지역보험료가 아직 미검증(ready:false)이므로', async ({ page }) => {
+test('탈락 시 이어지는 CTA(지역보험료 계산)가 연결된다 — 공식 대조 완료 상태', async ({ page }) => {
   await page.goto(ROUTES.dependent.path);
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await page.getByLabel('근로소득').fill('30000000'); // 소득요건 초과로 탈락시킴
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
 
   await expect(page.getByRole('status')).toContainText('탈락할 것으로 보입니다');
-  // regionalPremium.ready 가 false 인 동안에는 "그러면 보험료는 얼마인가요" 링크가 없어야 한다.
-  await expect(page.getByRole('link', { name: /보험료는 얼마인가요/ })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /보험료는 얼마인가요/ })).toHaveAttribute(
+    'href',
+    new RegExp(`^${ROUTES.regionalPremium.path}`),
+  );
 });
 
 test.describe('모바일 입력 글자 크기', () => {

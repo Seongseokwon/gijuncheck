@@ -6,12 +6,12 @@
  * 검증 상태
  *  - 60등급 구간·점수: 독립된 두 출처에서 전 구간이 일치함을 확인 (2026-07-30)
  *  - 기본공제 1억원: 두 출처 일치
- *  - ⚠️ 미확정: 공제 후 금액이 0원 이하일 때의 처리 (ZERO_PROPERTY_NOTE 참조)
- *  - ⚠️ 미지원: 전세·월세 환산 (RENT_CONVERSION_NOTE 참조)
+ *  - 공제 후 금액이 0원 이하이면 재산점수 0점으로 확인 (2026-08-03)
+ *  - 전세·월세 환산식과 대표 사례를 공단 모의계산으로 확인 (2026-08-03)
  *
  * 남은 검증 작업 (docs/02-다음작업-타임라인.md Week 3)
- *  공단 "지역보험료 모의계산"과 10개 케이스 대조. 특히 재산 0원 케이스로
- *  ZERO_PROPERTY_NOTE 의 모호함을 확정할 것.
+ *  공단 "지역보험료 모의계산"과 13개 케이스 대조 완료. 입력값과 결과는
+ *  docs/03-검증기록.md 의 P2-1 기록을 참조한다.
  */
 
 /**
@@ -21,8 +21,8 @@
  */
 export const VERIFIED = true;
 
-/** 공단 모의계산과의 대조 검증 완료 여부. Week 3 작업 후 true 로 변경. */
-export const VERIFIED_AGAINST_NHIS = false;
+/** 공단 모의계산과의 대조 검증 완료 여부. 2026-08-03 대표 13건 대조 완료. */
+export const VERIFIED_AGAINST_NHIS = true;
 
 /** 재산 기본공제액 (원) — 과세표준 합계에서 먼저 공제 */
 export const BASIC_DEDUCTION = 100_000_000;
@@ -30,22 +30,15 @@ export const BASIC_DEDUCTION = 100_000_000;
 /**
  * 공제 후 재산금액이 0원 이하일 때의 처리.
  *
- * 출처가 갈린다.
- *  - A안: 표의 1등급("450만원 이하")에 해당하므로 22점.
- *         "22점 × 점수당 금액" 예시를 제시하는 출처가 있다.
- *  - B안: 재산이 없으면 재산보험료 0원이므로 0점.
- *
- * 현재는 표 조회 로직에 충실한 A안을 따른다. 표의 1등급 구간이
- * "450만원 이하"이므로 0원도 그 구간에 포함되는 것이 자연스럽다.
- *
- * 공단 모의계산에서 소득 0 · 재산 0 케이스를 넣어보면 바로 확정된다.
- * 확정 후 이 상수와 zeroPropertyScore() 를 함께 수정할 것.
+ * 공단 모의계산에서 소득 0·재산 0 및 기본공제 경계 사례를 대조한 결과,
+ * 재산보험료부과점수는 0점이다. 1등급(22점)은 공제 후 금액이 0원을
+ * 초과할 때부터 적용된다.
  */
 export const ZERO_PROPERTY_NOTE =
-  'A안(1등급 22점) 적용 — 공단 대조로 확정 필요';
+  '공제 후 재산금액이 0원 이하이면 재산점수 0점 — 공단 모의계산 2026-08-03 확인';
 
 /**
- * 전세·월세를 재산금액으로 환산하는 공식은 구현하지 않았다.
+ * 전세·월세 평가금액.
  *
  * ── 공단 공식 문서로 확인된 것 ──────────────────────────────
  *  - 재산 산식 = {재산세 과세표준금액 + 전월세평가금액(30% 적용)} - 기본공제액
@@ -55,23 +48,11 @@ export const ZERO_PROPERTY_NOTE =
  *    (집이 있으면 전월세는 아예 계산에 들어가지 않는다)
  *  - 자동차 보험료는 2024년 2월부터 폐지
  *
- * ── 확인되지 않은 것 ────────────────────────────────────────
- *  월세를 보증금으로 환산하는 공식. 시행령 별표 4가 이 부분을
- *  "보건복지부령으로 정하는 기준"으로 위임하고 있어서 별표만 봐서는 알 수 없다.
+ * 공단 2026년 지역보험료 모의계산 도움말의 공식식:
+ *   (보증금 + 월세금액 × 40) × 30%
  *
- *  2차 출처들은 (보증금 + 월세×12÷0.025) × 30% 류의 공식을 제시하지만,
- *  그 출처가 제시한 계산 예시가 자기 공식으로 재현되지 않았다.
- *  (한 출처의 예시는 보증금을 빼먹고 월세분만 계산한 값이었다.)
- *
- *  역산해보면 월세분 = 월세 × 12 ÷ 0.025 × 30% 가 유력하지만,
- *  **블로그 산수를 역산한 가설이므로 채택하지 않는다.**
- *  이 사이트의 가치는 정확성이고, 추측으로 구현하면 그걸 잃는다.
- *
- * ── 확인할 곳 ──────────────────────────────────────────────
- *  국민건강보험법 **시행규칙** (보건복지부령) 중 임차주택 보증금·월세 평가 기준
- *
- * 그때까지 propertyAmount 인자는 "이미 환산이 끝난 재산금액 합계"로 취급한다.
- * UI에서 그렇게 안내해야 한다.
+ * 입력값과 반환값은 모두 원 단위다. 주택·건물을 소유하지 않은 경우에만
+ * 이 평가금액을 재산세 과세표준 합계에 더한다.
  *
  * ── 공정시장가액비율 (지방세법 시행령 기준) ────────────────
  *  과세표준 = 공시가격 × 공정시장가액비율
@@ -87,8 +68,15 @@ export const ZERO_PROPERTY_NOTE =
  *  /health-insurance/guides/property-tax-base/
  */
 export const RENT_CONVERSION_NOTE =
-  '전세·월세 환산 미지원 (월세→보증금 환산율이 보건복지부령에 위임되어 미확인). ' +
-  'propertyAmount 는 환산 완료된 재산금액 합계로 취급';
+  '전월세 평가금액 = (보증금 + 월세 × 40) × 30%; 주택·건물 미소유 세대에만 적용';
+
+/** 공단 공식식에 따른 전월세 평가금액 (원). */
+export function rentEvaluationAmount(
+  deposit: number,
+  monthlyRent: number,
+): number {
+  return Math.round((deposit + monthlyRent * 40) * 0.3);
+}
 
 export interface PropertyBracket {
   /** 등급 (1~60) */
@@ -168,7 +156,7 @@ export const PROPERTY_BRACKETS: readonly PropertyBracket[] = [
 
 /** 공제 후 금액이 0원 이하일 때의 점수. ZERO_PROPERTY_NOTE 참조 */
 export function zeroPropertyScore(): number {
-  return PROPERTY_BRACKETS[0].score; // A안: 1등급 22점
+  return 0;
 }
 
 export interface PropertyScoreResult {
@@ -192,7 +180,7 @@ export function propertyScoreDetail(
   const afterDeduction = propertyAmount - BASIC_DEDUCTION;
 
   if (afterDeduction <= 0) {
-    return { score: zeroPropertyScore(), grade: 1, taxableAfterDeduction: 0 };
+    return { score: zeroPropertyScore(), grade: 0, taxableAfterDeduction: 0 };
   }
 
   const manwon = afterDeduction / 10_000;

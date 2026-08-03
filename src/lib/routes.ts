@@ -44,18 +44,14 @@ export const ROUTES = {
     path: '/health-insurance/regional-premium/',
     label: '지역가입자 보험료 계산',
     priority: 0.9,
-    /*
-     * 00-brief.md 의 선결 결정: 재산점수표 공단 대조(VERIFIED_AGAINST_NHIS)가
-     * true 가 되기 전까지 비공개. 대조가 끝나면 이 값을 true 로 되돌린다.
-     * (docs/design-decisions/ADR-002-visual-system-index3.md 후속 반영)
-     */
-    ready: false,
+    /** 2026-08-03 공단 공식 모의계산 13개 대표 입력 대조 완료 */
+    ready: true,
   },
   voluntaryContinuation: {
     path: '/health-insurance/voluntary-continuation/',
     label: '임의계속가입 비교',
     priority: 0.8,
-    /** regionalPremium 과 동일한 미검증 수치를 내부적으로 쓰므로 함께 비공개 */
+    /** 지역보험료는 검증됐지만 임의계속가입 자체의 공식 대조 전까지 비공개 */
     ready: false,
   },
 

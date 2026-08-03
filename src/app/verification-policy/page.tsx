@@ -97,8 +97,8 @@ export default function VerificationPolicyPage() {
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">지역가입자 보험료 계산</td>
-                <td className="px-5 py-4 leading-6">재산 0원 처리, 전월세 환산, 공식 모의계산 대표 사례 대조가 완료되지 않았습니다.</td>
-                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-900">비공개</span></td>
+                <td className="px-5 py-4 leading-6">2026년 공단 모의계산 13개 대표 사례와 대조했습니다. 재산 0원·공제 경계·등급 경계·소득 조합·전월세·상한을 포함하며 모든 차이는 0원입니다.</td>
+                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-accent-100 px-3 py-1 text-xs font-bold text-accent-700">검증된 참고 계산</span></td>
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">임의계속가입 비교</td>

@@ -9,14 +9,8 @@ export const metadata: Metadata = {
   description:
     '퇴직 후 지역가입자가 되면 월 보험료가 얼마인지 계산합니다. ' +
     '근로·연금소득 50% 반영, 재산 60등급표, 기본공제 1억원, 상한·하한까지 적용. ' +
-    '적용된 재산 등급과 점수도 함께 보여줍니다.',
+    '임차보증금·월세 환산과 적용된 재산 등급·점수도 함께 보여줍니다.',
   alternates: { canonical: ROUTES.regionalPremium.path },
-  /*
-   * ROUTES.regionalPremium.ready 가 false 인 동안 검색 노출을 막는다.
-   * 공단 대조(VERIFIED_AGAINST_NHIS)가 끝나 ready:true 로 바뀌면 이 줄도 지운다.
-   * privacy/terms/contact 와 같은 패턴(noindex 페이지는 robots 를 직접 명시).
-   */
-  robots: { index: false, follow: true },
 };
 
 const FAQ = [

@@ -217,7 +217,7 @@ export default function Home() {
                 <li key={key} className="relative border-t border-slate-200 first:border-t-0 lg:border-l lg:border-t-0 lg:first:border-l-0">
                   {tool.ready ? (
                     <TrackedLink
-                      href="#judge"
+                      href={key === 'regionalPremium' ? tool.path : '#judge'}
                       location="tool"
                       className="block min-h-[224px] p-7 transition hover:bg-slate-50"
                     >

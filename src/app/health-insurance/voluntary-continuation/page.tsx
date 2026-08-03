@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: ROUTES.voluntaryContinuation.path },
   /*
    * ROUTES.voluntaryContinuation.ready 가 false 인 동안 검색 노출을 막는다.
-   * regionalPremium 과 동일한 미검증 수치에 의존하므로 함께 비공개.
+   * 임의계속가입 자체의 공식 대조 전까지 비공개.
    * 공단 대조가 끝나 ready:true 로 바뀌면 이 줄도 지운다.
    */
   robots: { index: false, follow: true },

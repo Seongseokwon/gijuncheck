@@ -11,6 +11,7 @@ import { INCOME_REFLECTION, PREMIUM_LIMIT, RATE } from '../constants/2026';
 import {
   BASIC_DEDUCTION,
   PROPERTY_BRACKETS,
+  rentEvaluationAmount,
   VERIFIED,
   VERIFIED_AGAINST_NHIS,
   propertyScore,
@@ -84,21 +85,15 @@ describe('소득 종류별 반영률 — 가장 조심해야 하는 지점', () 
     expect(r.annualRaw).toBe(32_000_000);
   });
 
-  it('금융소득이 1,000만원 이하면 부과 대상에서 빠진다', () => {
+  it('지역보험료에서는 금융소득 1,000만원 이하도 100% 반영된다', () => {
     const r = incomeBaseForPremium(income({ financial: 9_000_000 }));
-    expect(r.annualReflected).toBe(0);
+    expect(r.annualReflected).toBe(9_000_000);
     expect(r.annualRaw).toBe(9_000_000);
-    expect(r.financialExcluded).toBe(true);
   });
 
-  it('금융소득이 1,000만원을 넘으면 전액 반영된다', () => {
+  it('금융소득이 1,000만원을 넘어도 전액 반영된다', () => {
     const r = incomeBaseForPremium(income({ financial: 11_000_000 }));
     expect(r.annualReflected).toBe(11_000_000);
-    expect(r.financialExcluded).toBe(false);
-  });
-
-  it('금융소득이 아예 없으면 제외 플래그가 켜지지 않는다', () => {
-    expect(incomeBaseForPremium(income({})).financialExcluded).toBe(false);
   });
 
   it('소득월액은 반영 후 금액을 12로 나눈 값이다', () => {
@@ -155,13 +150,17 @@ describe('재산점수 산정', () => {
     expect(BASIC_DEDUCTION).toBe(100_000_000);
   });
 
-  it('재산이 기본공제 이하면 1등급 22점이다', () => {
+  it('재산이 기본공제 이하이면 재산점수 0점이다', () => {
     for (const amount of [0, man(5_000), BASIC_DEDUCTION]) {
       const r = propertyScoreDetail(amount);
-      expect(r.grade).toBe(1);
-      expect(r.score).toBe(22);
+      expect(r.grade).toBe(0);
+      expect(r.score).toBe(0);
       expect(r.taxableAfterDeduction).toBe(0);
     }
+  });
+
+  it('전월세 평가금액은 (보증금 + 월세×40)×30%다', () => {
+    expect(rentEvaluationAmount(400_000_000, 500_000)).toBe(126_000_000);
   });
 
   it('모든 등급 경계에서 등급이 정확히 전환된다', () => {
@@ -197,16 +196,14 @@ describe('검증 플래그', () => {
     expect(VERIFIED).toBe(true);
   });
 
-  it('공단 대조 검증은 아직 미완료다', () => {
-    // Week 3 에서 공단 모의계산 10케이스 대조 후 true 로 바꾸고
-    // 이 기대값도 함께 수정할 것. 이 테스트가 실패하면 그 작업이 끝났다는 뜻.
-    expect(VERIFIED_AGAINST_NHIS).toBe(false);
+  it('공단 대조 검증이 완료됐다', () => {
+    expect(VERIFIED_AGAINST_NHIS).toBe(true);
   });
 
   it('보험료 결과에 두 플래그가 모두 실려 나온다', () => {
     const r = calculateRegionalPremium(noIncome, 0);
     expect(r.verified).toBe(true);
-    expect(r.crossChecked).toBe(false);
+    expect(r.crossChecked).toBe(true);
   });
 
   it('근거 조항이 배열로 실려 나온다', () => {
@@ -227,13 +224,13 @@ describe('지역가입자 보험료', () => {
   it('재산 부분은 점수 × 211.5원이다', () => {
     const r = calculateRegionalPremium(noIncome, 360_000_000);
     expect(r.propertyScore).toBe(659);
-    expect(r.propertyPortion).toBe(Math.round(659 * 211.5));
+    expect(r.propertyPortion).toBe(Math.floor(659 * 211.5));
   });
 
-  it('재산이 없어도 1등급 22점만큼은 부과된다', () => {
+  it('재산이 없으면 재산보험료는 0원이다', () => {
     const r = calculateRegionalPremium(noIncome, 0);
-    expect(r.propertyScore).toBe(22);
-    expect(r.propertyPortion).toBe(Math.round(22 * 211.5));
+    expect(r.propertyScore).toBe(0);
+    expect(r.propertyPortion).toBe(0);
   });
 
   it('상한·하한 적용 전 건강보험료는 소득분 + 재산분이다', () => {
@@ -250,7 +247,9 @@ describe('지역가입자 보험료', () => {
       400_000_000,
     );
     expect(r.total).toBe(r.health + r.longTermCare);
-    expect(r.longTermCare).toBe(Math.round(r.health * longTermCareRatio()));
+    expect(r.longTermCare).toBe(
+      Math.floor((r.health * longTermCareRatio()) / 10) * 10,
+    );
   });
 
   it('자동차는 계산하지 않는다 (2024년 2월 폐지)', () => {
@@ -260,6 +259,44 @@ describe('지역가입자 보험료', () => {
       400_000_000,
     );
     expect(r.healthBeforeLimit).toBe(r.incomePortion + r.propertyPortion);
+  });
+});
+
+/* ------------------------------------------------------------------ */
+describe('국민건강보험공단 모의계산 대표 사례 — 2026-08-03', () => {
+  it('공단 계산기와 13개 대표 사례가 일치한다', () => {
+    const cases = [
+      [noIncome, 0, 0, 0, 20_160, 2_640, 22_800],
+      [income({ business: 3_000_000 }), 0, 0, 0, 20_160, 2_640, 22_800],
+      [income({ business: 5_000_000 }), 0, 0, 0, 29_950, 3_930, 33_880],
+      [noIncome, 100_000_000, 0, 0, 20_160, 2_640, 22_800],
+      [noIncome, 100_010_000, 22, 4_653, 24_810, 3_260, 28_070],
+      [noIncome, 104_500_000, 22, 4_653, 24_810, 3_260, 28_070],
+      [noIncome, 104_510_000, 44, 9_306, 29_460, 3_870, 33_330],
+      [income({ wage: 5_000_000, pension: 5_000_000 }), 0, 0, 0, 29_950, 3_930, 33_880],
+      [income({ business: 5_000_000, wage: 5_000_000 }), 0, 0, 0, 44_930, 5_900, 50_830],
+      [noIncome, 360_000_000, 659, 139_378, 159_530, 20_960, 180_490],
+      [income({ business: 800_000_000 }), 0, 0, 0, 4_591_740, 603_370, 5_195_110],
+      [noIncome, rentEvaluationAmount(400_000_000, 500_000), 146, 30_879, 51_030, 6_700, 57_730],
+      [income({ financial: 9_000_000 }), 0, 0, 0, 53_920, 7_080, 61_000],
+    ] as const;
+
+    for (const [caseIncome, property, score, propertyPart, health, longTermCare, total] of cases) {
+      const result = calculateRegionalPremium(caseIncome, property);
+      expect({
+        propertyScore: result.propertyScore,
+        propertyPortion: result.propertyPortion,
+        health: result.health,
+        longTermCare: result.longTermCare,
+        total: result.total,
+      }).toEqual({
+        propertyScore: score,
+        propertyPortion: propertyPart,
+        health,
+        longTermCare,
+        total,
+      });
+    }
   });
 });
 
@@ -288,13 +325,13 @@ describe('보험료 상한·하한', () => {
       400_000_000,
     );
     expect(r.limitApplied).toBeNull();
-    expect(r.health).toBe(r.healthBeforeLimit);
+    expect(r.health).toBe(Math.floor(r.healthBeforeLimit / 10) * 10);
   });
 
   it('장기요양보험료는 한도 적용 후 건강보험료에서 환산된다', () => {
     const r = calculateRegionalPremium(noIncome, 0);
     expect(r.longTermCare).toBe(
-      Math.round(PREMIUM_LIMIT.LOWER * longTermCareRatio()),
+      Math.floor((PREMIUM_LIMIT.LOWER * longTermCareRatio()) / 10) * 10,
     );
   });
 });

@@ -54,13 +54,14 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
   );
 });
 
-test('홈 — 준비 중인 도구(지역보험료·임의계속가입)는 클릭 불가능한 카드로만 노출된다', async ({ page }) => {
+test('홈 — 검증된 지역보험료는 접근 가능하고 임의계속가입만 준비 중이다', async ({ page }) => {
   await page.goto('/');
-  // regionalPremium·voluntaryContinuation 두 카드 모두 "공단 대조 미완료" 배지가 붙어야 한다.
-  // ready:false 인 도구가 실수로 클릭 가능한 <a> 로 노출되면 안 된다 (04-실행-우선순위.md 안전 규칙 3).
-  await expect(page.getByText('공단 대조 미완료')).toHaveCount(2);
+  await expect(
+    page.locator(`a[href="${ROUTES.regionalPremium.path}"]`),
+  ).toHaveCount(1);
+  await expect(page.getByText('공단 대조 미완료')).toHaveCount(1);
   const disabledCards = page.locator('[aria-disabled="true"]');
-  await expect(disabledCards).toHaveCount(2);
+  await expect(disabledCards).toHaveCount(1);
   for (const card of await disabledCards.all()) {
     await expect(card.locator('a')).toHaveCount(0);
   }
