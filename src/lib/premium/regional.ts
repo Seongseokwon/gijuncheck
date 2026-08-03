@@ -294,7 +294,7 @@ export interface ComparisonResult {
   /** 최대 유지 개월 */
   maxMonths: number;
   /**
-   * 신청기한 안내 문구.
+   * 신청 기한 안내 문구.
    * 고정 일수가 아니라 "최초 고지 납부기한 + 2개월"이라 숫자로 못 박지 않는다.
    */
   applyDeadlineRule: string;

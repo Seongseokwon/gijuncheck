@@ -45,7 +45,7 @@ const TOC: TocItem[] = [
   { id: 'what', label: '임의계속가입이란' },
   { id: 'why', label: '왜 싸지는가 — 재산이 빠진다' },
   { id: 'when', label: '유리한 경우 · 불리한 경우' },
-  { id: 'apply', label: '신청 조건과 신청기한' },
+  { id: 'apply', label: '신청 조건과 신청 기한' },
   { id: 'after', label: '36개월이 끝나면' },
 ];
 
@@ -63,7 +63,7 @@ const FAQ: FaqItem[] = [
   },
   {
     q: '언제까지 신청해야 하나요?',
-    a: `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE}입니다. "퇴직 후 90일"로 알려진 경우가 많은데 낡은 기준입니다. 기한 내 신고하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않습니다. 놓치면 그 기간은 지역보험료로 확정됩니다.`,
+    a: `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE}입니다. "퇴직 후 90일"로 알려진 경우가 많은데 현재 기준과 다른 안내입니다. 기한 내 신고하면 퇴사일로 소급 인정되어 그 기간의 지역보험료를 내지 않습니다. 놓치면 그 기간은 지역보험료로 확정됩니다.`,
   },
   {
     q: '임의계속가입자도 피부양자를 등재할 수 있나요?',
@@ -210,7 +210,7 @@ export default function Page() {
           </P>
         </Section>
 
-        <Section id="apply" title="신청 조건과 신청기한">
+        <Section id="apply" title="신청 조건과 신청 기한">
           <P>조건은 하나이고, 기한은 생각보다 헷갈립니다.</P>
 
           <Ol>
@@ -226,8 +226,8 @@ export default function Page() {
             </li>
           </Ol>
 
-          <Callout tone="warn" title="&ldquo;퇴직 후 90일&rdquo;은 낡은 안내입니다">
-            신청기한은 퇴직일이 아니라 <strong>지역가입자로 전환된 뒤 처음
+          <Callout tone="warn" title="&ldquo;퇴직 후 90일&rdquo;은 현재 기준과 다른 안내입니다">
+            신청 기한은 퇴직일이 아니라 <strong>지역가입자로 전환된 뒤 처음
             받는 지역보험료 고지서의 납부기한</strong>을 기준으로, 그 납부기한부터
             2개월이 지나기 전까지입니다. 기한 내 신청하면{' '}
             <strong>퇴사일로 소급 인정</strong>되어 그 기간의 지역보험료를
@@ -274,7 +274,7 @@ export default function Page() {
 
           <ToolCta
             routeKey="dependent"
-            description="소득과 재산을 넣어 피부양자 자격이 되는지 미리 확인해보세요. 36개월이 끝나기 전에 알아두면 선택지가 생깁니다."
+            description="소득과 재산을 넣어 피부양자 자격이 되는지 미리 확인해 보세요. 36개월이 끝나기 전에 알아두면 선택지가 생깁니다."
           />
         </Section>
 

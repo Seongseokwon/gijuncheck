@@ -189,12 +189,12 @@ export default function DependentJudge() {
           <aside
             className="mt-5 rounded-xl border border-accent-200 bg-accent-50/60 p-4"
             aria-live="polite"
-            aria-label={`${relationGuidance.title} 관계별 먼저 확인할 기준`}
+            aria-label={`${relationGuidance.title} 관계별로 먼저 확인할 기준`}
           >
             <div className="flex items-start gap-2">
               <div className="min-w-0">
                 <p className="text-sm font-bold text-brand-950">
-                  {relationGuidance.title} 관계별 먼저 확인할 기준
+                  {relationGuidance.title} 관계별로 먼저 확인할 기준
                 </p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">
                   {relationGuidance.summary}
@@ -213,7 +213,7 @@ export default function DependentJudge() {
           </aside>
         </FormSection>
 
-        <FormSection number="2" title="연간 소득을 입력해주세요">
+        <FormSection number="2" title="연간 소득을 입력해 주세요">
           <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
             사업·근로·공적연금·금융·기타소득을 입력합니다. 개인연금은 포함하지 않습니다.
           </p>

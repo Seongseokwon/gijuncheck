@@ -76,7 +76,7 @@ test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async (
   await expect(disabledCards).toHaveCount(0);
 });
 
-test('임의계속가입 비교 — 자격 충족 시 보험료와 신청기한을 보여준다', async ({ page }) => {
+test('임의계속가입 비교 — 자격 충족 시 보험료와 신청 기한을 보여준다', async ({ page }) => {
   await page.goto(ROUTES.voluntaryContinuation.path);
   await page.getByLabel(/^퇴직 전 12개월 보수월액 평균/).fill('4000000');
   await page.getByLabel(/^퇴직 전 18개월 중 직장가입 개월수/).fill('12');

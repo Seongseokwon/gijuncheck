@@ -452,7 +452,7 @@ describe('퇴직 후 비교', () => {
     expect(r.notes[0]).toContain('12개월 이상');
   });
 
-  it('신청기한 소급 안내가 항상 포함된다', () => {
+  it('신청 기한 소급 안내가 항상 포함된다', () => {
     const r = compareAfterRetirement({
       income: noIncome,
       propertyAmount: 0,

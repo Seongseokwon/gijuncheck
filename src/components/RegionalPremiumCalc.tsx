@@ -6,7 +6,7 @@
  * 주의할 점 두 가지
  *  - 소득은 종류별 반영률이 다르므로(근로·연금 50%) 항목을 분리해서 입력받는다.
  *    합쳐서 받으면 연금 수령자 보험료가 2배로 나온다.
- *  - 재산은 과세표준과 임차주택 전월세를 분리해 입력받고 공단 공식식으로 합산한다.
+ *  - 재산은 과세표준과 임차주택 전월세를 분리해 입력받고 공단 공식 계산식으로 합산한다.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -99,7 +99,7 @@ export default function RegionalPremiumCalc() {
         title="지역가입자 보험료 계산"
         description="소득과 재산을 입력하면 적용한 기준과 월 보험료 구성을 함께 보여드립니다."
       >
-        <FormSection number="1" title="연간 소득을 입력해주세요">
+        <FormSection number="1" title="연간 소득을 입력해 주세요">
         <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
           소득 종류에 따라 반영률이 다릅니다. 사업·금융·기타소득은 100%,
           <strong className="font-semibold text-slate-700">
@@ -107,7 +107,7 @@ export default function RegionalPremiumCalc() {
             근로·연금소득은 50%
           </strong>
           만 반영됩니다. 금융소득은 사업·기타소득과 함께 100% 반영됩니다. 연
-          1,000만원 문턱은 피부양자 자격 판정 기준이므로 지역보험료 계산에 섞지
+          1,000만원 문턱은 피부양자 자격 판정 기준이므로 지역보험료 계산에는 적용하지
           않습니다.
         </p>
 
@@ -140,7 +140,7 @@ export default function RegionalPremiumCalc() {
         </div>
         </FormSection>
 
-        <FormSection number="2" title="재산을 입력해주세요">
+        <FormSection number="2" title="재산을 입력해 주세요">
         <Field
           label="재산세 과세표준 합계"
           hint="주택·건물·토지·선박·항공기 과세표준 합계"
@@ -174,7 +174,7 @@ export default function RegionalPremiumCalc() {
               <MoneyInput value={monthlyRent} onChange={setMonthlyRent} />
             </Field>
             <p className="sm:col-span-2 text-sm leading-6 text-slate-600">
-              공단 공식식에 따라 전월세 평가금액을{' '}
+              공단의 공식 계산식에 따라 전월세 평가금액을{' '}
               <strong className="font-semibold text-slate-700">
                 (보증금 + 월세 × 40) × 30%
               </strong>{' '}

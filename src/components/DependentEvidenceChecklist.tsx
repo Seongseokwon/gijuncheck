@@ -210,9 +210,10 @@ export default function DependentEvidenceChecklist({
           <ExternalLink href={DEPENDENT_SOURCES.application.service.href}>신고 방법 안내</ExternalLink>
         </p>
         <p className="mt-3 text-sm leading-relaxed text-slate-700">
-          <strong>90일 기준:</strong> 자격변동일(사유발생일)부터 {data.application.retroactiveDays}일
-          이내 신고하면 자격변동일로 소급 인정될 수 있고, {data.application.retroactiveDays}일을
-          넘기면 원칙적으로 신고일이 취득일이 됩니다. {data.application.exception}{' '}
+          <strong>피부양자 자격변동 신고 기준:</strong> 자격변동일(사유 발생일)부터{' '}
+          {data.application.retroactiveDays}일 이내 신고하면 자격변동일로 소급 인정될 수
+          있고, {data.application.retroactiveDays}일을 넘기면 원칙적으로 신고일을 기준으로
+          취득 처리됩니다. {data.application.exception}{' '}
           <ExternalLink href={DEPENDENT_SOURCES.application.criteria.href}>공단 피부양자 안내</ExternalLink>
           {' · '}
           <ExternalLink href={DEPENDENT_SOURCES.application.form.href}>취득·상실 신고서</ExternalLink>
@@ -227,8 +228,8 @@ export default function DependentEvidenceChecklist({
           ))}
         </ul>
         <p className="mt-3 text-sm leading-relaxed text-slate-700">
-          실제 제출 서류와 처리 여부는 입력 결과보다 국민건강보험공단 안내가 우선입니다. 문의
-          1577-1000
+          실제 제출 서류와 처리 여부는 입력 결과보다 국민건강보험공단 안내가 우선입니다.
+          1577-1000으로 문의하세요.
         </p>
       </div>
 

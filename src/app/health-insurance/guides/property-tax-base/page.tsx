@@ -46,7 +46,7 @@ const TOC: TocItem[] = [
   { id: 'why', label: '왜 이걸 먼저 확인해야 하나' },
   { id: 'diff', label: '공시가격과 과세표준의 차이' },
   { id: 'ratio', label: '공정시장가액비율 — 1주택자는 다릅니다' },
-  { id: 'check', label: '내 과세표준 확인하는 절차' },
+  { id: 'check', label: '내 과세표준을 확인하는 절차' },
   { id: 'use', label: '확인한 금액을 어디에 쓰나' },
 ];
 
@@ -219,7 +219,7 @@ export default function Page() {
           </Callout>
         </Section>
 
-        <Section id="check" title="내 과세표준 확인하는 절차">
+        <Section id="check" title="내 과세표준을 확인하는 절차">
           <P>
             추정하지 말고 실제 값을 확인하는 것이 정확합니다. 방법은 두 가지입니다.
           </P>

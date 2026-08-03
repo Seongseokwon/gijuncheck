@@ -53,9 +53,9 @@ test.describe('관계 유형별 조건부 입력', () => {
     await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toHaveCount(0);
   });
 
-  test('관계를 바꾸면 관계별 먼저 확인할 기준이 바뀐다', async ({ page }) => {
+  test('관계를 바꾸면 관계별로 먼저 확인할 기준이 바뀐다', async ({ page }) => {
     await selectRelation(page, '형제자매');
-    await expect(page.getByText('형제자매 관계별 먼저 확인할 기준')).toBeVisible();
+    await expect(page.getByText('형제자매 관계별로 먼저 확인할 기준')).toBeVisible();
     await expect(page.locator('body')).toContainText('재산 기준도 일반 관계보다 엄격합니다');
   });
 });

@@ -15,8 +15,8 @@ const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
 const SCENARIOS = [
   ['퇴', '퇴직을 앞두고 있어요', '피부양자 가능 여부와 적용 근거를 먼저 확인합니다.'],
   ['사', '사업자등록을 고민해요', '사업소득이 자격에 어떤 영향을 주는지 확인합니다.'],
-  ['부', '부모님을 올리고 싶어요', '관계·소득·재산 기준을 순서대로 확인합니다.'],
-  ['연', '연금 수령을 시작해요', '공적연금이 소득기준에 미치는 영향을 확인합니다.'],
+  ['부', '부모님을 피부양자로 등록하고 싶어요', '관계·소득·재산 기준을 순서대로 확인합니다.'],
+  ['연', '연금 수령을 시작해요', '공적연금이 소득 기준에 미치는 영향을 확인합니다.'],
 ] as const;
 
 const GUIDE_TAG: Partial<Record<(typeof GUIDE_KEYS)[number], string>> = {
@@ -287,7 +287,7 @@ export default function Home() {
               판정에 쓰이는 기준을 먼저 읽어보세요
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              판정 결과에서도 관련 가이드와 법령 근거로 다시 연결됩니다.
+              판정 결과에서도 관련 가이드와 법령 근거를 다시 확인할 수 있습니다.
             </p>
           </div>
 
@@ -350,7 +350,7 @@ export default function Home() {
               id="judge-title"
               className="mt-3 text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl"
             >
-              등록 전에 내 조건을 확인해보세요
+              등록 전에 내 조건을 확인해 보세요
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
               입력값은 브라우저 안에서만 계산되며 서버로 전송하거나 저장하지

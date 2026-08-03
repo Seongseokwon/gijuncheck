@@ -48,7 +48,7 @@ export const ZERO_PROPERTY_NOTE =
  *    (집이 있으면 전월세는 아예 계산에 들어가지 않는다)
  *  - 자동차 보험료는 2024년 2월부터 폐지
  *
- * 공단 2026년 지역보험료 모의계산 도움말의 공식식:
+ * 공단 2026년 지역보험료 모의계산 도움말의 공식 계산식:
  *   (보증금 + 월세금액 × 40) × 30%
  *
  * 입력값과 반환값은 모두 원 단위다. 주택·건물을 소유하지 않은 경우에만
@@ -70,7 +70,7 @@ export const ZERO_PROPERTY_NOTE =
 export const RENT_CONVERSION_NOTE =
   '전월세 평가금액 = (보증금 + 월세 × 40) × 30%; 주택·건물 미소유 세대에만 적용';
 
-/** 공단 공식식에 따른 전월세 평가금액 (원). */
+/** 공단 공식 계산식에 따른 전월세 평가금액 (원). */
 export function rentEvaluationAmount(
   deposit: number,
   monthlyRent: number,

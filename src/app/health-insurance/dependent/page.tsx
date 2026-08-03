@@ -5,7 +5,7 @@ import { toEok, toManwon } from '@/lib/dependent/judge';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 
 export const metadata: Metadata = {
-  title: '피부양자 자격판정 — 소득·재산·관계 3단 자동 판정',
+  title: '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정',
   description:
     `2026년 기준 건강보험 피부양자 자격을 자동 판정합니다. 합산소득 ${toManwon(
       INCOME.TOTAL_LIMIT,

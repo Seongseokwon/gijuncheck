@@ -4,9 +4,9 @@
  * 지역가입자 vs 임의계속가입 비교
  *
  * 이 도구의 핵심은 금액 두 개를 나란히 놓고 유리한 쪽을 명확히 말해주는 것.
- * 그리고 신청기한 안내 — 이 한 줄이 실제로 돈을 아껴준다.
+ * 그리고 신청 기한 안내 — 이 한 줄이 실제로 돈을 아껴준다.
  *
- * 신청기한은 "퇴직 후 90일"이 아니다. 2026년 기준 올바른 기한은
+ * 신청 기한은 "퇴직 후 90일"이 아니다. 2026년 기준 올바른 기한은
  * VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE 참조 — 고정 일수가 아니라
  * 최초 지역보험료 납부기한부터 2개월이므로 숫자로 카운트다운하지 않는다.
  */
@@ -77,7 +77,7 @@ export default function VoluntaryComparison() {
         title="퇴직 후 보험료 비교"
         description="퇴직 전 보수와 퇴직 후 소득·재산을 기준으로 두 선택지를 비교합니다."
       >
-        <FormSection number="1" title="퇴직 전 상황을 입력해주세요">
+        <FormSection number="1" title="퇴직 전 상황을 입력해 주세요">
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="퇴직 전 12개월 보수월액 평균" hint="세전 월급 평균">
             <MoneyInput value={avgWage} onChange={setAvgWage} />
@@ -112,7 +112,7 @@ export default function VoluntaryComparison() {
         </div>
         </FormSection>
 
-        <FormSection number="2" title="퇴직 후 소득을 입력해주세요">
+        <FormSection number="2" title="퇴직 후 소득을 입력해 주세요">
           <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
             보수 외 소득은 연 2,000만원 초과분만 추가 반영합니다. 근로·연금소득은
             50%, 사업·금융·기타소득은 100% 반영합니다.

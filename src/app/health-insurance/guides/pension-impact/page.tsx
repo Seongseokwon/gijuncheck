@@ -43,7 +43,7 @@ const TOC: TocItem[] = [
   { id: 'twofaces', label: '같은 연금, 다른 두 기준' },
   { id: 'which', label: '어떤 연금이 포함되나' },
   { id: 'threshold', label: '2,000만원 선을 넘을 때' },
-  { id: 'timing', label: '개시 시점을 고민할 때 볼 것' },
+  { id: 'timing', label: '연금 개시 시점에 함께 확인할 것' },
 ];
 
 const FAQ: FaqItem[] = [
@@ -239,7 +239,7 @@ export default function Page() {
           />
         </Section>
 
-        <Section id="timing" title="개시 시점을 고민할 때 볼 것">
+        <Section id="timing" title="연금 개시 시점에 함께 확인할 것">
           <P>
             국민연금은 수령 시기를 앞당기거나 미룰 수 있습니다. 조기수령은 감액,
             연기수령은 증액됩니다. 이때 건강보험도 함께 움직입니다.

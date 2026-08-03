@@ -45,7 +45,7 @@ const TOC: TocItem[] = [
   { id: 'trap', label: '사업자등록의 숨은 비용' },
   { id: 'rule', label: '피부양자 소득요건 — 등록 여부로 갈린다' },
   { id: 'cost', label: '탈락하면 얼마를 내는가' },
-  { id: 'benefit', label: '등록으로 얻는 것 — 통념과 다른 부분' },
+  { id: 'benefit', label: '등록으로 얻는 것과 달라지는 점' },
   { id: 'decide', label: '판단하는 순서' },
 ];
 
@@ -243,7 +243,7 @@ export default function Page() {
           />
         </Section>
 
-        <Section id="benefit" title="등록으로 얻는 것 — 통념과 다른 부분">
+        <Section id="benefit" title="등록으로 얻는 것과 달라지는 점">
           <P>
             비교의 반대쪽도 정확해야 합니다. 사업자등록으로 실제로 얻는 것은
             다음과 같습니다.

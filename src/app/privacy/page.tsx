@@ -62,9 +62,11 @@ export default function Page() {
         {analyticsConfigured ? (
           <>
             <p>
-              현재 배포에는 Google Analytics 4가 설정되어 있습니다. 방문 페이지,
-              체류 시간, 기기 종류, 유입 경로 등의 통계와 아래의 익명 이벤트를
-              수집합니다. IP 주소는 익명화되어 처리됩니다.
+              현재 배포에는 Google Analytics 4와 Vercel Speed Insights가 설정되어
+              있습니다. Google Analytics 4는 방문 페이지, 체류 시간, 기기 종류,
+              유입 경로 등의 통계와 아래의 익명 이벤트를 수집합니다. Vercel Speed
+              Insights는 페이지 로딩 성능과 Core Web Vitals를 측정합니다. IP 주소는
+              익명화되어 처리됩니다.
             </p>
             <ul className="ml-5 list-disc space-y-2">
               <li>홈에서 판정기로 이동한 CTA 위치와 판정 시작 여부</li>
@@ -75,9 +77,10 @@ export default function Page() {
           </>
         ) : (
           <p>
-            현재 배포에는 Google Analytics 4 측정 ID가 설정되어 있지 않아 분석
-            스크립트와 이벤트를 수집하지 않습니다. 추후 설정하면 아래 범위만
-            수집하고 이 방침의 시행일을 갱신합니다.
+            현재 배포에는 Google Analytics 4 측정 ID가 설정되어 있지 않습니다. 따라서
+            GA4 분석 스크립트와 이벤트는 수집하지 않지만, Vercel Speed Insights를
+            통해 페이지 성능 지표는 측정됩니다. GA4를 추후 설정하면 수집 범위와 이
+            방침의 시행일을 갱신합니다.
           </p>
         )}
         <p className="rounded-xl border border-slate-200 bg-canvas p-4">
