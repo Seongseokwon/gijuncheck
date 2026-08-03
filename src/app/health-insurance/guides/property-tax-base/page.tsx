@@ -18,6 +18,7 @@ import {
 } from '@/components/guide';
 import { PROPERTY, RATE } from '@/lib/constants/2026';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
+import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { toEok, wonExact } from '@/lib/format';
 import { ROUTES } from '@/lib/routes';
 
@@ -30,7 +31,7 @@ const LEAD =
   '재산세 과세표준입니다. 이 둘을 혼동하면 판정 결과가 완전히 달라집니다. ' +
   '차이가 왜 생기는지, 내 과세표준을 어디서 확인하는지 정리했습니다.';
 const ANSWER =
-  '건강보험 판정에 입력할 재산은 공시가격이 아니라 재산세 과세표준이며, 고지서나 위택스에서 확인해야 합니다.';
+  '건강보험 판정에 입력할 재산은 공시가격이 아니라 재산세 과세표준이며, 고지서나 위택스·서울시 ETAX에서 확인해야 합니다.';
 
 export const metadata: Metadata = {
   title: TITLE,
@@ -64,8 +65,8 @@ const FAQ: FaqItem[] = [
   {
     q: '과세표준은 어디서 확인할 수 있나요?',
     a:
-      '재산세 고지서에 과세표준 항목이 표시됩니다. 온라인으로는 위택스(wetax.go.kr)에 로그인해 지방세 납부내역 조회에서 확인할 수 있습니다. ' +
-      '다만 고지서가 발급된 이후에만 조회됩니다.',
+      '재산세 고지서에 과세표준 항목이 표시됩니다. 온라인으로는 전국 지방세를 위택스에서, ' +
+      '서울시 지방세를 서울시 ETAX에서 확인할 수 있습니다. 다만 고지서가 발급된 이후에만 조회됩니다.',
   },
   {
     q: '전세나 월세로 살고 있으면 재산이 0인가요?',
@@ -90,7 +91,11 @@ const SOURCES = [
   },
   {
     label: '위택스 (지방세 납부내역 조회)',
-    href: 'https://www.wetax.go.kr/',
+    href: DEPENDENT_SOURCES.application.wetax.href,
+  },
+  {
+    label: '서울시 ETAX (지방세 납부내역 조회)',
+    href: DEPENDENT_SOURCES.application.seoulEtax.href,
   },
 ];
 
@@ -229,6 +234,12 @@ export default function Page() {
               간편인증으로 로그인 → 지방세 → 납부내역 조회 → 해당 세목(재산세
               주택·토지·건축물)을 선택하면 고지내역에서 과세표준을 확인할 수
               있습니다.
+            </li>
+            <li>
+              <strong>서울시 ETAX에서도 확인합니다.</strong> 서울시 지방세라면
+              서울시 ETAX(etax.seoul.go.kr)에서 로그인 후 지방세 납부내역을
+              조회하세요. 고지서 발급 이후 실제 과세표준을 확인하는 것이
+              안전합니다.
             </li>
           </Ol>
 

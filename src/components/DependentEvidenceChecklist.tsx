@@ -1,15 +1,8 @@
 import type { ReactNode } from 'react';
-import { PROPERTY } from '@/lib/constants/2026';
+import { DEPENDENT_APPLICATION, PROPERTY } from '@/lib/constants/2026';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { RELATION_LABEL, type DependentInput, type JudgeResult } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
-
-const OFFICIAL_NHIS_GUIDE =
-  'https://www.nhis.or.kr/nhis/minwon/wbhapa01000m01.do?mode=view&articleNo=10946887';
-const DEPENDENT_FORM = 'https://www.nhis.or.kr/static/html/wbdb/f/wbdbf0301.html';
-const FAMILY_RELATION_CERTIFICATE = 'https://efamily.scourt.go.kr/index.jsp';
-const HOMETAX = 'https://www.hometax.go.kr/';
-const WETAX = 'https://www.wetax.go.kr/';
 
 export interface EvidenceChecklistItem {
   category: '관계' | '소득' | '재산';
@@ -17,6 +10,8 @@ export interface EvidenceChecklistItem {
   detail: string;
   href: string;
   linkLabel: string;
+  secondaryHref?: string;
+  secondaryLinkLabel?: string;
 }
 
 export interface EvidenceChecklistGuide {
@@ -51,23 +46,29 @@ export function buildEvidenceChecklist(
           : `${relationLabel} 관계·동거 확인`,
       detail:
         input.relation === 'spouse'
-          ? '배우자 관계를 확인할 가족관계 자료를 준비하세요.'
-          : `${relationLabel} 관계와 동거 여부를 확인할 가족관계 자료를 준비하세요. ` +
-            '공단이 추가 확인을 요청하면 주민등록등본 등 보유 자료를 함께 확인합니다.',
-      href: FAMILY_RELATION_CERTIFICATE,
-      linkLabel: '가족관계증명서 발급',
+          ? '먼저 주민등록등본으로 혼인·가족관계가 확인되는지 확인하세요. 확인되지 않을 때에만 가족관계등록부의 증명서가 필요할 수 있습니다. 사실혼 등 특수한 관계는 공단에 추가서류를 먼저 문의하세요.'
+          : `${relationLabel} 관계와 동거 여부가 주민등록등본으로 확인되는지 먼저 확인하세요. ` +
+            '확인되지 않을 때에만 가족관계등록부의 증명서가 필요할 수 있으며, 공단이 추가 확인을 요청하면 보유 자료를 함께 준비합니다. 사실혼·생부모·외국인 등 특수한 관계는 별도 서류를 공단에 문의하세요.',
+      href: DEPENDENT_SOURCES.application.familyRelation.href,
+      linkLabel: '가족관계등록부 발급(필요 시)',
     },
     {
       category: '소득',
       title: '소득·사업자등록 자료 확인',
       detail:
-        input.businessRegistered || input.income.business > 0
-          ? '사업자등록 상태와 사업소득 금액을 먼저 확인하세요. 등록 여부와 사업소득에 따라 적용 기준이 달라집니다.'
+        (input.businessRegistered || input.income.business > 0
+          ? '사업자등록 상태와 사업소득 금액을 먼저 확인하세요. 등록 여부와 사업소득에 따라 적용 기준이 달라집니다. '
           : result.failedAt === 'income'
-            ? '소득자료의 종류·금액·반영연도를 다시 확인하세요. 공단 전산에 반영된 자료와 입력값이 다를 수 있습니다.'
-            : '근로·공적연금·금융·기타소득의 금액과 반영연도를 확인하세요. 입력값이 0원이어도 공단 반영자료를 최종 확인합니다.',
+            ? '소득자료의 종류·금액·반영연도를 다시 확인하세요. 공단 전산에 반영된 자료와 입력값이 다를 수 있습니다. '
+            : '근로·공적연금·금융·기타소득의 금액과 반영연도를 확인하세요. 입력값이 0원이어도 공단 반영자료를 최종 확인합니다. ') +
+        `1~10월에는 전전년도 자료(공적연금은 전년도), 11~12월에는 전년도 자료가 반영됩니다. ` +
+        (input.disabled
+          ? '장애인·국가유공상이자·보훈보상대상자 특례를 적용받는다면 관련 등록·상이등급 증명서류도 공단이 요청할 수 있습니다.'
+          : ''),
       href:
-        input.businessRegistered || input.income.business > 0 ? HOMETAX : DEPENDENT_SOURCES.income.nhis.href,
+        input.businessRegistered || input.income.business > 0
+          ? DEPENDENT_SOURCES.application.hometax.href
+          : DEPENDENT_SOURCES.income.nhis.href,
       linkLabel:
         input.businessRegistered || input.income.business > 0
           ? '홈택스 확인'
@@ -81,8 +82,10 @@ export function buildEvidenceChecklist(
         : input.relation === 'sibling'
           ? '형제자매는 별도의 재산세 과세표준 기준이 적용되므로 해당 금액을 확인하세요.'
           : '재산세 과세표준을 확인하세요. 실거래가·공시가격이 아니라 과세표준을 기준으로 판정합니다.',
-      href: WETAX,
+      href: DEPENDENT_SOURCES.application.wetax.href,
       linkLabel: '위택스 확인',
+      secondaryHref: DEPENDENT_SOURCES.application.seoulEtax.href,
+      secondaryLinkLabel: '서울시 ETAX 확인',
     },
   ];
 
@@ -99,6 +102,7 @@ export function buildEvidenceChecklist(
     { label: '관계·자격상실 대표 사례', href: ROUTES.guideLosingEligibility.path },
     { label: '사업자등록·사업소득 대표 사례', href: ROUTES.guideBusinessRegistration.path },
     { label: '재산세 과세표준 확인 방법', href: ROUTES.guidePropertyTaxBase.path },
+    { label: '11월 소득·재산 재산정', href: ROUTES.guideNovemberReassessment.path },
   ];
 
   return { items, questions, guides };
@@ -149,8 +153,13 @@ export default function DependentEvidenceChecklist({
               <div className="min-w-0">
                 <p className="font-semibold text-slate-900">{item.title}</p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">{item.detail}</p>
-                <p className="mt-2 text-sm">
+                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
                   <ExternalLink href={item.href}>{item.linkLabel} ↗</ExternalLink>
+                  {item.secondaryHref && item.secondaryLinkLabel ? (
+                    <ExternalLink href={item.secondaryHref}>
+                      {item.secondaryLinkLabel} ↗
+                    </ExternalLink>
+                  ) : null}
                 </p>
               </div>
             </div>
@@ -166,10 +175,26 @@ export default function DependentEvidenceChecklist({
           ))}
         </ul>
         <p className="mt-3 text-sm leading-relaxed text-slate-700">
-          실제 제출 서류와 처리 여부는 입력 결과보다 국민건강보험공단 안내가 우선입니다.{' '}
-          <ExternalLink href={OFFICIAL_NHIS_GUIDE}>공단 피부양자 안내</ExternalLink>
+          피부양자 취득 신고는 직장가입자 또는 임의계속가입자가 합니다. 홈페이지·모바일앱·
+          4대사회보험정보연계센터·웹 EDI를 이용할 수 있고, 관계에 따라 관할 지사 방문·팩스·
+          우편으로 접수할 수 있습니다. 회사 담당자를 통한 접수 가능 여부는 회사의 4대보험
+          처리 절차를 확인하세요.{' '}
+          <ExternalLink href={DEPENDENT_SOURCES.application.fourInsurance.href}>
+            4대사회보험정보연계센터
+          </ExternalLink>
           {' · '}
-          <ExternalLink href={DEPENDENT_FORM}>취득·상실 신고서</ExternalLink>
+          <ExternalLink href={DEPENDENT_SOURCES.application.service.href}>신고 방법 안내</ExternalLink>
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-slate-700">
+          자격변동일(사유발생일)부터 {DEPENDENT_APPLICATION.RETROACTIVE_DAYS}일 이내 신고하면 자격변동일로
+          소급 인정될 수 있고, {DEPENDENT_APPLICATION.RETROACTIVE_DAYS}일을 넘기면 원칙적으로 신고일이
+          취득일이 됩니다. 사업장 지연 등 본인 책임이 없는 부득이한 사유는 공단 판단으로 예외가
+          적용될 수 있습니다. 참고로 법률의 {DEPENDENT_APPLICATION.MEMBER_QUALIFICATION_REPORT_DAYS}일 규정은
+          사용자·지역가입자 세대주의 ‘가입자 자격’ 신고에 관한 것으로, 피부양자 취득의 소급 기준인
+          {DEPENDENT_APPLICATION.RETROACTIVE_DAYS}일과 다릅니다.{' '}
+          <ExternalLink href={DEPENDENT_SOURCES.application.criteria.href}>공단 피부양자 안내</ExternalLink>
+          {' · '}
+          <ExternalLink href={DEPENDENT_SOURCES.application.form.href}>취득·상실 신고서</ExternalLink>
           {' · 문의 1577-1000'}
         </p>
       </div>

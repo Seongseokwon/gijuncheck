@@ -150,6 +150,14 @@ export const VOLUNTARY_CONTINUATION = {
     '지역가입자가 된 후 최초로 고지받은 지역보험료 납부기한으로부터 2개월이 지나기 전까지',
 } as const;
 
+/** 피부양자 자격 취득 신고 시점 — 공단 안내 기준 */
+export const DEPENDENT_APPLICATION = {
+  /** 자격변동일로 소급 인정되는 신고 구간 */
+  RETROACTIVE_DAYS: 90,
+  /** 사용자·지역가입자 세대주의 가입자 자격 신고 규정과 혼동하지 않도록 명시 */
+  MEMBER_QUALIFICATION_REPORT_DAYS: 14,
+} as const;
+
 /** 결과 화면에 표시할 근거 문구 */
 export const BASIS = {
   SUPPORT:
