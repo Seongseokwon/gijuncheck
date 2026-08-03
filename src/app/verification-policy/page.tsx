@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
+import { BASIS } from '@/lib/constants/2026';
+import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 
 export const metadata: Metadata = {
   title: '검증 원칙',
@@ -9,14 +11,28 @@ export const metadata: Metadata = {
   alternates: { canonical: ROUTES.verificationPolicy.path },
 };
 
-const SOURCES = [
+const SOURCES = [DEPENDENT_SOURCES.support.law, DEPENDENT_SOURCES.support.nhis] as const;
+
+const DEPENDENT_RULE_COVERAGE = [
   {
-    label: '국민건강보험법 시행규칙(현행) — 제2조, 별표 1, 별표 1의2',
-    href: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+    label: '부양요건',
+    basis: BASIS.SUPPORT,
+    coverage:
+      '배우자·직계존속·직계비속·형제자매의 관계, 동거, 혼인, 형제자매 연령·장애 분기',
+    source: DEPENDENT_SOURCES.support,
   },
   {
-    label: '국민건강보험공단 — 피부양자 자격취득 및 상실 신고',
-    href: 'https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&articleNo=10945798',
+    label: '소득요건',
+    basis: BASIS.INCOME,
+    coverage:
+      '합산소득 2,000만원, 사업자등록 여부별 사업소득 500만원 예외, 장애인 등 특례, 금융소득 문턱',
+    source: DEPENDENT_SOURCES.income,
+  },
+  {
+    label: '재산요건',
+    basis: BASIS.PROPERTY,
+    coverage: '재산세 과세표준 5.4억원·9억원 구간과 형제자매 1.8억원 기준',
+    source: DEPENDENT_SOURCES.property,
   },
 ] as const;
 
@@ -94,6 +110,57 @@ export default function VerificationPolicyPage() {
         </div>
       </section>
 
+      <section className="space-y-4" aria-labelledby="dependent-sources">
+        <h2 id="dependent-sources" className="text-2xl font-bold tracking-tight text-brand-950">
+          피부양자 판정의 근거 매핑
+        </h2>
+        <div className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
+          <table className="min-w-[58rem] w-full border-collapse text-sm">
+            <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
+              <tr>
+                <th className="px-5 py-4 font-bold">단계</th>
+                <th className="px-5 py-4 font-bold">코드에서 확인하는 핵심 분기·수치</th>
+                <th className="px-5 py-4 font-bold">근거 및 원문</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 text-slate-700">
+              {DEPENDENT_RULE_COVERAGE.map((rule) => (
+                <tr key={rule.label}>
+                  <td className="px-5 py-4 align-top font-bold text-brand-950">{rule.label}</td>
+                  <td className="px-5 py-4 align-top leading-6">{rule.coverage}</td>
+                  <td className="px-5 py-4 align-top leading-6">
+                    <p>{rule.basis}</p>
+                    <p className="mt-2 space-x-3">
+                      <a
+                        href={rule.source.law.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent-700 underline underline-offset-4 hover:text-accent-600"
+                      >
+                        법령 원문 ↗
+                      </a>
+                      <a
+                        href={rule.source.nhis.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-accent-700 underline underline-offset-4 hover:text-accent-600"
+                      >
+                        공단 안내 ↗
+                      </a>
+                    </p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-sm leading-6 text-slate-600">
+          위 표는 코드가 적용하는 모델의 범위를 보여줍니다. 주택임대소득 제외, 기혼자 부부 요건,
+          공단이 관계 자료로 인정하는 예외처럼 개별 사실관계가 필요한 항목은 입력 모델에 모두
+          포함하지 않았으므로 최종 신고 전 공단 확인이 필요합니다.
+        </p>
+      </section>
+
       <section className="rounded-[22px] border border-slate-200 bg-canvas p-6 sm:p-7" aria-labelledby="limits">
         <h2 id="limits" className="text-xl font-bold text-brand-950">결과를 이렇게 해석해 주세요</h2>
         <ul className="mt-4 space-y-3 text-base leading-7 text-slate-700">
@@ -101,6 +168,23 @@ export default function VerificationPolicyPage() {
           <li>자료 반영 시점, 개별 사실관계, 공단의 최종 심사는 이 도구가 대신할 수 없습니다.</li>
           <li>결과가 중요한 신청·납부 결정으로 이어진다면 근거 링크와 국민건강보험공단 안내를 함께 확인해 주세요.</li>
         </ul>
+      </section>
+
+      <section className="rounded-[22px] border border-slate-200 bg-white p-6 sm:p-7" aria-labelledby="operator">
+        <h2 id="operator" className="text-xl font-bold text-brand-950">운영 주체와 책임 범위</h2>
+        <dl className="mt-4 grid gap-3 text-sm leading-6 sm:grid-cols-[140px_1fr]">
+          <dt className="font-bold text-slate-900">운영 주체</dt>
+          <dd>{SITE.operatorName}</dd>
+          <dt className="font-bold text-slate-900">문의 채널</dt>
+          <dd>
+            <a href={`mailto:${SITE.contactEmail}`} className="text-accent-700 underline underline-offset-4">
+              {SITE.contactEmail}
+            </a>
+            {' '}— 오류 신고·출처 정정 요청·개인정보 문의를 받습니다.
+          </dd>
+          <dt className="font-bold text-slate-900">공식 판단 여부</dt>
+          <dd>기준체크는 민간 정보 서비스이며 국민건강보험공단의 공식 판정·처분을 대신하지 않습니다.</dd>
+        </dl>
       </section>
 
       <section className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="sources">

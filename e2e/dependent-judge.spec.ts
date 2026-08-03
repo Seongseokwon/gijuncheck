@@ -107,7 +107,7 @@ test.describe('재산요건 경계값', () => {
   });
 });
 
-test('결과의 근거 링크는 새 탭으로 열리고 법제처 원문을 가리킨다', async ({ page }) => {
+test('결과의 근거 링크는 새 탭으로 열리고 공식 법령·공단 원문을 가리킨다', async ({ page }) => {
   await selectRelation(page, '배우자');
   await submit(page);
 
@@ -120,7 +120,7 @@ test('결과의 근거 링크는 새 탭으로 열리고 법제처 원문을 가
     await expect(link).toHaveAttribute('target', '_blank');
     await expect(link).toHaveAttribute('rel', /noopener/);
     const href = await link.getAttribute('href');
-    expect(href, '근거 링크 href').toMatch(/^https:\/\/www\.law\.go\.kr\//);
+    expect(href, '근거 링크 href').toMatch(/^https:\/\/(www\.law\.go\.kr|www\.nhis\.or\.kr)\//);
   }
 });
 

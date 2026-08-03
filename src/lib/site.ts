@@ -29,6 +29,9 @@ export const SITE = {
   /** 화면·메타데이터에 쓰는 공식 서비스명 */
   name: '기준체크',
 
+  /** 서비스 운영 주체 — 공단 등 공공기관으로 오인되지 않도록 명시한다. */
+  operatorName: '기준체크 운영자(개인 운영)',
+
   url: override || PRODUCTION_URL,
 
   /**
@@ -56,7 +59,7 @@ export const SITE = {
   baseYear: 2026,
 
   /** 요건·요율을 마지막으로 확인한 날 */
-  lastVerified: '2026-07-30',
+  lastVerified: '2026-08-03',
 
   contactEmail: 'devswseong@gmail.com',
 } as const;

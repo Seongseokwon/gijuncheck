@@ -26,26 +26,20 @@ import {
   RELATION_LABEL,
   STEP_LABEL,
   type DependentInput,
-  type JudgeStep,
   type Relation,
 } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
+import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 
 /**
  * 근거 조항 원문 링크.
  *
- * 출처는 docs/01-상세기획서.md 부록·design-preview/index3.html 이 이미 쓰던
- * 법제처 URL을 그대로 재사용한다(ADR-002 — 근거는 실제 링크로 연결한다).
- * step 으로 매핑해 judge.ts 의 BASIS 문구가 바뀌어도 깨지지 않게 한다.
+ * 단계별 링크는 법령 원문과 공단의 피부양자 안내를 함께 제공한다.
+ * judge.ts 의 BASIS 문구와 링크를 분리해 조항명 변경이 URL 매핑을 깨뜨리지
+ * 않도록 한다.
  */
-const BASIS_URL: Record<JudgeStep, string> = {
-  // flDownload 링크는 과거 특정 시점의 별표 파일을 열 수 있다. 결과 화면에서는
-  // 시행일·개정 이력을 확인할 수 있는 현행 법령 본문으로 연결한다.
-  support: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
-  income: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
-  property: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
-};
+const BASIS_SOURCE = DEPENDENT_SOURCES;
 
 const INCOME_FIELDS: Array<{
   key: keyof DependentInput['income'];
@@ -299,12 +293,21 @@ export default function DependentJudge() {
                 <p className="mt-1 text-sm text-slate-600">
                   근거 ·{' '}
                   <a
-                    href={BASIS_URL[s.step]}
+                    href={BASIS_SOURCE[s.step].law.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent-700 underline underline-offset-2 hover:text-accent-600"
                   >
                     {s.basis}
+                  </a>
+                  <span aria-hidden> · </span>
+                  <a
+                    href={BASIS_SOURCE[s.step].nhis.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-accent-700 underline underline-offset-2 hover:text-accent-600"
+                  >
+                    공단 안내
                   </a>
                 </p>
               </li>

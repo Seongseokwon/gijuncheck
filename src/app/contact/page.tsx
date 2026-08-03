@@ -8,8 +8,6 @@ export const metadata: Metadata = {
   alternates: { canonical: ROUTES.contact.path },
 };
 
-const CONTACT_EMAIL = 'devswseong@gmail.com';
-
 export default function Page() {
   return (
     <article className="mx-auto max-w-3xl space-y-8 px-4 py-12 text-base leading-8 text-slate-700 sm:py-16">
@@ -19,14 +17,17 @@ export default function Page() {
           {ROUTES.contact.label}
         </h1>
         <p className="mt-4">서비스 문의, 계산 오류 신고, 제도 개정 반영 요청은 아래 이메일로 보내주시기 바랍니다.</p>
+        <p className="mt-3 text-sm leading-6 text-slate-600">
+          운영 주체 · {SITE.operatorName} · 문의 채널 · 이메일만 운영
+        </p>
       </header>
 
       <p className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <a
-          href={`mailto:${CONTACT_EMAIL}`}
+          href={`mailto:${SITE.contactEmail}`}
           className="text-base font-semibold text-slate-900 underline"
         >
-          {CONTACT_EMAIL}
+          {SITE.contactEmail}
         </a>
       </p>
 

@@ -9,9 +9,9 @@ export const metadata: Metadata = {
   alternates: { canonical: ROUTES.privacy.path },
 };
 
-const CONTACT_EMAIL = 'devswseong@gmail.com';
-
 export default function Page() {
+  const analyticsConfigured = Boolean(process.env.NEXT_PUBLIC_GA_ID?.trim());
+
   return (
     <article className="prose-sm mx-auto max-w-3xl space-y-6 px-4 py-12 text-base leading-8 text-slate-700 sm:py-16">
       <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -19,6 +19,9 @@ export default function Page() {
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950">
           {ROUTES.privacy.label}
         </h1>
+        <p className="mt-4 text-sm leading-6 text-slate-600">
+          운영 주체 · {SITE.operatorName} · 문의 · {SITE.contactEmail}
+        </p>
       </header>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -42,34 +45,13 @@ export default function Page() {
           2. 쿠키 및 광고
         </h2>
         <p>
-          {SITE.name}는 Google AdSense를 통해 광고를 게재할 수 있습니다. Google을
-          포함한 제3자 광고 사업자는 쿠키를 사용하여 이용자의 이전 방문 기록에
-          기반한 광고를 게재할 수 있습니다.
+          현재 {SITE.name}에는 광고 코드가 설치되어 있지 않아 광고 쿠키를 사용하지
+          않습니다. 향후 광고를 도입하면 광고 사업자와 쿠키 사용 여부를 이 방침에
+          먼저 반영합니다.
         </p>
         <p>
-          이용자는{' '}
-          <a
-            href="https://adssettings.google.com/"
-            className="underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Google 광고 설정
-          </a>
-          에서 맞춤 광고를 해제할 수 있으며,{' '}
-          <a
-            href="https://www.aboutads.info/choices/"
-            className="underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            aboutads.info
-          </a>
-          에서 제3자 광고 사업자의 쿠키를 일괄 거부할 수 있습니다.
-        </p>
-        <p>
-          또한 브라우저 설정에서 쿠키 저장을 거부할 수 있습니다. 쿠키를 거부해도
-          {SITE.name}의 판정·계산 기능은 정상적으로 이용할 수 있습니다.
+          브라우저 설정에서 쿠키 저장을 거부할 수 있습니다. 쿠키를 거부해도
+          {SITE.name}의 판정 기능은 정상적으로 이용할 수 있습니다.
         </p>
       </section>
 
@@ -77,22 +59,26 @@ export default function Page() {
         <h2 className="text-xl font-extrabold text-brand-950">
           3. 접속 통계
         </h2>
-        <p>
-          서비스 개선을 위해 Google Analytics 등의 분석 도구를 사용할 수
-          있습니다. 이때 수집되는 정보는 방문 페이지, 체류 시간, 기기 종류,
-          유입 경로 등의 통계 정보이며 개인을 식별하는 데 사용되지 않습니다.
-          IP 주소는 익명화되어 처리됩니다.
-        </p>
-        <p>
-          어떤 도구가 실제로 사용되는지 파악하기 위해 다음과 같은 익명 이벤트를
-          함께 수집합니다.
-        </p>
-        <ul className="ml-5 list-disc space-y-2">
-          <li>판정 결과가 자격 인정인지 탈락인지, 탈락이라면 어느 요건인지</li>
-          <li>선택한 가족관계, 사업자등록 여부</li>
-          <li>보험료 계산에서 상한·하한이 적용되었는지</li>
-          <li>임의계속가입 비교의 결론</li>
-        </ul>
+        {analyticsConfigured ? (
+          <>
+            <p>
+              현재 배포에는 Google Analytics 4가 설정되어 있습니다. 방문 페이지,
+              체류 시간, 기기 종류, 유입 경로 등의 통계와 아래의 익명 이벤트를
+              수집합니다. IP 주소는 익명화되어 처리됩니다.
+            </p>
+            <ul className="ml-5 list-disc space-y-2">
+              <li>판정 결과의 인정 여부와 탈락 단계, 선택한 가족관계·사업자등록 여부</li>
+              <li>보험료 계산의 상한·하한 적용 여부</li>
+              <li>임의계속가입 비교의 결론 범주</li>
+            </ul>
+          </>
+        ) : (
+          <p>
+            현재 배포에는 Google Analytics 4 측정 ID가 설정되어 있지 않아 분석
+            스크립트와 이벤트를 수집하지 않습니다. 추후 설정하면 아래 범위만
+            수집하고 이 방침의 시행일을 갱신합니다.
+          </p>
+        )}
         <p className="rounded-xl border border-slate-200 bg-canvas p-4">
           <strong>입력하신 소득·재산 금액과 나이는 전송되지 않습니다.</strong>{' '}
           수집하는 것은 위와 같은 참·거짓 값과 선택 항목뿐이며, 금액은 어떤
@@ -105,16 +91,20 @@ export default function Page() {
           4. 개인정보의 제3자 제공
         </h2>
         <p>
-          수집하는 개인정보가 없으므로 제3자에게 제공하는 개인정보도 없습니다.
+          판정 입력값은 제3자에게 제공되지 않습니다. 이용자가 문의 이메일을
+          보내는 경우에는 답변을 위해 이메일 주소와 문의 내용이 이메일 서비스에
+          전달될 수 있으며, 그 외 제3자 제공은 하지 않습니다.
         </p>
       </section>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-extrabold text-brand-950">5. 문의</h2>
+        <h2 className="text-xl font-extrabold text-brand-950">5. 문의 이메일</h2>
         <p>
-          개인정보 처리에 관한 문의는{' '}
-          <a href={`mailto:${CONTACT_EMAIL}`} className="underline">
-            {CONTACT_EMAIL}
+          이용자가 이메일로 문의하면 이메일 주소와 문의 내용이 답변·오류 대응을
+          위해 처리됩니다. 문의 처리가 끝난 뒤에는 필요한 경우를 제외하고 삭제를
+          요청할 수 있으며, 개인정보 처리 관련 문의는{' '}
+          <a href={`mailto:${SITE.contactEmail}`} className="underline">
+            {SITE.contactEmail}
           </a>
           로 보내주시기 바랍니다.
         </p>

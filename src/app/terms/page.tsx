@@ -16,6 +16,9 @@ export default function Page() {
         <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950">
           {ROUTES.terms.label}
         </h1>
+        <p className="mt-4 text-sm leading-6 text-slate-600">
+          운영 주체 · {SITE.operatorName} · 문의 · {SITE.contactEmail}
+        </p>
       </header>
 
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
