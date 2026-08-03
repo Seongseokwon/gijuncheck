@@ -260,4 +260,6 @@ test('모바일 결과 카드의 제목과 내용이 우측에서 잘리지 않�
   expect(headingBox!.x + headingBox!.width).toBeLessThanOrEqual(
     statusBox!.x + statusBox!.width + 1,
   );
+  expect(statusBox!.x).toBeGreaterThan(0);
+  expect(viewport!.width - (statusBox!.x + statusBox!.width)).toBeGreaterThan(0);
 });

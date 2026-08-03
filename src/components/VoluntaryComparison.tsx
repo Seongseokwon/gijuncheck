@@ -72,7 +72,7 @@ export default function VoluntaryComparison() {
   const voluntaryWins = recommendation === 'voluntary';
 
   return (
-    <div className="space-y-8">
+    <div className="w-full min-w-0 space-y-8 overflow-x-hidden">
       <FormCard
         title="퇴직 후 보험료 비교"
         description="퇴직 전 보수와 퇴직 후 소득·재산을 기준으로 두 선택지를 비교합니다."

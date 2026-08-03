@@ -94,7 +94,7 @@ export default function RegionalPremiumCalc() {
     setIncome((prev) => ({ ...prev, [key]: v }));
 
   return (
-    <div className="space-y-8">
+    <div className="w-full min-w-0 space-y-8 overflow-x-hidden">
       <FormCard
         title="지역가입자 보험료 계산"
         description="소득과 재산을 입력하면 적용한 기준과 월 보험료 구성을 함께 보여드립니다."

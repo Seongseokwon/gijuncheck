@@ -137,7 +137,7 @@ export default function DependentJudge() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="w-full min-w-0 space-y-8 overflow-x-hidden">
       {/* ---------- 입력 ---------- */}
       <FormCard
         title="피부양자 등록 전 기준 확인"
@@ -321,7 +321,7 @@ export default function DependentJudge() {
           // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
           role="status"
           aria-live="polite"
-          className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
+          className="w-full min-w-0 max-w-full overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
         >
           <div className="min-w-0 border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
           <div className="flex min-w-0 flex-wrap items-center gap-3">
