@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES, indexableRoutes, type RouteEntry } from '../src/lib/routes';
+import { SITE } from '../src/lib/site';
 
 /*
  * `Object.values(ROUTES)` 는 유니온 타입이라 noindex 를 선언하지 않은 항목에서
@@ -123,5 +124,17 @@ test.describe('OG/canonical 메타데이터', () => {
       .sort();
 
     expect(paths).toEqual(expected);
+  });
+
+  test('sitemap 의 lastmod 는 빌드 시각이 아닌 실제 기준 확인일을 사용한다', async ({ page }) => {
+    const res = await page.goto('/sitemap.xml');
+    const xml = await res!.text();
+    const lastModified = [...xml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(
+      (match) => match[1],
+    );
+
+    expect(lastModified).toHaveLength(indexableRoutes().length);
+    expect(new Set(lastModified)).toEqual(new Set([SITE.lastVerified]));
+    expect(lastModified.every((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))).toBe(true);
   });
 });
