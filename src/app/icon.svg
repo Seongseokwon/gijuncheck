@@ -1,46 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!--
-    파비콘. 글꼴에 의존하지 않는 도형으로 만든다.
-    한글 글자를 넣으면 환경에 따라 렌더링이 달라진다.
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title>기준체크</title>
 
-    의미: 3단 판정 체크리스트 — 통과 두 칸, 판정 한 칸.
-    이 사이트의 차별점이 "계산"이 아니라 "판정"이라는 것.
-  -->
-  <rect width="64" height="64" rx="14" fill="#0f172a" />
+  <!-- 기준체크의 헤더 심볼을 16px에서도 읽히는 단순한 형태로 확장 -->
+  <rect width="64" height="64" rx="16" fill="#102a43" />
 
-  <!-- 1단 통과 -->
+  <!-- 위에서 내려오는 기준 -->
   <path
-    d="M17 21.5l4.5 4.5 8-8.5"
-    fill="none"
-    stroke="#34d399"
-    stroke-width="4.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <!-- 2단 통과 -->
-  <path
-    d="M17 34.5l4.5 4.5 8-8.5"
-    fill="none"
-    stroke="#34d399"
-    stroke-width="4.5"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <!-- 3단 판정 중 -->
-  <circle
-    cx="21.5"
-    cy="48"
-    r="5"
-    fill="none"
-    stroke="#94a3b8"
-    stroke-width="4"
+    d="M14 14h36v11H31v25H14z"
+    fill="#f4f8fa"
   />
 
-  <!-- 항목 선 -->
+  <!-- 아래에서 올라오는 체크 결과 -->
   <path
-    d="M38 22h10M38 35h10M38 48h10"
-    stroke="#475569"
-    stroke-width="4"
-    stroke-linecap="round"
+    d="M50 50H14V39h19V14h17z"
+    fill="#0c8f9d"
   />
+
+  <!-- 두 기준이 맞물리는 중심부를 선명하게 유지 -->
+  <path d="M31 25h2v14h-2z" fill="#102a43" />
 </svg>
