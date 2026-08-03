@@ -82,37 +82,48 @@ export default function RootLayout({
         )}
 
         <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-          <div className="mx-auto flex min-h-[68px] max-w-[1120px] items-center justify-between gap-6 px-4">
-            <a
-              href={ROUTES.home.path}
-              aria-label={`${SITE.name} 홈`}
-              className="inline-flex min-h-[44px] items-center text-brand-950"
-            >
-              <span className="relative block h-9 w-9" aria-hidden>
-                <span
-                  className="absolute left-0 top-0 h-6 w-7 bg-brand-900"
-                  style={{ clipPath: 'polygon(0 0, 100% 0, 100% 34%, 48% 34%, 48% 100%, 0 100%)' }}
-                />
-                <span
-                  className="absolute bottom-0 right-0 h-6 w-7 bg-accent-600"
-                  style={{ clipPath: 'polygon(52% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 52% 66%)' }}
-                />
-              </span>
-              <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
-                {SITE.name}
-              </span>
-            </a>
-            <nav className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
-              <a href="/#guides" className="min-h-[44px] inline-flex items-center hover:text-brand-900">가이드</a>
-              <a href="/#journey" className="min-h-[44px] inline-flex items-center hover:text-brand-900">이용 방법</a>
-              <a href="/#judge" className="min-h-[44px] inline-flex items-center hover:text-brand-900">피부양자 판정</a>
-              <a href={ROUTES.verificationPolicy.path} className="min-h-[44px] inline-flex items-center hover:text-brand-900">검증 원칙</a>
+          <div className="mx-auto max-w-[1120px] px-4">
+            <div className="flex min-h-[68px] items-center justify-between gap-6">
               <a
-                href="/#judge"
-                className="min-h-[44px] inline-flex items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
+                href={ROUTES.home.path}
+                aria-label={`${SITE.name} 홈`}
+                className="inline-flex min-h-[44px] items-center text-brand-950"
               >
-                내 자격 확인
+                <span className="relative block h-9 w-9" aria-hidden>
+                  <span
+                    className="absolute left-0 top-0 h-6 w-7 bg-brand-900"
+                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 34%, 48% 34%, 48% 100%, 0 100%)' }}
+                  />
+                  <span
+                    className="absolute bottom-0 right-0 h-6 w-7 bg-accent-600"
+                    style={{ clipPath: 'polygon(52% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 52% 66%)' }}
+                  />
+                </span>
+                <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
+                  {SITE.name}
+                </span>
               </a>
+              <nav aria-label="데스크톱 주요 메뉴" className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
+                <a href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</a>
+                <a href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</a>
+                <a href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</a>
+                <a href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</a>
+                <a
+                  href="/#judge"
+                  className="inline-flex min-h-[44px] items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
+                >
+                  내 자격 확인
+                </a>
+              </nav>
+            </div>
+            <nav
+              aria-label="모바일 주요 메뉴"
+              className="flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-100 pb-3 pt-2 text-sm font-semibold text-slate-600 sm:hidden"
+            >
+              <a href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</a>
+              <a href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</a>
+              <a href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</a>
+              <a href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</a>
             </nav>
           </div>
         </header>

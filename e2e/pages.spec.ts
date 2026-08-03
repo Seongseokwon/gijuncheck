@@ -39,6 +39,21 @@ test('홈 — 상단 CTA(피부양자 등록 전 기준 확인하기)가 판정 
   await expect(page.locator('#judge')).toBeInViewport();
 });
 
+test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접근할 수 있다', async ({ page, isMobile }) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+  await page.goto('/');
+
+  const mobileNav = page.getByRole('navigation', { name: '모바일 주요 메뉴' });
+  await expect(mobileNav).toBeVisible();
+  await expect(mobileNav.getByRole('link', { name: '가이드' })).toHaveAttribute('href', '/#guides');
+  await expect(mobileNav.getByRole('link', { name: '이용 방법' })).toHaveAttribute('href', '/#journey');
+  await expect(mobileNav.getByRole('link', { name: '피부양자 판정' })).toHaveAttribute('href', '/#judge');
+  await expect(mobileNav.getByRole('link', { name: '검증 원칙' })).toHaveAttribute(
+    'href',
+    ROUTES.verificationPolicy.path,
+  );
+});
+
 test('홈 — 준비 중인 도구(지역보험료·임의계속가입)는 클릭 불가능한 카드로만 노출된다', async ({ page }) => {
   await page.goto('/');
   // regionalPremium·voluntaryContinuation 두 카드 모두 "공단 대조 미완료" 배지가 붙어야 한다.
