@@ -28,6 +28,15 @@ async function setCohabiting(page: Page, cohabiting: boolean) {
 async function submit(page: Page) {
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
   const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  const status = page.getByRole('status');
+  await expect
+    .poll(async () => {
+      if (await dialog.isVisible()) return 'dialog';
+      if (await status.isVisible()) return 'status';
+      return 'pending';
+    })
+    .toMatch(/dialog|status/);
+
   if (await dialog.isVisible()) {
     await dialog.getByRole('button', { name: '확인하고 판정하기' }).click();
   }
@@ -187,6 +196,32 @@ test('0원 입력 항목이 있으면 확인 후 판정을 진행한다', async 
     .getByRole('button', { name: '확인하고 판정하기' })
     .click();
   await expect(page.getByRole('status')).toBeVisible();
+});
+
+test('0원 확인 모달은 화면 중앙에 전체 backdrop과 함께 표시된다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+
+  const backdrop = page.getByTestId('zero-value-modal-backdrop');
+  const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  await expect(backdrop).toBeVisible();
+  await expect(dialog).toBeVisible();
+
+  const viewport = page.viewportSize();
+  const backdropBox = await backdrop.boundingBox();
+  const dialogBox = await dialog.boundingBox();
+  expect(viewport).not.toBeNull();
+  expect(backdropBox).not.toBeNull();
+  expect(dialogBox).not.toBeNull();
+
+  expect(backdropBox?.x).toBe(0);
+  expect(backdropBox?.y).toBe(0);
+  expect(backdropBox?.width).toBe(viewport?.width);
+  expect(backdropBox?.height).toBe(viewport?.height);
+  expect(Math.abs((dialogBox!.x + dialogBox!.width / 2) - viewport!.width / 2)).toBeLessThanOrEqual(1);
+  expect(Math.abs((dialogBox!.y + dialogBox!.height / 2) - viewport!.height / 2)).toBeLessThanOrEqual(1);
+
+  await expect(backdrop).toHaveCSS('backdrop-filter', 'blur(4px)');
 });
 
 test('결과 화면도 뷰포트 폭을 넘어 가로 스크롤을 만들지 않는다', async ({ page }) => {

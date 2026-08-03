@@ -7,7 +7,8 @@
  * 스타일을 바꿀 일이 생기면 이 파일만 고친다.
  */
 
-import { useEffect, useId, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { toKoreanAmount } from '@/lib/format';
 
 // won() 을 이 파일에 정의하면 안 된다. 'use client' 모듈의 함수는
@@ -318,6 +319,11 @@ export function ZeroValueConfirmModal({
 }) {
   const titleId = useId();
   const descriptionId = useId();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -334,8 +340,13 @@ export function ZeroValueConfirmModal({
     };
   }, [onCancel]);
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-brand-950/55 p-4 sm:items-center">
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      data-testid="zero-value-modal-backdrop"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
+    >
       <section
         role="dialog"
         aria-modal="true"
@@ -378,7 +389,8 @@ export function ZeroValueConfirmModal({
           </button>
         </div>
       </section>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
