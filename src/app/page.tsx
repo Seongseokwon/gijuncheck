@@ -1,4 +1,5 @@
 import DependentJudge from '@/components/DependentJudge';
+import TrackedLink from '@/components/TrackedLink';
 import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 
 const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
@@ -60,13 +61,14 @@ export default function Home() {
             </p>
 
             <div className="mt-[34px] flex flex-col gap-3 sm:flex-row">
-              <a
+              <TrackedLink
                 href="#judge"
+                location="hero"
                 className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-xl bg-brand-900 px-7 font-bold text-white shadow-md transition hover:-translate-y-0.5 hover:bg-brand-800 hover:shadow-lg"
               >
                 피부양자 자격 확인하기
                 <span aria-hidden>→</span>
-              </a>
+              </TrackedLink>
               <a
                 href="#journey"
                 className="inline-flex min-h-[52px] items-center justify-center rounded-xl border border-slate-500 bg-white/80 px-7 font-bold text-brand-900 transition hover:bg-white"
@@ -135,9 +137,10 @@ export default function Home() {
 
           <div className="mt-10 grid gap-[14px] sm:grid-cols-2 lg:grid-cols-4">
             {SCENARIOS.map(([mark, title, description]) => (
-              <a
+              <TrackedLink
                 key={title}
                 href="#judge"
+                location="scenario"
                 className="group min-h-[190px] rounded-[18px] border border-slate-200 bg-white p-[22px] shadow-sm transition hover:-translate-y-0.5 hover:border-accent-700 hover:shadow-[0_12px_28px_rgba(16,42,67,.08)]"
               >
                 <span
@@ -148,7 +151,7 @@ export default function Home() {
                 </span>
                 <h3 className="mt-6 text-base font-bold tracking-[-.02em] text-brand-950">{title}</h3>
                 <p className="mt-2 text-sm leading-[1.55] text-slate-600">{description}</p>
-              </a>
+              </TrackedLink>
             ))}
           </div>
         </div>
@@ -213,12 +216,13 @@ export default function Home() {
               return (
                 <li key={key} className="relative border-t border-slate-200 first:border-t-0 lg:border-l lg:border-t-0 lg:first:border-l-0">
                   {tool.ready ? (
-                    <a
+                    <TrackedLink
                       href="#judge"
+                      location="tool"
                       className="block min-h-[224px] p-7 transition hover:bg-slate-50"
                     >
                       {card}
-                    </a>
+                    </TrackedLink>
                   ) : (
                     <div
                       className="min-h-[224px] bg-[#fafafa] p-7"

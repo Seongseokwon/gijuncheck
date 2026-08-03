@@ -29,6 +29,14 @@ export interface JudgeCompleteParams {
   business_registered: boolean;
 }
 
+export interface HomeCtaClickParams {
+  location: 'hero' | 'scenario' | 'tool';
+}
+
+export interface JudgeStartParams {
+  entry: 'dependent_judge';
+}
+
 export interface PremiumCalculateParams {
   /** 재산을 입력했는지 (금액이 아니라 유무만) */
   has_property: boolean;
@@ -47,6 +55,8 @@ export interface VoluntaryCompareParams {
  * 여기에 없는 이벤트는 보낼 수 없고, 파라미터에 number 를 넣을 수 없다.
  */
 export interface EventMap {
+  home_cta_click: HomeCtaClickParams;
+  judge_start: JudgeStartParams;
   judge_complete: JudgeCompleteParams;
   premium_calculate: PremiumCalculateParams;
   voluntary_compare: VoluntaryCompareParams;

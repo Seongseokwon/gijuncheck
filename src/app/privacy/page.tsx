@@ -67,6 +67,7 @@ export default function Page() {
               수집합니다. IP 주소는 익명화되어 처리됩니다.
             </p>
             <ul className="ml-5 list-disc space-y-2">
+              <li>홈에서 판정기로 이동한 CTA 위치와 판정 시작 여부</li>
               <li>판정 결과의 인정 여부와 탈락 단계, 선택한 가족관계·사업자등록 여부</li>
               <li>보험료 계산의 상한·하한 적용 여부</li>
               <li>임의계속가입 비교의 결론 범주</li>

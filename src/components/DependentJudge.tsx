@@ -11,7 +11,7 @@
  *    (중복 정의하면 금액 입력 개선 같은 변경이 이 도구에만 안 먹는다)
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   Field,
   FormCard,
@@ -60,19 +60,32 @@ const INCOME_FIELDS: Array<{
 export default function DependentJudge() {
   const [input, setInput] = useState<DependentInput>(emptyInput);
   const [submitted, setSubmitted] = useState(false);
+  const judgeStarted = useRef(false);
 
   const result = useMemo(() => judgeDependent(input), [input]);
+
+  const recordJudgeStart = () => {
+    if (judgeStarted.current) return;
+
+    judgeStarted.current = true;
+    track('judge_start', { entry: 'dependent_judge' });
+  };
 
   const set = <K extends keyof DependentInput>(
     key: K,
     value: DependentInput[K],
-  ) => setInput((prev) => ({ ...prev, [key]: value }));
+  ) => {
+    recordJudgeStart();
+    setInput((prev) => ({ ...prev, [key]: value }));
+  };
 
-  const setIncome = (key: keyof DependentInput['income'], value: number) =>
+  const setIncome = (key: keyof DependentInput['income'], value: number) => {
+    recordJudgeStart();
     setInput((prev) => ({
       ...prev,
       income: { ...prev.income, [key]: value },
     }));
+  };
 
   const isSibling = input.relation === 'sibling';
   const needsSiblingIncomeFlag =
@@ -207,6 +220,7 @@ export default function DependentJudge() {
         <div className="px-5 py-6 sm:px-7 sm:py-7">
           <SubmitButton
             onClick={() => {
+              recordJudgeStart();
               setSubmitted(true);
               // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
               // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
