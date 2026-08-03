@@ -71,6 +71,22 @@ test.describe('관계 유형별 조건부 입력', () => {
     await expect(page.getByText('형제자매 관계별로 먼저 확인할 기준')).toBeVisible();
     await expect(page.locator('body')).toContainText('재산 기준도 일반 관계보다 엄격합니다');
   });
+
+  test('1단계 관계 안내 툴팁이 모바일 화면 밖으로 잘리지 않는다', async ({ page, isMobile }) => {
+    test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+
+    const tooltipTrigger = page.getByRole('img', { name: /도움말: 관계 요건을 먼저 확인하는 이유/ });
+    await tooltipTrigger.focus();
+
+    const tooltip = tooltipTrigger.getByRole('tooltip');
+    const tooltipBox = await tooltip.boundingBox();
+    const viewport = page.viewportSize();
+
+    expect(tooltipBox).not.toBeNull();
+    expect(viewport).not.toBeNull();
+    expect(tooltipBox!.x).toBeGreaterThanOrEqual(0);
+    expect(tooltipBox!.x + tooltipBox!.width).toBeLessThanOrEqual(viewport!.width);
+  });
 });
 
 test.describe('소득요건 경계값 — 합산소득 2,000만원', () => {

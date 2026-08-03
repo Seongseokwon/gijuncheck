@@ -231,7 +231,7 @@ export default function DependentJudge() {
                   {relationGuidance.summary}
                 </p>
               </div>
-              <InfoTooltip>
+              <InfoTooltip placement="end">
                 관계 요건을 먼저 확인하는 이유는 가족관계·동거·혼인 상태에 따라 다음 소득·재산
                 단계로 넘어갈 수 있는 범위가 달라지기 때문입니다.
               </InfoTooltip>

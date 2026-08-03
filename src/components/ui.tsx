@@ -69,7 +69,13 @@ export function Field({
  * 아이콘을 탭하면 포커스가 남아 내용을 확인한다. `aria-label`에 본문을 함께 넣어
  * 툴팁을 열지 않아도 스크린리더가 설명을 전달한다.
  */
-export function InfoTooltip({ children }: { children: ReactNode }) {
+export function InfoTooltip({
+  children,
+  placement = 'center',
+}: {
+  children: ReactNode;
+  placement?: 'center' | 'end';
+}) {
   const text = typeof children === 'string' ? children : '입력 도움말';
 
   return (
@@ -82,7 +88,11 @@ export function InfoTooltip({ children }: { children: ReactNode }) {
       <span aria-hidden>i</span>
       <span
         role="tooltip"
-        className="pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-64 -translate-x-1/2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100"
+        className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100 ${
+          placement === 'end'
+            ? 'right-0 w-[min(16rem,calc(100vw-2rem))] sm:w-64'
+            : 'left-1/2 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2'
+        }`}
       >
         {children}
       </span>
