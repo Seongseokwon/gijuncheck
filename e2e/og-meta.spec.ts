@@ -26,16 +26,11 @@ test.describe('OG/canonical 메타데이터', () => {
     const description = page.locator('meta[name="description"]');
     await expect(description).toHaveAttribute('content', /.+/);
 
-    const ogUrl = page.locator('meta[property="og:url"]');
-    // Next metadata API 가 og:url 을 자동으로 채우지 않는 설정일 수 있으므로
-    // 없으면 canonical 로 대체 확인한다.
     const canonical = page.locator('link[rel="canonical"]');
-    if ((await canonical.count()) > 0) {
-      await expect(canonical).toHaveAttribute('href', /^https:\/\/gijuncheck\.kr\//);
-    }
-    if ((await ogUrl.count()) > 0) {
-      await expect(ogUrl).toHaveAttribute('content', /^https:\/\/gijuncheck\.kr\//);
-    }
+    await expect(canonical).toHaveAttribute('href', 'https://gijuncheck.kr/');
+
+    const ogUrl = page.locator('meta[property="og:url"]');
+    await expect(ogUrl).toHaveAttribute('content', 'https://gijuncheck.kr/');
 
     const ogImage = page.locator('meta[property="og:image"]');
     await expect(ogImage).toHaveAttribute('content', /^https:\/\/gijuncheck\.kr\/og\.png/);

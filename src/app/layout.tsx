@@ -14,10 +14,14 @@ export const metadata: Metadata = {
     template: `%s | ${SITE.name}`,
   },
   description: SITE.description,
+  alternates: {
+    canonical: SITE.url,
+  },
 
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
+    url: SITE.url,
     // 정적 export 라 ImageResponse(런타임 생성)를 쓸 수 없다.
     // public/og.png 를 미리 만들어 두고 참조한다.
     images: [
