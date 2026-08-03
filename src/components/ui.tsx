@@ -423,15 +423,15 @@ export function ResultRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-4 py-1.5">
-      <span className="text-sm text-slate-600">
+      <span className="min-w-0 flex-1 text-sm text-slate-600">
         {label}
         {hint && <span className="ml-1 text-sm text-slate-600">{hint}</span>}
       </span>
       <span
         className={
           strong
-            ? 'text-lg font-bold text-slate-900'
-            : 'text-sm font-medium text-slate-900'
+            ? 'shrink-0 whitespace-nowrap text-lg font-bold text-slate-900'
+            : 'shrink-0 whitespace-nowrap text-sm font-medium text-slate-900'
         }
       >
         {value}

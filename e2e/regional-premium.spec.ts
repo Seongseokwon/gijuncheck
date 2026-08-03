@@ -205,6 +205,30 @@ test('결과가 나온 뒤에도 가로 스크롤을 만들지 않는다', async
     .toBeLessThanOrEqual(clientWidth + 1);
 });
 
+test('모바일 결과 행에서 금액이 줄바꿈되거나 카드 밖으로 밀리지 않는다', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+
+  await fillMoney(page, '사업소득 (100%)', 800_000_000);
+  await calculate(page);
+
+  const resultCard = result(page);
+  const total = resultCard.getByText('5,195,110원', { exact: true });
+  const cardBox = await resultCard.boundingBox();
+  const totalBox = await total.boundingBox();
+
+  expect(cardBox).not.toBeNull();
+  expect(totalBox).not.toBeNull();
+  expect(totalBox!.x + totalBox!.width).toBeLessThanOrEqual(
+    cardBox!.x + cardBox!.width + 1,
+  );
+  expect(await total.evaluate((element) => getComputedStyle(element).whiteSpace)).toBe(
+    'nowrap',
+  );
+});
+
 test('키보드만으로 소득 입력 → 계산 → 결과까지 도달한다', async ({ page }) => {
   await moneyField(page, '사업소득 (100%)').focus();
   await page.keyboard.type('5000000');
