@@ -17,6 +17,7 @@ for (const key of GUIDE_KEYS) {
     await expect(page.getByRole('heading', { name: '자주 묻는 질문' })).toBeVisible();
     await expect(page.getByText('함께 읽기', { exact: true })).toBeVisible();
     await expect(page.getByText('근거 · 출처', { exact: true })).toBeVisible();
+    await expect(page.getByText(/최종 확인\s+\d{4}-\d{2}-\d{2}/).last()).toBeVisible();
 
     const sourceLinks = page.locator('article a[target="_blank"]');
     expect(await sourceLinks.count(), `${route.path} 출처 링크`).toBeGreaterThan(0);
