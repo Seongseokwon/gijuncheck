@@ -14,6 +14,7 @@ describe('buildEvidenceChecklist', () => {
     expect(data.questions[0]).toContain('추가 서류');
     expect(data.guides).toHaveLength(4);
     expect(data.application.actor).toBe('직장가입자 또는 임의계속가입자');
+    expect(data.application.methods).toContain('4대사회보험정보연계센터');
     expect(data.application.retroactiveDays).toBe(90);
     expect(data.application.exception).toContain('천재지변·질병·사고');
   });

@@ -188,12 +188,21 @@ export default function DependentEvidenceChecklist({
         ))}
       </ul>
 
-      <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+      {/*
+        앰버 계열은 이 프로젝트에서 경고 톤이다(`guide.tsx` 의 warn·danger).
+        여기는 절차 안내이므로 문의 카드와 같은 중립 카드로 두고, 강조는
+        굵은 라벨과 배치 순서로만 준다.
+      */}
+      <div className="mt-5 rounded-xl border border-slate-300 bg-white p-4">
         <h3 className="font-semibold text-slate-900">신고 시점·신청 경로</h3>
         <p className="mt-2 text-sm leading-relaxed text-slate-700">
-          <strong>신고 주체:</strong> {data.application.actor}. {data.application.methods}를
-          이용할 수 있습니다. 회사 담당자를 통한 접수 가능 여부는 회사의 4대보험 처리
-          절차를 확인하세요.{' '}
+          <strong>신고 주체:</strong> {data.application.actor}.{' '}
+          {/*
+            경로 목록 뒤에 조사를 붙이면 목록 끝 글자의 받침에 따라 조사가 달라진다.
+            라벨 형식으로 두어 문자열이 바뀌어도 문장이 깨지지 않게 한다.
+          */}
+          <strong>신청 경로:</strong> {data.application.methods}. 회사 담당자를 통한 접수
+          가능 여부는 회사의 4대보험 처리 절차를 확인하세요.{' '}
           <ExternalLink href={DEPENDENT_SOURCES.application.fourInsurance.href}>
             4대사회보험정보연계센터
           </ExternalLink>
