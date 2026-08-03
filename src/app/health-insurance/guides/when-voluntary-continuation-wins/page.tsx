@@ -90,10 +90,6 @@ const SOURCES = [
     label: '국민건강보험법 (제110조 임의계속가입자)',
     href: 'https://www.law.go.kr/LSW/lsSc.do?menuId=1&query=%EA%B5%AD%EB%AF%BC%EA%B1%B4%EA%B0%95%EB%B3%B4%ED%97%98%EB%B2%95',
   },
-  {
-    label: '퇴직자의 지역가입자 전환 (미래에셋투자와연금센터)',
-    href: 'https://investpension.miraeasset.com/contents/view.do?idx=22669',
-  },
 ];
 
 export default function Page() {

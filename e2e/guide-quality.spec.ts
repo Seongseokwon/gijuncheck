@@ -21,6 +21,17 @@ for (const key of GUIDE_KEYS) {
     const sourceLinks = page.locator('article a[target="_blank"]');
     expect(await sourceLinks.count(), `${route.path} 출처 링크`).toBeGreaterThan(0);
 
+    const officialSourceLinks = page.locator(
+      'article a[target="_blank"][href*="law.go.kr"], ' +
+        'article a[target="_blank"][href*="nhis.or.kr"], ' +
+        'article a[target="_blank"][href*="gov.kr"], ' +
+        'article a[target="_blank"][href*="nts.go.kr"]',
+    );
+    expect(
+      await officialSourceLinks.count(),
+      `${route.path} 공식 출처 링크`,
+    ).toBeGreaterThan(0);
+
     const internalLinks = page.locator('article a[href^="/health-insurance/"]');
     expect(await internalLinks.count(), `${route.path} 내부 링크`).toBeGreaterThan(0);
   });

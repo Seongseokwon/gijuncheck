@@ -87,10 +87,6 @@ const SOURCES = [
     label: '연금소득 (국세청)',
     href: 'https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7889&mi=6609',
   },
-  {
-    label: '연금 받기 시작하면 건강보험료는 어떻게 달라질까 (브라보마이라이프)',
-    href: 'https://bravo.etoday.co.kr/view/atc_view/18380',
-  },
 ];
 
 export default function Page() {

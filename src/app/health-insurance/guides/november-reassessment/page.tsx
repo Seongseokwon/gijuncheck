@@ -82,10 +82,6 @@ const SOURCES = [
     href: 'https://www.nhis.or.kr/nhis/minwon/minwonServiceBoard.do?mode=view&articleNo=10945798',
   },
   {
-    label: '건강보험료 조정·정산 FAQ (KB의 생각)',
-    href: 'https://kbthink.com/main/asset-management/asset-management-expert-column/wm_content/wm_health_insurance/wm_2023_health_insurance2.html',
-  },
-  {
     label: '11월부터 새로운 소득·재산 반영해 건강보험료 산정 (한국세정신문)',
     href: 'https://www.taxtimes.co.kr/mobile/article.html?no=267343',
   },

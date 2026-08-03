@@ -94,10 +94,6 @@ const SOURCES = [
     label: '지역가입자 보험료 산정방법 (국민건강보험공단)',
     href: 'https://www.nhis.or.kr/static/html/wbma/b/wbmab0102.html',
   },
-  {
-    label: '건강보험 피부양자 자격 인정기준 (노무법인 해든)',
-    href: 'https://www.deunhr.com/22/?bmode=view&idx=138853327',
-  },
 ];
 
 export default function Page() {

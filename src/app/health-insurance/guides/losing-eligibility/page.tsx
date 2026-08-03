@@ -85,10 +85,6 @@ const SOURCES = [
     label: '피부양자 자격(취득·상실) 신고서 (국민건강보험공단)',
     href: 'https://www.nhis.or.kr/static/html/wbdb/f/wbdbf0301.html',
   },
-  {
-    label: '피부양자 등록 방법·자격 상실 기준 (KB의 생각)',
-    href: 'https://kbthink.com/life/daily/health-insurance-dependent.html',
-  },
 ];
 
 export default function Page() {
