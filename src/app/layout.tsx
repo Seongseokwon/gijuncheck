@@ -39,6 +39,13 @@ export const metadata: Metadata = {
   robots: SITE.indexable
     ? { index: true, follow: true }
     : { index: false, follow: false },
+
+  // 네이버 서치어드바이저 사이트 소유 확인 태그
+  verification: {
+    other: {
+      'naver-site-verification': '2286bc7351f229cb076d5229cb4ba19294b5727b',
+    },
+  },
 };
 
 export default function RootLayout({
