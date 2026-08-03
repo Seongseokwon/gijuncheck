@@ -111,7 +111,7 @@ test('결과의 근거 링크는 새 탭으로 열리고 공식 법령·공단 �
   await selectRelation(page, '배우자');
   await submit(page);
 
-  const basisLinks = result(page).getByRole('link');
+  const basisLinks = result(page).locator('ol a');
   const count = await basisLinks.count();
   expect(count, '판정 결과에 근거 링크가 최소 1개 있어야 한다').toBeGreaterThan(0);
 
@@ -122,6 +122,19 @@ test('결과의 근거 링크는 새 탭으로 열리고 공식 법령·공단 �
     const href = await link.getAttribute('href');
     expect(href, '근거 링크 href').toMatch(/^https:\/\/(www\.law\.go\.kr|www\.nhis\.or\.kr)\//);
   }
+});
+
+test('결과별 신청 준비 체크리스트와 공단 문의 질문을 보여준다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await page.getByLabel('사업자등록').selectOption({ label: '있음' });
+  await page.getByLabel('사업소득').fill('1');
+  await submit(page);
+
+  await expect(result(page).locator('#evidence-checklist-title')).toBeVisible();
+  await expect(result(page)).toContainText('사업자등록 상태와 사업소득 금액을 먼저 확인하세요');
+  await expect(result(page)).toContainText('소득자료 반영연도와 사업소득 인정액을 어떻게 확인하나요?');
+  await expect(result(page).getByRole('link', { name: /홈택스 확인/ })).toHaveAttribute('href', 'https://www.hometax.go.kr/');
+  await expect(result(page).getByRole('link', { name: /취득·상실 신고서/ })).toHaveAttribute('href', /nhis\.or\.kr/);
 });
 
 test('결과 화면에 입력값 요약(합산소득·재산세 과세표준)이 결론과 같은 화면에 보인다', async ({ page }) => {

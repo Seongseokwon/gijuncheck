@@ -31,6 +31,7 @@ import {
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
+import DependentEvidenceChecklist from './DependentEvidenceChecklist';
 
 /**
  * 근거 조항 원문 링크.
@@ -327,6 +328,8 @@ export default function DependentJudge() {
               </li>
             ))}
           </ol>
+
+          <DependentEvidenceChecklist input={input} result={result} />
 
           {/*
             탈락 시 "그래서 얼마 내나"로 이어지는 동선.
