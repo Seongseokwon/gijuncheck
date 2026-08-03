@@ -323,9 +323,9 @@ export default function DependentJudge() {
           aria-live="polite"
           className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
         >
-          <div className="border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-xl font-extrabold tracking-tight text-brand-950">
+          <div className="min-w-0 border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
+          <div className="flex min-w-0 flex-wrap items-center gap-3">
+            <p className="min-w-0 max-w-full text-xl font-extrabold tracking-tight text-brand-950">
               {result.eligible
                 ? '피부양자 자격이 인정될 것으로 보입니다'
                 : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
@@ -357,7 +357,7 @@ export default function DependentJudge() {
           </p>
 
           </div>
-          <ol className="space-y-4 px-5 py-6 sm:px-7">
+          <ol className="min-w-0 space-y-4 px-5 py-6 sm:px-7">
             {result.steps.map((s) => (
               <li
                 key={s.step}

@@ -239,3 +239,25 @@ test('결과 화면도 뷰포트 폭을 넘어 가로 스크롤을 만들지 않
     clientWidth + 1,
   );
 });
+
+test('모바일 결과 카드의 제목과 내용이 우측에서 잘리지 않는다', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
+
+  await selectRelation(page, '배우자');
+  await submit(page);
+  const status = result(page);
+  const viewport = page.viewportSize();
+  const statusBox = await status.boundingBox();
+  const headingBox = await status.locator('p').first().boundingBox();
+
+  expect(viewport).not.toBeNull();
+  expect(statusBox).not.toBeNull();
+  expect(headingBox).not.toBeNull();
+  expect(statusBox!.x + statusBox!.width).toBeLessThanOrEqual(viewport!.width + 1);
+  expect(headingBox!.x + headingBox!.width).toBeLessThanOrEqual(
+    statusBox!.x + statusBox!.width + 1,
+  );
+});

@@ -255,7 +255,7 @@ export function FormSection({
       <span className="grid h-9 w-9 place-items-center rounded-[11px] bg-brand-900 text-sm font-bold text-white sm:h-11 sm:w-11">
         {number}
       </span>
-      <div>
+      <div className="min-w-0">
         <h3 className="mt-1 text-lg font-bold tracking-tight text-brand-950">{title}</h3>
         <div className="mt-5">{children}</div>
       </div>
@@ -275,7 +275,7 @@ export function FormCard({
   return (
     <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
       <header className="flex items-start justify-between gap-5 border-b border-slate-200 px-5 py-6 sm:px-7">
-        <div>
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold tracking-tight text-brand-950">{title}</h2>
           <p className="mt-2 text-sm leading-6 text-slate-600">{description}</p>
         </div>

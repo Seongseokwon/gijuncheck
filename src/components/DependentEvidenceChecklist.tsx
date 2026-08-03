@@ -154,7 +154,7 @@ export default function DependentEvidenceChecklist({
   return (
     <section
       aria-labelledby="evidence-checklist-title"
-      className="mx-5 mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:mx-7 sm:p-6"
+      className="mx-5 mb-6 min-w-0 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:mx-7 sm:p-6"
     >
       <h2 id="evidence-checklist-title" className="text-lg font-extrabold text-brand-950">
         다음 확인: 신청 준비 체크리스트
