@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '../src/lib/routes';
+import { GUIDE_KEYS, ogImageForPath, ROUTES, TOOL_KEYS } from '../src/lib/routes';
 import { SITE } from '../src/lib/site';
 
 /**
@@ -55,13 +55,12 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
     });
 
   const expectedAuthorUrl = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
-  const expectedImage = new URL(SITE.ogImage, SITE.url).toString();
-
   for (const key of GUIDE_KEYS) {
     await page.goto(ROUTES[key].path);
     const graph = await readGraph();
     const article = graph.find((node) => node['@type'] === 'Article');
     const breadcrumb = graph.find((node) => node['@type'] === 'BreadcrumbList');
+    const expectedImage = new URL(ogImageForPath(ROUTES[key].path), SITE.url).toString();
 
     expect(article, `${ROUTES[key].path} Article`).toMatchObject({
       author: {

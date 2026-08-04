@@ -9,7 +9,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { ROUTES, type RouteKey } from '@/lib/routes';
+import { ogImageForPath, ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { breadcrumbJsonLd } from '@/lib/structured-data';
 
@@ -50,7 +50,7 @@ export function guideJsonLd({
         headline: title,
         description,
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-        image: [new URL(SITE.ogImage, SITE.url).toString()],
+        image: [new URL(ogImageForPath(path), SITE.url).toString()],
         author: {
           '@type': 'Person',
           name: SITE.authorName,

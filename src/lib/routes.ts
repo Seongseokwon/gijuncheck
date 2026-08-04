@@ -17,6 +17,8 @@ export interface RouteEntry {
   path: string;
   /** 내부 링크·목록에 쓰는 표시명 */
   label: string;
+  /** 정적 export에 포함할 페이지별 OG 이미지 경로 */
+  ogImage?: string;
   /** sitemap priority (0~1) */
   priority: number;
   /** 구현 완료 여부. false 면 sitemap 에서 제외되고 허브에서 "준비 중"으로 표시된다 */
@@ -29,6 +31,7 @@ export const ROUTES = {
   home: {
     path: '/',
     label: '홈',
+    ogImage: '/og/home.png',
     priority: 1,
     ready: true,
   },
@@ -37,12 +40,14 @@ export const ROUTES = {
   dependent: {
     path: '/health-insurance/dependent/',
     label: '피부양자 자격판정',
+    ogImage: '/og/dependent.png',
     priority: 0.9,
     ready: true,
   },
   regionalPremium: {
     path: '/health-insurance/regional-premium/',
     label: '지역가입자 보험료 계산',
+    ogImage: '/og/regional-premium.png',
     priority: 0.9,
     /** 2026-08-03 공단 공식 모의계산 13개 대표 입력 대조 완료 */
     ready: true,
@@ -50,6 +55,7 @@ export const ROUTES = {
   voluntaryContinuation: {
     path: '/health-insurance/voluntary-continuation/',
     label: '임의계속가입 비교',
+    ogImage: '/og/voluntary-continuation.png',
     priority: 0.8,
     /** 2026-08-03 법령·공단 산식·대표 사례 대조 완료 */
     ready: true,
@@ -59,30 +65,35 @@ export const ROUTES = {
   guidePropertyTaxBase: {
     path: '/health-insurance/guides/property-tax-base/',
     label: '재산세 과세표준 확인하는 방법',
+    ogImage: '/og/property-tax-base.png',
     priority: 0.7,
     ready: true,
   },
   guideBusinessRegistration: {
     path: '/health-insurance/guides/before-business-registration/',
     label: '사업자등록 전에 반드시 계산해야 하는 것',
+    ogImage: '/og/before-business-registration.png',
     priority: 0.7,
     ready: true,
   },
   guideLosingEligibility: {
     path: '/health-insurance/guides/losing-eligibility/',
     label: '피부양자 자격상실 시점과 소급 부과',
+    ogImage: '/og/losing-eligibility.png',
     priority: 0.7,
     ready: true,
   },
   guideVoluntaryContinuation: {
     path: '/health-insurance/guides/when-voluntary-continuation-wins/',
     label: '임의계속가입이 유리한 경우',
+    ogImage: '/og/when-voluntary-continuation-wins.png',
     priority: 0.7,
     ready: true,
   },
   guidePensionImpact: {
     path: '/health-insurance/guides/pension-impact/',
     label: '연금 수령이 피부양자 자격에 미치는 영향',
+    ogImage: '/og/pension-impact.png',
     priority: 0.7,
     ready: true,
   },
@@ -90,6 +101,7 @@ export const ROUTES = {
     path: '/health-insurance/guides/november-reassessment/',
     // 11월 피크를 겨냥한 글. 검색량이 몰리는 시기 전에 순위를 만들어둬야 한다.
     label: '11월 건강보험 자격 일괄 재산정이란',
+    ogImage: '/og/november-reassessment.png',
     priority: 0.8,
     ready: true,
   },
@@ -97,6 +109,7 @@ export const ROUTES = {
   verificationPolicy: {
     path: '/verification-policy/',
     label: '검증 원칙',
+    ogImage: '/og/verification-policy.png',
     priority: 0.5,
     ready: true,
   },
@@ -121,6 +134,7 @@ export const ROUTES = {
   privacy: {
     path: '/privacy/',
     label: '개인정보처리방침',
+    ogImage: '/og/privacy.png',
     priority: 0.1,
     ready: true,
     noindex: true,
@@ -128,6 +142,7 @@ export const ROUTES = {
   terms: {
     path: '/terms/',
     label: '이용약관',
+    ogImage: '/og/terms.png',
     priority: 0.1,
     ready: true,
     noindex: true,
@@ -135,6 +150,7 @@ export const ROUTES = {
   contact: {
     path: '/contact/',
     label: '문의',
+    ogImage: '/og/contact.png',
     priority: 0.1,
     ready: true,
     noindex: true,
@@ -151,6 +167,11 @@ export type RouteKey = keyof typeof ROUTES;
  * RouteEntry[] 로 명시해야 noindex 미선언 항목도 옵셔널 속성으로 다뤄진다.
  */
 const ALL_ROUTES: readonly RouteEntry[] = Object.values(ROUTES);
+
+/** 경로에 맞는 정적 OG 이미지. 미등록 경로는 홈 카드를 기본값으로 쓴다. */
+export function ogImageForPath(path: string): string {
+  return ALL_ROUTES.find((route) => route.path === path)?.ogImage || '/og/home.png';
+}
 
 /** sitemap 에 넣을 경로 — 구현 완료 + 색인 대상만 */
 export function indexableRoutes(): RouteEntry[] {

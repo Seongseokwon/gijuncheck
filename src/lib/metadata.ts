@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { ogImageForPath } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 
 type OpenGraphKind = 'website' | 'article';
@@ -23,7 +24,7 @@ export function createPageMetadata({
   robots,
 }: PageMetadataOptions): Metadata {
   const url = new URL(path, SITE.url).toString();
-  const image = new URL(SITE.ogImage, SITE.url).toString();
+  const image = new URL(ogImageForPath(path), SITE.url).toString();
   const summary = description || SITE.description;
 
   return {

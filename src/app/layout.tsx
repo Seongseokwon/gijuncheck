@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     locale: 'ko_KR',
     url: SITE.url,
     // 정적 export 라 ImageResponse(런타임 생성)를 쓸 수 없다.
-    // public/og.png 를 미리 만들어 두고 참조한다.
+    // public/og/home.png 를 미리 만들어 두고 참조한다.
     images: [
       {
         url: SITE.ogImage,
@@ -91,16 +91,7 @@ export default function RootLayout({
                 aria-label={`${SITE.name} 홈`}
                 className="inline-flex min-h-[44px] items-center text-brand-950"
               >
-                <span className="relative block h-9 w-9" aria-hidden>
-                  <span
-                    className="absolute left-0 top-0 h-6 w-7 bg-brand-900"
-                    style={{ clipPath: 'polygon(0 0, 100% 0, 100% 34%, 48% 34%, 48% 100%, 0 100%)' }}
-                  />
-                  <span
-                    className="absolute bottom-0 right-0 h-6 w-7 bg-accent-600"
-                    style={{ clipPath: 'polygon(52% 0, 100% 0, 100% 100%, 0 100%, 0 66%, 52% 66%)' }}
-                  />
-                </span>
+                <img src="/logo.svg" alt="" aria-hidden className="block h-9 w-9" />
                 <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
                   {SITE.name}
                 </span>

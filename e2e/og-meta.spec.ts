@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { ROUTES, indexableRoutes, type RouteEntry } from '../src/lib/routes';
+import { ROUTES, indexableRoutes, ogImageForPath, type RouteEntry } from '../src/lib/routes';
 import { SITE } from '../src/lib/site';
 
 /*
@@ -41,10 +41,29 @@ test.describe('OG/canonical 메타데이터', () => {
     await expect(ogUrl).toHaveAttribute('content', 'https://gijuncheck.kr/');
 
     const ogImage = page.locator('meta[property="og:image"]');
-    await expect(ogImage).toHaveAttribute('content', /^https:\/\/gijuncheck\.kr\/og\.png/);
+    await expect(ogImage).toHaveAttribute('content', 'https://gijuncheck.kr/og/home.png');
 
     const robots = page.locator('meta[name="robots"]');
     await expect(robots).toHaveAttribute('content', /index, ?follow|index,follow/);
+  });
+
+  test('준비된 페이지마다 해당 페이지 전용 OG 이미지를 사용한다', async ({ page }) => {
+    const readyRoutes = ALL_ROUTES.filter((entry) => entry.ready);
+    const images = new Set<string>();
+
+    for (const route of readyRoutes) {
+      await page.goto(route.path);
+      const expectedImage = new URL(ogImageForPath(route.path), SITE.url).toString();
+      const ogImage = page.locator('meta[property="og:image"]');
+
+      await expect(ogImage, `${route.path} OG image`).toHaveAttribute('content', expectedImage);
+      const imageResponse = await page.request.get(new URL(expectedImage).pathname);
+      expect(imageResponse.status(), `${route.path} OG image status`).toBe(200);
+      expect(imageResponse.headers()['content-type'], `${route.path} OG image type`).toContain('image/png');
+      images.add(expectedImage);
+    }
+
+    expect(images.size).toBe(readyRoutes.length);
   });
 
   test('공개·정책 페이지의 canonical과 og:url이 같은 자기 URL을 가리킨다', async ({ page }) => {
