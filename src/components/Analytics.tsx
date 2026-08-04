@@ -28,8 +28,8 @@ export default function Analytics() {
           window.gtag = gtag;
           gtag('js', new Date());
           gtag('config', '${id}', {
-            // IP 익명화. 이 사이트는 개인 식별이 필요 없다
-            anonymize_ip: true
+            // 쿼리에 입력값이 붙더라도 분석 도구에는 경로만 전달한다.
+            page_location: window.location.origin + window.location.pathname
           });
         `}
       </Script>

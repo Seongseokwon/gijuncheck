@@ -34,6 +34,7 @@ import {
 } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
+import { savePremiumHandoff } from '@/lib/premium-handoff';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { getConfidenceSummary, RELATION_GUIDANCE, STEP_GUIDANCE } from '@/lib/dependent/guidance';
 import DependentEvidenceChecklist from './DependentEvidenceChecklist';
@@ -118,7 +119,7 @@ export default function DependentJudge() {
     recordJudgeStart();
     setSubmitted(true);
     // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
-    // 금액은 보내지 않는다 — 개인정보처리방침의 약속이다.
+    // 금액은 분석 이벤트로 보내지 않는다 — 보험료 계산기 핸드오프는 같은 탭에만 임시 보관한다.
     track('judge_complete', {
       eligible: result.eligible,
       failed_at: result.failedAt,
@@ -293,7 +294,7 @@ export default function DependentJudge() {
             내 자격 판정하기
           </SubmitButton>
           <p className="mt-3 text-center text-sm text-slate-600">
-            입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.
+            입력값은 브라우저 안에서만 계산되며 서버로 전송되지 않습니다.
           </p>
         </div>
       </FormCard>
@@ -425,12 +426,19 @@ export default function DependentJudge() {
 
           {/*
             탈락 시 "그래서 얼마 내나"로 이어지는 동선.
-            입력값을 쿼리로 넘겨 다시 타이핑하지 않게 한다.
+            입력값은 같은 브라우저 탭의 sessionStorage로만 임시 전달한다.
             보험료 페이지가 준비되기 전에는 링크를 노출하지 않는다.
           */}
           {!result.eligible && ROUTES.regionalPremium.ready && (
             <a
-              href={`${ROUTES.regionalPremium.path}?income=${result.totalIncome}&property=${input.propertyTaxBase}`}
+              href={ROUTES.regionalPremium.path}
+              onClick={() =>
+                savePremiumHandoff(
+                  'dependent-judge',
+                  input.income,
+                  input.propertyTaxBase,
+                )
+              }
               className="mx-5 mb-6 block min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800 sm:mx-7"
             >
               그러면 보험료는 얼마인가요 →

@@ -36,7 +36,7 @@ export interface EvidenceChecklistData {
 
 /**
  * 판정 결과를 신청 전 확인할 자료와 공단 문의 질문으로 변환한다.
- * 입력값을 저장하거나 전송하지 않고, 현재 브라우저 화면을 만들 때만 사용한다.
+ * 입력값을 서버로 전송하지 않고, 현재 브라우저 화면을 만들 때만 사용한다.
  */
 export function buildEvidenceChecklist(
   input: DependentInput,

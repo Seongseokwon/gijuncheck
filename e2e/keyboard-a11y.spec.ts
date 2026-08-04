@@ -50,7 +50,7 @@ test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더�
   await expect(tooltip).toHaveAttribute('aria-label', '도움말: 개인연금은 제외');
 });
 
-test('탈락 시 이어지는 CTA(지역보험료 계산)가 연결된다 — 공식 대조 완료 상태', async ({ page }) => {
+test('탈락 시 이어지는 CTA가 금액을 URL에 노출하지 않고 지역보험료 계산으로 연결된다', async ({ page }) => {
   await page.goto(ROUTES.dependent.path);
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await fillMoney(page.getByLabel('근로소득'), 30000000); // 소득요건 초과로 탈락시킴
@@ -60,10 +60,12 @@ test('탈락 시 이어지는 CTA(지역보험료 계산)가 연결된다 — �
     .click();
 
   await expect(page.getByRole('status')).toContainText('탈락할 것으로 보입니다');
-  await expect(page.getByRole('link', { name: /보험료는 얼마인가요/ })).toHaveAttribute(
-    'href',
-    new RegExp(`^${ROUTES.regionalPremium.path}`),
-  );
+  const link = page.getByRole('link', { name: /보험료는 얼마인가요/ });
+  await expect(link).toHaveAttribute('href', ROUTES.regionalPremium.path);
+  await link.click();
+  await expect(page).toHaveURL(new RegExp(`${ROUTES.regionalPremium.path.replaceAll('/', '\\/')}$`));
+  await expect(page.getByLabel('근로소득 (50%)')).toHaveValue('30,000,000');
+  expect(new URL(page.url()).search).toBe('');
 });
 
 test.describe('모바일 입력 글자 크기', () => {

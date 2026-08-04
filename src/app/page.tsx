@@ -111,7 +111,7 @@ export default function Home() {
             </div>
 
             <div className="mt-6 grid max-w-xl grid-cols-2 gap-x-5 gap-y-3 text-[13px] font-semibold text-slate-500 sm:flex sm:flex-wrap">
-              {['약 3분', '회원가입 없음', '입력값 저장 안 함', '판정 근거 표시'].map(
+              {['약 3분', '회원가입 없음', '입력값 서버 전송 없음', '판정 근거 표시'].map(
                 (point) => (
                   <span key={point}>
                     <span className="mr-1.5 font-bold text-accent-700" aria-hidden>
@@ -353,8 +353,8 @@ export default function Home() {
               등록 전에 내 조건을 확인해 보세요
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              입력값은 브라우저 안에서만 계산되며 서버로 전송하거나 저장하지
-              않습니다.
+              입력값은 브라우저 안에서만 계산되며 서버로 전송하지 않습니다. 도구 간 이동
+              때만 같은 탭에 잠시 전달하고 수신 즉시 삭제합니다.
             </p>
           </div>
 

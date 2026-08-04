@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { PREMIUM_HANDOFF_STORAGE_KEY } from '../src/lib/premium-handoff';
 import { fillMoney } from './helpers';
 
 /**
@@ -116,12 +117,31 @@ test('보수 외 소득이 기준 이하이면 추가 보험료 줄을 띄우지
 test('지역보험료 계산기에서 넘어온 재산금액이 다시 입력하지 않아도 채워진다', async ({
   page,
 }) => {
-  await page.goto(`${ROUTES.voluntaryContinuation.path}?property=300000000`);
+  await page.addInitScript(
+    ({ key, value }) => sessionStorage.setItem(key, JSON.stringify(value)),
+    {
+      key: PREMIUM_HANDOFF_STORAGE_KEY,
+      value: {
+        version: 1,
+        source: 'regional-premium',
+        income: {
+          business: 0,
+          wage: 0,
+          pension: 0,
+          financial: 0,
+          other: 0,
+        },
+        propertyTaxBase: 300_000_000,
+      },
+    },
+  );
+  await page.goto(ROUTES.voluntaryContinuation.path);
   await expect(field(page, '재산금액 합계')).toHaveValue('300,000,000');
+  expect(new URL(page.url()).search).toBe('');
 });
 
-test('공식 대조 상태에 맞는 고지를 보여주고 면책·비저장 안내가 함께 있다', async ({ page }) => {
-  await expect(page.getByText('입력값은 브라우저 안에서만 계산되며 저장되지 않습니다')).toBeVisible();
+test('공식 대조 상태에 맞는 고지를 보여주고 면책·비전송 안내가 함께 있다', async ({ page }) => {
+  await expect(page.getByText('입력값은 브라우저 안에서만 계산되며 서버로 전송되지 않습니다')).toBeVisible();
 
   await compare(page);
 

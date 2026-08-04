@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { PREMIUM_HANDOFF_STORAGE_KEY } from '../src/lib/premium-handoff';
 import { fillMoney as fill } from './helpers';
 
 /**
@@ -145,11 +146,30 @@ test.describe('임차 전월세 환산', () => {
 test('판정기에서 넘어온 소득·재산이 다시 입력하지 않아도 채워지고 바로 계산된다', async ({
   page,
 }) => {
-  await page.goto(`${ROUTES.regionalPremium.path}?income=30000000&property=200000000`);
+  const handoff = {
+    version: 1,
+    source: 'dependent-judge',
+    income: {
+      business: 0,
+      wage: 12_000_000,
+      pension: 30_000_000,
+      financial: 0,
+      other: 0,
+    },
+    propertyTaxBase: 200_000_000,
+  };
+  await page.addInitScript(
+    ({ key, value }) => sessionStorage.setItem(key, JSON.stringify(value)),
+    { key: PREMIUM_HANDOFF_STORAGE_KEY, value: handoff },
+  );
+  await page.goto(ROUTES.regionalPremium.path);
 
-  // 판정기는 합산소득만 넘기므로 반영률이 높은 쪽(사업소득)에 들어간다
-  await expect(moneyField(page, '사업소득 (100%)')).toHaveValue('30,000,000');
+  // 판정기의 소득 종류별 금액을 그대로 전달해 반영률을 보존한다.
+  await expect(moneyField(page, '사업소득 (100%)')).toHaveValue('');
+  await expect(moneyField(page, '근로소득 (50%)')).toHaveValue('12,000,000');
+  await expect(moneyField(page, '공적연금소득 (50%)')).toHaveValue('30,000,000');
   await expect(moneyField(page, '재산세 과세표준 합계')).toHaveValue('200,000,000');
+  expect(new URL(page.url()).search).toBe('');
 
   // 다시 계산 버튼을 누르지 않아도 결과가 보여야 한다
   await expect(result(page)).toBeVisible();
@@ -162,8 +182,8 @@ test('공식 대조가 끝난 계산기이므로 "참고용" 미검증 배지를
   await expect(page.getByText('대조 검증이 아직 완료되지 않았습니다')).toHaveCount(0);
 });
 
-test('결과에 근거와 면책, 입력값 비저장 고지가 함께 있다', async ({ page }) => {
-  await expect(page.getByText('입력값은 브라우저 안에서만 계산되며 저장되지 않습니다')).toBeVisible();
+test('결과에 근거와 면책, 입력값 비전송 고지가 함께 있다', async ({ page }) => {
+  await expect(page.getByText('입력값은 브라우저 안에서만 계산되며 서버로 전송되지 않습니다')).toBeVisible();
 
   await calculate(page);
 
@@ -179,8 +199,12 @@ test('공식 대조가 끝난 임의계속가입 CTA가 재산금액을 들고 �
 
   const cta = result(page).locator(`a[href^="${ROUTES.voluntaryContinuation.path}"]`);
   await expect(cta).toHaveCount(1);
-  // 다시 타이핑하게 만들지 않는다 — 재산금액을 쿼리로 넘긴다
-  await expect(cta).toHaveAttribute('href', /property=200000000/);
+  // 다시 타이핑하게 만들지만 금액을 URL에 노출하지 않는다.
+  await expect(cta).toHaveAttribute('href', ROUTES.voluntaryContinuation.path);
+  await cta.click();
+  await expect(page).toHaveURL(new RegExp(`${ROUTES.voluntaryContinuation.path.replaceAll('/', '\\/')}$`));
+  await expect(page.getByLabel(/^재산금액 합계/)).toHaveValue('200,000,000');
+  expect(new URL(page.url()).search).toBe('');
 });
 
 test('임의계속가입이 미검증 상태로 되돌아가면 CTA를 숨긴다', async ({ page }) => {

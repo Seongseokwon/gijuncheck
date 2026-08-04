@@ -30,14 +30,30 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-async function events(page: Page) {
+async function calls(page: Page) {
   return page.evaluate(() => {
     const calls = ((window as unknown as { __qaGtagCalls?: unknown[][] }).__qaGtagCalls ?? []);
-    return calls
-      .filter((call) => call[0] === 'event')
-      .map((call) => ({ name: call[1], params: call[2] as Record<string, unknown> }));
+    return calls.map((call) => ({
+      command: call[0],
+      name: call[1],
+      params: call[2] as Record<string, unknown>,
+    }));
   });
 }
+
+async function events(page: Page) {
+  return (await calls(page)).filter((call) => call.command === 'event');
+}
+
+test('GA4 config는 page_location에 쿼리 없이 pathname만 전달한다', async ({ page }) => {
+  await page.goto('/?income=123456789&property=987654321');
+
+  const config = (await calls(page)).find((call) => call.command === 'config');
+  test.skip(!config, 'GA4 측정 ID가 없는 환경에서는 config가 생성되지 않는다');
+
+  expect(config?.params.page_location).toBe('http://127.0.0.1:4173/');
+  expect(JSON.stringify(config?.params)).not.toMatch(/income=|property=|123456789|987654321/);
+});
 
 test('홈 CTA가 home_cta_click 범주값만 기록한다', async ({ page }) => {
   await page.goto('/');

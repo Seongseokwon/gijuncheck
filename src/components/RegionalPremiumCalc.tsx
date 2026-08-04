@@ -29,6 +29,10 @@ import { DISCLAIMER } from '@/lib/constants/2026';
 import { rentEvaluationAmount } from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
+import {
+  consumePremiumHandoff,
+  savePremiumHandoff,
+} from '@/lib/premium-handoff';
 
 const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = [
   { key: 'business', label: '사업소득' },
@@ -63,19 +67,14 @@ export default function RegionalPremiumCalc() {
   /** 판정기에서 넘어왔는지. 퍼널이 작동하는지 보려고 이벤트에 담는다 */
   const [fromJudge, setFromJudge] = useState(false);
 
-  // 판정기에서 넘어온 값이 있으면 채운다. 다시 타이핑하게 만들면 이탈한다.
+  // 판정기에서 넘어온 값이 있으면 같은 탭의 임시 핸드오프를 소비한다.
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search);
-    const p = Number(q.get('property'));
-    if (Number.isFinite(p) && p > 0) setProperty(p);
-
-    // 판정기는 합산소득만 넘긴다. 종류를 알 수 없으므로 반영률이 높은 쪽에
-    // 넣어 과소 계산을 피한다. 사용자가 직접 항목을 옮길 수 있다.
-    const inc = Number(q.get('income'));
-    if (Number.isFinite(inc) && inc > 0) {
-      setIncome({ ...emptyIncome, business: inc });
+    const handoff = consumePremiumHandoff();
+    if (handoff) {
+      setIncome(handoff.income);
+      setProperty(handoff.propertyTaxBase);
       setSubmitted(true);
-      setFromJudge(true);
+      setFromJudge(handoff.source === 'dependent-judge');
     }
   }, []);
 
@@ -200,7 +199,7 @@ export default function RegionalPremiumCalc() {
         >
           보험료 계산하기
         </SubmitButton>
-        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.</p>
+        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 서버로 전송되지 않습니다.</p>
         </div>
       </FormCard>
 
@@ -258,7 +257,10 @@ export default function RegionalPremiumCalc() {
 
           {ROUTES.voluntaryContinuation.ready && (
             <a
-              href={`${ROUTES.voluntaryContinuation.path}?property=${propertyAmount}`}
+              href={ROUTES.voluntaryContinuation.path}
+              onClick={() =>
+                savePremiumHandoff('regional-premium', income, propertyAmount)
+              }
               className="block min-h-[48px] rounded-xl bg-brand-900 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-brand-800"
             >
               임의계속가입이 더 싸지 않을까요 →

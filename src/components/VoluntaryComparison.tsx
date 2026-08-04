@@ -30,6 +30,7 @@ import {
   VOLUNTARY_CONTINUATION,
 } from '@/lib/constants/2026';
 import { track } from '@/lib/analytics';
+import { consumePremiumHandoff } from '@/lib/premium-handoff';
 
 const emptyIncome: Income = {
   business: 0,
@@ -49,9 +50,11 @@ export default function VoluntaryComparison() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const q = new URLSearchParams(window.location.search);
-    const p = Number(q.get('property'));
-    if (Number.isFinite(p) && p > 0) setProperty(p);
+    const handoff = consumePremiumHandoff();
+    if (!handoff) return;
+
+    setIncome(handoff.income);
+    setProperty(handoff.propertyTaxBase);
   }, []);
 
   const result = useMemo(
@@ -165,7 +168,7 @@ export default function VoluntaryComparison() {
         >
           어느 쪽이 유리한지 비교하기
         </SubmitButton>
-        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 저장되지 않습니다.</p>
+        <p className="mt-3 text-center text-sm text-slate-600">입력값은 브라우저 안에서만 계산되며 서버로 전송되지 않습니다.</p>
         </div>
       </FormCard>
 
