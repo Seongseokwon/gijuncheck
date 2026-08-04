@@ -11,12 +11,13 @@
     "build": "next build",
     "preview": "serve out",
     "start": "npm run build && npm run preview",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm test && npm run build && npm run test:e2e",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run build && npm run test:e2e",
     "verify:e2e": "npm run build && npm run test:e2e"
   },
   "dependencies": {
@@ -26,11 +27,14 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
     "@playwright/test": "^1.62.1",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^15.5.22",
     "postcss": "^8.4.49",
     "serve": "^14.2.4",
     "tailwindcss": "^3.4.17",
