@@ -51,7 +51,15 @@
   `https://gijuncheck.kr#organization`으로 연결했다. `verification-policy`에는
   `AboutPage`·운영자 `Person`을 추가했으며, 홈에는 피부양자 전용 페이지 명시 링크를 추가했다.
   로컬 타입 검사·빌드·관련 E2E는 통과했고, Production 배포 후 Rich Results Test·Search
-  Console·PageSpeed 결과 기록은 아직 남아 있다.
+  Console·PageSpeed 결과 기록은 아직 작성하지 않았다.
+- 2026-08-04 품질·유지보수 정리: ESLint 9와 Next.js 접근성 규칙을 `eslint.config.mjs`에
+  추가하고 `npm run verify`의 첫 단계로 `npm run lint`를 연결했다. lint는 오류 0개·경고
+  3개로 통과한다. 공통 헤더 내부 링크는 `next/link`로 전환했고, 임의계속가입 가이드의
+  문장부호를 정리했다.
+- 2026-08-04 코드 비평 결과와 2주 실행계획을 `reports/critic-alpha.md`,
+  `reports/critic-beta.md`, `reports/action-plan.md`에 기록하고, 재사용 가능한 비평
+  에이전트 정의를 `.claude/agents/`에 추가했다. 이 리포트들은 감사 당시의 스냅샷이므로
+  현재 코드 상태와 대조해 다음 작업을 선택한다.
 
 ## 검증 기준선
 
@@ -74,6 +82,7 @@
 - sitemap 생성과 안정적인 `lastmod`: `src/app/sitemap.ts`, `src/lib/routes.ts`의 경로별 `lastModified`
 - 구조화 데이터: `src/lib/structured-data.ts`, `src/app/layout.tsx`, `src/components/guide.tsx`,
   `src/app/verification-policy/page.tsx`
+- 품질 게이트: `eslint.config.mjs`, `package.json`의 `lint`·`verify` 스크립트
 - 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
 - 판정 제출 흐름: `src/components/DependentJudge.tsx`
 - 이벤트 이름·허용 파라미터: `src/lib/analytics.ts`
@@ -131,6 +140,9 @@
 5. 국민건강보험공단 로그인 모의계산은 2026-08-03 부모·배우자 관계 조회 결과를 부분 확인했다. 로그인 사용자의 현재 자료를 조회하는 방식이라 D01·D02 합성 경계값의 공식 대조로 승격하지 않았고, 임의 금액 입력이 필요한 D03·D04는 미확인 상태다. 임의입력 가능한 공단 경로 또는 실제 처리 결과를 확보하면 `docs/03-검증기록.md`의 D01~D04 표를 추가 갱신한다.
 6. 최신 Production 배포 후 페이지별 OG 이미지 14개가 200으로 열리는지와 카카오·SNS 공유
    미리보기 캐시를 확인한다.
+7. 4단계 GEO·AEO 변경을 배포한 뒤 Rich Results Test·Search Console·PageSpeed 결과를
+   날짜·URL과 함께 `docs/06-QA-전수점검.md`에 기록한다.
+8. GitHub Actions가 아직 없으므로 `npm run verify`를 push/PR마다 실행하는 CI를 추가한다.
 
 ## 작업 시작 순서
 
