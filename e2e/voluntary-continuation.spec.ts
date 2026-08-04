@@ -60,6 +60,7 @@ test('12개월을 채우면 두 선택지를 금액으로 비교한다', async (
   await expect(result(page)).toContainText('유리합니다');
   await expect(result(page)).toContainText('지역가입자');
   await expect(result(page)).toContainText('임의계속가입');
+  await expect(result(page)).toContainText('대조 검증이 아직 완료되지 않았습니다');
 });
 
 test.describe('결론은 조건에 따라 뒤집힌다', () => {

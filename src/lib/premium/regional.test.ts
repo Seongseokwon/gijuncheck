@@ -356,10 +356,10 @@ describe('임의계속가입 보험료', () => {
     expect(r.limitApplied).toBe('lower');
   });
 
-  it('재산점수표에 의존하지 않으므로 검증 플래그가 모두 true 다', () => {
+  it('직접 대조 전인 참고 계산 상태를 표시한다', () => {
     const r = calculateVoluntaryPremium(4_000_000);
     expect(r.verified).toBe(true);
-    expect(r.crossChecked).toBe(true);
+    expect(r.crossChecked).toBe(false);
   });
 
   it('보수 외 소득이 연 2,000만원 이하면 추가 보험료가 없다', () => {

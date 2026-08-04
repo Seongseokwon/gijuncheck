@@ -199,7 +199,7 @@ export default function VoluntaryComparison() {
                 {/* 비교 결과 강조 */}
               </p>
 
-              <ReferenceOnlyNotice crossChecked={regional.crossChecked} />
+              <ReferenceOnlyNotice crossChecked={voluntary?.crossChecked ?? false} />
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div

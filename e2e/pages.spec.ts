@@ -67,7 +67,7 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
 
 test('세 도구 상단에 기준일과 검증 범위를 표시한다', async ({ page }) => {
   const signals = [
-    ['/health-insurance/dependent/', '공개 기준 8건 대조 완료'],
+    ['/health-insurance/dependent/', '공개 기준 8건 자체 재현'],
     ['/health-insurance/regional-premium/', '공단 모의계산 13건 대조 완료'],
     ['/health-insurance/voluntary-continuation/', '법령·공단 산식 기반 참고 비교'],
   ] as const;

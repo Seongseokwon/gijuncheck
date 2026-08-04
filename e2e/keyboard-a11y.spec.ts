@@ -40,14 +40,41 @@ test('키보드만으로 관계 선택 → 소득 입력 → 제출 → 결과 �
   await expect(firstBasisLink).toBeFocused();
 });
 
+test('0원 확인 모달은 포커스를 가두고 닫힌 뒤 제출 버튼으로 복원한다', async ({ page }) => {
+  await page.goto(ROUTES.dependent.path);
+
+  const submitButton = page.getByRole('button', { name: '내 자격 판정하기' });
+  await submitButton.focus();
+  await submitButton.click();
+
+  const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
+  const editButton = dialog.getByRole('button', { name: '입력 수정하기' });
+  const confirmButton = dialog.getByRole('button', { name: '확인하고 판정하기' });
+
+  await expect(editButton).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(confirmButton).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(editButton).toBeFocused();
+  await page.keyboard.press('Escape');
+
+  await expect(dialog).toHaveCount(0);
+  await expect(submitButton).toBeFocused();
+});
+
 test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더가 읽을 수 있다', async ({ page }) => {
   await page.goto(ROUTES.dependent.path);
 
   // '공적연금소득' Field 의 InfoTooltip — 마우스 hover 없이 focus 만으로 접근
-  const tooltip = page.getByRole('img', { name: /도움말: 개인연금은 제외/ });
+  const tooltip = page.getByRole('button', { name: /도움말: 개인연금은 제외/ });
   await tooltip.focus();
   await expect(tooltip).toBeFocused();
   await expect(tooltip).toHaveAttribute('aria-label', '도움말: 개인연금은 제외');
+  await tooltip.click();
+  await expect(tooltip).toHaveAttribute('aria-expanded', 'true');
+  await expect(tooltip.getByRole('tooltip')).toHaveClass(/opacity-100/);
+  await page.keyboard.press('Escape');
+  await expect(tooltip).toHaveAttribute('aria-expanded', 'false');
 });
 
 test('탈락 시 이어지는 CTA가 금액을 URL에 노출하지 않고 지역보험료 계산으로 연결된다', async ({ page }) => {

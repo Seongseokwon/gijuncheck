@@ -89,6 +89,17 @@
 - GA4 `page_location`은 pathname만 전달한다. 개인정보처리방침·README·QA 문구와 핵심
   핸드오프 E2E를 함께 갱신했다. GA4 config 테스트는 로컬 측정 ID 미설정으로 스킵한다.
 
+## 2026-08-04 2단계 신뢰·접근성 보강
+
+- 임의계속가입 비교의 `crossChecked`를 직접 공단 모의계산 대조 전 상태로 정정하고,
+  피부양자 `TrustSignal`도 공단 공개 안내·시행규칙 기준의 자체 재현임을 명시한다.
+- 개인정보처리방침에 GA4 분석 쿠키(`_ga` 등) 고지를 추가했다. 입력값 비전송 원칙과
+  분석 쿠키 고지를 분리해 설명한다.
+- `InfoTooltip`을 실제 버튼으로 바꾸고 입력 라벨·설명과 연결했다. 모바일 44px 터치 타깃,
+  `aria-expanded`·Escape 닫기·설명 연결을 적용했다.
+- `ZeroValueConfirmModal`에 포커스 트랩, Escape 닫기, 닫힌 뒤 제출 버튼 포커스 복원,
+  배경 형제 `aria-hidden` 처리를 적용했다. 관련 단위·Playwright 회귀 검사를 추가했다.
+
 ## 작업 규칙
 
 - `ready: false` 기능은 홈 메뉴·sitemap·검색 색인 대상에 공개하지 않는다.

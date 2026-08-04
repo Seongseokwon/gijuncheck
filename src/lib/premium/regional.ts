@@ -252,9 +252,9 @@ export function calculateVoluntaryPremium(
     limitApplied,
     longTermCare,
     total: health + longTermCare,
-    // 재산점수표에 의존하지 않으므로 등급표 검증 상태와 무관하다
+    // 법령·공단 산식 기반 참고 계산이며 공단 모의계산 직접 대조 전이다.
     verified: true,
-    crossChecked: true,
+    crossChecked: false,
     basis: [
       BASIS.RATE,
       BASIS.PREMIUM_LIMIT,

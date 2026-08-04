@@ -76,7 +76,7 @@ test.describe('관계 유형별 조건부 입력', () => {
   test('1단계 관계 안내 툴팁이 모바일 화면 밖으로 잘리지 않는다', async ({ page, isMobile }) => {
     test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
 
-    const tooltipTrigger = page.getByRole('img', { name: /도움말: 관계 요건을 먼저 확인하는 이유/ });
+    const tooltipTrigger = page.getByRole('button', { name: /도움말: 관계 요건을 먼저 확인하는 이유/ });
     await tooltipTrigger.focus();
 
     const tooltip = tooltipTrigger.getByRole('tooltip');

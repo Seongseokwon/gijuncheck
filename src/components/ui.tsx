@@ -7,7 +7,16 @@
  * 스타일을 바꿀 일이 생기면 이 파일만 고친다.
  */
 
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { toKoreanAmount } from '@/lib/format';
 
@@ -46,19 +55,31 @@ export function Field({
   hint?: ReactNode;
   children: ReactNode;
 }) {
+  const labelId = useId();
+  const controlId = useId();
+  const control = isValidElement(children)
+    ? cloneElement(
+        children as ReactElement<{
+          id?: string;
+          'aria-labelledby'?: string;
+        }>,
+        { id: controlId, 'aria-labelledby': labelId },
+      )
+    : children;
+
   return (
-    <label className="block">
-      <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-bold text-slate-700">
-        {label}
+    <div className="block">
+      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-bold text-slate-700">
+        <span id={labelId}>{label}</span>
         {/*
           text-slate-600 인 이유: slate-400(2.56:1)·slate-500(4.01:1, 14px 미만에서
           4.5:1 기준 미달)는 본문 대비 기준을 통과하지 못한다. slate-600(5.85:1)부터
           통과한다 — 00-brief.md 대비표 및 index3.html(ADR-002)과 동일한 결론.
         */}
         {hint && <InfoTooltip>{hint}</InfoTooltip>}
-      </span>
-      <div className="mt-1">{children}</div>
-    </label>
+      </div>
+      <div className="mt-1">{control}</div>
+    </div>
   );
 }
 
@@ -77,18 +98,36 @@ export function InfoTooltip({
   placement?: 'center' | 'end';
 }) {
   const text = typeof children === 'string' ? children : '입력 도움말';
+  const tooltipId = useId();
+  const [open, setOpen] = useState(false);
 
   return (
-    <span
-      tabIndex={0}
-      role="img"
+    <button
+      type="button"
       aria-label={`도움말: ${text}`}
-      className="group relative inline-flex h-[18px] w-[18px] shrink-0 cursor-help items-center justify-center rounded-full border border-slate-400 text-[11px] font-bold leading-none text-slate-600 outline-none transition hover:border-accent-700 hover:text-accent-700 focus:border-accent-700 focus:text-accent-700 focus:ring-4 focus:ring-accent-100"
+      aria-describedby={tooltipId}
+      aria-expanded={open}
+      onClick={() => setOpen((current) => !current)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          setOpen(false);
+        }
+      }}
+      className="group relative inline-flex h-11 w-11 shrink-0 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
     >
-      <span aria-hidden>i</span>
       <span
+        aria-hidden
+        className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-slate-400 transition group-hover:border-accent-700 group-hover:text-accent-700 group-focus:border-accent-700 group-focus:text-accent-700"
+      >
+        i
+      </span>
+      <span
+        id={tooltipId}
         role="tooltip"
-        className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus:opacity-100 ${
+        className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-lg transition-opacity ${
+          open ? 'opacity-100' : 'opacity-0'
+        } sm:group-hover:opacity-100 sm:group-focus:opacity-100 ${
           placement === 'end'
             ? 'right-0 w-[min(16rem,calc(100vw-2rem))] sm:w-64'
             : 'left-1/2 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2'
@@ -96,7 +135,7 @@ export function InfoTooltip({
       >
         {children}
       </span>
-    </span>
+    </button>
   );
 }
 
@@ -118,15 +157,21 @@ export function MoneyInput({
   onChange,
   /** 한글 단위 보조 표시. 금액이 큰 입력에서는 켜두는 게 좋다 */
   showReading = true,
+  id,
+  'aria-labelledby': ariaLabelledBy,
 }: {
   value: number;
   onChange: (v: number) => void;
   showReading?: boolean;
+  id?: string;
+  'aria-labelledby'?: string;
 }) {
   return (
     <>
       <input
         type="text"
+        id={id}
+        aria-labelledby={ariaLabelledBy}
         // 모바일 숫자 키패드. type=number 없이도 숫자 입력이 편해진다
         inputMode="numeric"
         autoComplete="off"
@@ -160,11 +205,15 @@ export function NumberInput({
   onChange,
   min = 0,
   max,
+  id,
+  'aria-labelledby': ariaLabelledBy,
 }: {
   value: number;
   onChange: (v: number) => void;
   min?: number;
   max?: number;
+  id?: string;
+  'aria-labelledby'?: string;
 }) {
   const clamp = (n: number) =>
     Math.min(max ?? Number.MAX_SAFE_INTEGER, Math.max(min, n));
@@ -172,6 +221,8 @@ export function NumberInput({
   return (
     <input
       type="text"
+      id={id}
+      aria-labelledby={ariaLabelledBy}
       inputMode="numeric"
       autoComplete="off"
       className={`${inputCls} tabular-nums`}
@@ -192,13 +243,19 @@ export function Select<T extends string>({
   value,
   onChange,
   options,
+  id,
+  'aria-labelledby': ariaLabelledBy,
 }: {
   value: T;
   onChange: (v: T) => void;
   options: ReadonlyArray<{ value: T; label: string }>;
+  id?: string;
+  'aria-labelledby'?: string;
 }) {
   return (
     <select
+      id={id}
+      aria-labelledby={ariaLabelledBy}
       className={inputCls}
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
@@ -217,14 +274,20 @@ export function YesNo({
   onChange,
   yesLabel = '예',
   noLabel = '아니오',
+  id,
+  'aria-labelledby': ariaLabelledBy,
 }: {
   value: boolean;
   onChange: (v: boolean) => void;
   yesLabel?: string;
   noLabel?: string;
+  id?: string;
+  'aria-labelledby'?: string;
 }) {
   return (
     <select
+      id={id}
+      aria-labelledby={ariaLabelledBy}
       className={inputCls}
       value={value ? 'y' : 'n'}
       onChange={(e) => onChange(e.target.value === 'y')}
@@ -329,26 +392,89 @@ export function ZeroValueConfirmModal({
 }) {
   const titleId = useId();
   const descriptionId = useId();
+  const dialogRef = useRef<HTMLElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+  const onCancelRef = useRef(onCancel);
   const [mounted, setMounted] = useState(false);
 
+  onCancelRef.current = onCancel;
+
   useEffect(() => {
+    previousActiveElement.current =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
     setMounted(true);
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
+
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () =>
+      Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
+      ).filter((element) => !element.hasAttribute('disabled'));
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onCancel();
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onCancelRef.current();
+        return;
+      }
+
+      if (event.key !== 'Tab') return;
+
+      const focusable = getFocusable();
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialogRef.current?.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      const outsideDialog = !dialogRef.current?.contains(active);
+
+      if (event.shiftKey && (active === first || outsideDialog)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (active === last || outsideDialog)) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
     const previousOverflow = document.body.style.overflow;
+    const hiddenSiblings = Array.from(document.body.children)
+      .filter(
+        (element) =>
+          !element.matches('[data-testid="zero-value-modal-backdrop"]') &&
+          !element.querySelector('[data-testid="zero-value-modal-backdrop"]'),
+      )
+      .map((element) => ({
+        element,
+        ariaHidden: element.getAttribute('aria-hidden'),
+      }));
+
+    hiddenSiblings.forEach(({ element }) => element.setAttribute('aria-hidden', 'true'));
     document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+
+    requestAnimationFrame(() => getFocusable()[0]?.focus());
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
+      hiddenSiblings.forEach(({ element, ariaHidden }) => {
+        if (ariaHidden === null) element.removeAttribute('aria-hidden');
+        else element.setAttribute('aria-hidden', ariaHidden);
+      });
       document.body.style.overflow = previousOverflow;
+      if (previousActiveElement.current?.isConnected) {
+        previousActiveElement.current.focus();
+      }
     };
-  }, [onCancel]);
+  }, [mounted]);
 
   if (!mounted) return null;
 
@@ -358,10 +484,12 @@ export function ZeroValueConfirmModal({
       className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/45 p-4 backdrop-blur-sm"
     >
       <section
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
+        tabIndex={-1}
         className="max-h-[calc(100dvh-2rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-7"
       >
         <h2 id={titleId} className="text-xl font-extrabold tracking-tight text-brand-950">
