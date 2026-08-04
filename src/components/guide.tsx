@@ -13,6 +13,15 @@ import { ogImageForPath, ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { breadcrumbJsonLd } from '@/lib/structured-data';
 
+const KOREA_TIME_ZONE = '+09:00';
+
+/** Google Article JSON-LD가 요구하는 ISO 8601 DateTime으로 변환한다. */
+function toIsoDateTime(value: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value)
+    ? `${value}T00:00:00${KOREA_TIME_ZONE}`
+    : value;
+}
+
 /* ------------------------------------------------------------------ */
 /* 구조화 데이터                                                       */
 /* ------------------------------------------------------------------ */
@@ -61,8 +70,8 @@ export function guideJsonLd({
           name: SITE.name,
           url: SITE.url,
         },
-        datePublished: published,
-        dateModified: SITE.lastVerified,
+        datePublished: toIsoDateTime(published),
+        dateModified: toIsoDateTime(SITE.lastVerified),
         inLanguage: 'ko',
       },
       breadcrumbJsonLd([
