@@ -46,6 +46,12 @@
   확인일 `<time dateTime>`을 반영했다. 관련 구현은 `src/app/page.tsx`, `src/app/not-found.tsx`,
   `src/app/sitemap.ts`, `src/lib/routes.ts`, `src/components/guide.tsx`와
   `e2e/og-meta.spec.ts`, `e2e/guide-quality.spec.ts`에 있다.
+- 2026-08-04 GEO·AEO 엔티티 보강 4단계 코드 작업 완료: `src/app/layout.tsx`에서 공통
+  `Organization`·`WebSite` JSON-LD를 제공하고, 가이드 Article publisher를
+  `https://gijuncheck.kr#organization`으로 연결했다. `verification-policy`에는
+  `AboutPage`·운영자 `Person`을 추가했으며, 홈에는 피부양자 전용 페이지 명시 링크를 추가했다.
+  로컬 타입 검사·빌드·관련 E2E는 통과했고, Production 배포 후 Rich Results Test·Search
+  Console·PageSpeed 결과 기록은 아직 남아 있다.
 
 ## 검증 기준선
 
@@ -66,7 +72,8 @@
 - 페이지별 OG metadata 생성: `src/lib/metadata.ts`
 - 페이지별 OG 경로: `src/lib/routes.ts`; 정적 카드·사이트 로고: `public/og/`, `public/logo.svg`
 - sitemap 생성과 안정적인 `lastmod`: `src/app/sitemap.ts`, `src/lib/routes.ts`의 경로별 `lastModified`
-- 구조화 데이터: `src/lib/structured-data.ts`, `src/components/guide.tsx`
+- 구조화 데이터: `src/lib/structured-data.ts`, `src/app/layout.tsx`, `src/components/guide.tsx`,
+  `src/app/verification-policy/page.tsx`
 - 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
 - 판정 제출 흐름: `src/components/DependentJudge.tsx`
 - 이벤트 이름·허용 파라미터: `src/lib/analytics.ts`

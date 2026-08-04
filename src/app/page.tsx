@@ -238,6 +238,12 @@ export default function Home() {
               피부양자 자격과 퇴직 후 보험료 선택에 필요한 세 가지 도구를
               확인할 수 있습니다.
             </p>
+            <a
+              href={ROUTES.dependent.path}
+              className="mt-5 inline-flex min-h-[44px] items-center font-semibold text-accent-700 underline underline-offset-4 hover:text-accent-600"
+            >
+              피부양자 전용 판정 페이지에서 전체 기준 보기 →
+            </a>
           </div>
 
           <ol className="mt-12 overflow-hidden rounded-[22px] border border-slate-200 bg-white lg:grid lg:grid-cols-3">

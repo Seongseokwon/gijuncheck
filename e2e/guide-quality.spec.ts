@@ -46,15 +46,20 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
 
   const readGraph = async () =>
     page.evaluate(() => {
-      const script = document.querySelector('script[type="application/ld+json"]');
-      if (!script?.textContent) return [];
-      const json = JSON.parse(script.textContent) as {
-        '@graph'?: Array<Record<string, unknown>>;
-      };
-      return json['@graph'] ?? [];
+      return Array.from(document.querySelectorAll('script[type="application/ld+json"]')).flatMap(
+        (script) => {
+          if (!script.textContent) return [];
+          const json = JSON.parse(script.textContent) as {
+            '@graph'?: Array<Record<string, unknown>>;
+          };
+          return json['@graph'] ?? [];
+        },
+      );
     });
 
   const expectedAuthorUrl = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
+  const expectedOrganizationId = `${SITE.url}#organization`;
+  const expectedWebsiteId = `${SITE.url}#website`;
   for (const key of GUIDE_KEYS) {
     await page.goto(ROUTES[key].path);
     const graph = await readGraph();
@@ -65,16 +70,21 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
     expect(article, `${ROUTES[key].path} Article`).toMatchObject({
       author: {
         '@type': 'Person',
+        '@id': `${SITE.url}#author`,
         name: SITE.authorName,
         url: expectedAuthorUrl,
       },
-      publisher: {
-        '@type': 'Organization',
-        name: SITE.name,
-        url: SITE.url,
-      },
+      publisher: { '@id': expectedOrganizationId },
       image: [expectedImage],
     });
+    expect(
+      graph.find((node) => node['@id'] === expectedOrganizationId),
+      `${ROUTES[key].path} Organization 엔티티`,
+    ).toMatchObject({ '@type': 'Organization', name: SITE.name, url: SITE.url });
+    expect(
+      graph.find((node) => node['@id'] === expectedWebsiteId),
+      `${ROUTES[key].path} WebSite 엔티티`,
+    ).toMatchObject({ '@type': 'WebSite', name: SITE.name, url: SITE.url });
     expect(article?.datePublished, `${ROUTES[key].path} datePublished`).toMatch(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/,
     );
@@ -97,6 +107,41 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
     expect(breadcrumb, `${ROUTES[key].path} BreadcrumbList`).toBeDefined();
     expect(breadcrumb?.itemListElement).toHaveLength(2);
   }
+});
+
+test('검증 원칙 페이지는 AboutPage와 운영자 Person 엔티티를 제공한다', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-1440', '뷰포트와 무관한 JSON-LD 검사');
+  await page.goto(ROUTES.verificationPolicy.path);
+
+  const graph = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('script[type="application/ld+json"]')).flatMap(
+      (script) => {
+        if (!script.textContent) return [];
+        const json = JSON.parse(script.textContent) as {
+          '@graph'?: Array<Record<string, unknown>>;
+        };
+        return json['@graph'] ?? [];
+      },
+    ),
+  );
+
+  const policyUrl = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
+  const aboutPage = graph.find((node) => node['@type'] === 'AboutPage');
+  const person = graph.find((node) => node['@id'] === `${SITE.url}#author`);
+
+  expect(aboutPage).toMatchObject({
+    '@id': `${policyUrl}#about`,
+    url: policyUrl,
+    about: { '@id': `${SITE.url}#author` },
+    mainEntity: { '@id': `${SITE.url}#author` },
+    publisher: { '@id': `${SITE.url}#organization` },
+  });
+  expect(person).toMatchObject({
+    '@type': 'Person',
+    name: SITE.authorName,
+    url: policyUrl,
+    worksFor: { '@id': `${SITE.url}#organization` },
+  });
 });
 
 /**

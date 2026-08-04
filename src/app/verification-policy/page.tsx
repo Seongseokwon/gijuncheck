@@ -3,6 +3,7 @@ import { ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { BASIS } from '@/lib/constants/2026';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
+import { breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 export const metadata = createPageMetadata({
   title: '검증 원칙',
@@ -11,6 +12,37 @@ export const metadata = createPageMetadata({
 });
 
 const SOURCES = [DEPENDENT_SOURCES.support.law, DEPENDENT_SOURCES.support.nhis] as const;
+
+const POLICY_URL = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'AboutPage',
+      '@id': `${POLICY_URL}#about`,
+      url: POLICY_URL,
+      name: '검증 원칙',
+      description: metadata.description,
+      isPartOf: { '@id': SITE_ENTITY_IDS.website },
+      about: { '@id': SITE_ENTITY_IDS.author },
+      mainEntity: { '@id': SITE_ENTITY_IDS.author },
+      publisher: { '@id': SITE_ENTITY_IDS.organization },
+      inLanguage: 'ko',
+    },
+    {
+      '@type': 'Person',
+      '@id': SITE_ENTITY_IDS.author,
+      name: SITE.authorName,
+      url: POLICY_URL,
+      description: '기준체크의 건강보험 기준 콘텐츠를 정리·검증하는 개인 운영자입니다.',
+      worksFor: { '@id': SITE_ENTITY_IDS.organization },
+    },
+    breadcrumbJsonLd([
+      { name: SITE.name, path: ROUTES.home.path },
+      { name: '검증 원칙', path: ROUTES.verificationPolicy.path },
+    ]),
+  ],
+};
 
 const DEPENDENT_RULE_COVERAGE = [
   {
@@ -37,7 +69,12 @@ const DEPENDENT_RULE_COVERAGE = [
 
 export default function VerificationPolicyPage() {
   return (
-    <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
       <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-bold text-accent-700">기준체크의 운영 원칙</p>
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">
@@ -222,6 +259,7 @@ export default function VerificationPolicyPage() {
           홈으로 돌아가기
         </a>
       </div>
-    </article>
+      </article>
+    </>
   );
 }

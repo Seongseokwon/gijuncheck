@@ -88,6 +88,9 @@ test('세 도구 상단에 기준일과 검증 범위를 표시한다', async ({
 test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async ({ page }) => {
   await page.goto('/');
   await expect(
+    page.locator(`#journey a[href="${ROUTES.dependent.path}"]`),
+  ).toHaveCount(1);
+  await expect(
     page.locator(`#journey a[href="${ROUTES.regionalPremium.path}"]`),
   ).toHaveCount(1);
   await expect(

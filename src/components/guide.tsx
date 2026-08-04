@@ -11,7 +11,7 @@
 import type { ReactNode } from 'react';
 import { ogImageForPath, ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
-import { breadcrumbJsonLd } from '@/lib/structured-data';
+import { breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 const KOREA_TIME_ZONE = '+09:00';
 
@@ -62,14 +62,11 @@ export function guideJsonLd({
         image: [new URL(ogImageForPath(path), SITE.url).toString()],
         author: {
           '@type': 'Person',
+          '@id': SITE_ENTITY_IDS.author,
           name: SITE.authorName,
           url: new URL(ROUTES.verificationPolicy.path, SITE.url).toString(),
         },
-        publisher: {
-          '@type': 'Organization',
-          name: SITE.name,
-          url: SITE.url,
-        },
+        publisher: { '@id': SITE_ENTITY_IDS.organization },
         datePublished: toIsoDateTime(published),
         dateModified: toIsoDateTime(SITE.lastVerified),
         inLanguage: 'ko',
