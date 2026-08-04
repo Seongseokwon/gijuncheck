@@ -77,6 +77,50 @@ test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더�
   await expect(tooltip).toHaveAttribute('aria-expanded', 'false');
 });
 
+test('도움말이 있는 필드도 데스크톱에서 같은 행에 정렬된다', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-1440', '데스크톱 그리드 정렬 검사');
+
+  const cases = [
+    {
+      path: ROUTES.dependent.path,
+      rows: [
+        ['사업소득', '근로소득', '공적연금소득'],
+        ['금융소득', '기타소득'],
+        ['사업자등록', '재산세 과세표준'],
+      ],
+    },
+    {
+      path: ROUTES.regionalPremium.path,
+      rows: [
+        ['사업소득 (100%)', '금융소득 (100%)', '기타소득 (100%)'],
+        ['근로소득 (50%)', '공적연금소득 (50%)'],
+      ],
+    },
+    {
+      path: ROUTES.voluntaryContinuation.path,
+      rows: [
+        ['근로소득 (50%)', '연금소득 (50%)', '사업소득 (100%)'],
+        ['금융소득 (100%)', '기타소득 (100%)'],
+      ],
+    },
+  ] as const;
+
+  for (const { path, rows } of cases) {
+    await page.goto(path);
+
+    for (const row of rows) {
+      const boxes = await Promise.all(
+        row.map(async (label) => {
+          const box = await page.getByLabel(label).boundingBox();
+          expect(box, `${label} 입력 필드 위치`).not.toBeNull();
+          return box;
+        }),
+      );
+      expect(new Set(boxes.map((box) => Math.round(box!.y))).size, `${row.join(', ')} 행 정렬`).toBe(1);
+    }
+  }
+});
+
 test('탈락 시 이어지는 CTA가 금액을 URL에 노출하지 않고 지역보험료 계산으로 연결된다', async ({ page }) => {
   await page.goto(ROUTES.dependent.path);
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });

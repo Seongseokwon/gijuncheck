@@ -114,7 +114,7 @@ export function InfoTooltip({
           setOpen(false);
         }
       }}
-      className="group relative inline-flex h-11 w-11 shrink-0 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
+      className="group relative inline-flex h-11 w-11 -my-3 shrink-0 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
     >
       <span
         aria-hidden
