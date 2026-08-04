@@ -202,11 +202,11 @@ export default function Home() {
               id="journey-title"
               className="mt-3 text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl"
             >
-              지금 확인할 수 있는 도구
+              현재 이용 가능한 건강보험 도구
             </h2>
             <p className="mt-4 text-lg leading-8 text-slate-600">
-              검증이 끝난 범위만 이용할 수 있습니다. 준비 중인 기능은 결과를
-              제공하지 않습니다.
+              피부양자 자격과 퇴직 후 보험료 선택에 필요한 세 가지 도구를
+              확인할 수 있습니다.
             </p>
           </div>
 
