@@ -28,6 +28,12 @@ async function collectLinks(page: Page): Promise<LinkInfo[]> {
   );
 }
 
+// 이 파일의 테스트는 모두 사이트 전체를 순회한다. goto 가 수십 번 일어나고
+// WebKit 은 Chromium 보다 느려 기본 30초로는 부족하다 — 파일 전체에 여유를 준다.
+test.beforeEach(() => {
+  test.slow();
+});
+
 test('페이지 안의 모든 외부 링크는 새 탭 + noopener 로 열린다', async ({ page }) => {
   const offenders: string[] = [];
 

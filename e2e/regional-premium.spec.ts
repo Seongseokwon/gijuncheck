@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney as fill } from './helpers';
 
 /**
  * P2-1 "지역가입자 보험료 공식 대조" 이후의 공개 화면 QA.
@@ -33,7 +34,7 @@ function moneyField(page: Page, label: string) {
 }
 
 async function fillMoney(page: Page, label: string, value: number) {
-  await moneyField(page, label).fill(String(value));
+  await fill(moneyField(page, label), value);
 }
 
 async function calculate(page: Page) {

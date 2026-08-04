@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney } from './helpers';
 
 /**
  * P0-2 "판정기의 관계 유형, 소득 경계, 재산 경계, 오류 메시지, 결과의 근거 링크를 손으로 점검한다"
@@ -92,14 +93,14 @@ test.describe('관계 유형별 조건부 입력', () => {
 test.describe('소득요건 경계값 — 합산소득 2,000만원', () => {
   test('정확히 2,000만원이면 소득요건을 통과한다', async ({ page }) => {
     await selectRelation(page, '배우자'); // 부양요건은 항상 통과, 소득요건만 본다
-    await page.getByLabel('근로소득').fill(String(INCOME_TOTAL_LIMIT));
+    await fillMoney(page.getByLabel('근로소득'), INCOME_TOTAL_LIMIT);
     await submit(page);
     await expect(result(page)).toContainText('인정될 것으로 보입니다');
   });
 
   test('2,000만원을 1원이라도 초과하면 소득요건에서 탈락한다', async ({ page }) => {
     await selectRelation(page, '배우자');
-    await page.getByLabel('근로소득').fill(String(INCOME_TOTAL_LIMIT + 1));
+    await fillMoney(page.getByLabel('근로소득'), INCOME_TOTAL_LIMIT + 1);
     await submit(page);
     await expect(result(page)).toContainText('소득요건에서 탈락할 것으로 보입니다');
     await expect(result(page)).toContainText('초과합니다');
@@ -110,7 +111,7 @@ test.describe('사업자등록 특례', () => {
   test('사업자등록이 있으면 사업소득 1원만 있어도 탈락한다', async ({ page }) => {
     await selectRelation(page, '배우자');
     await page.getByLabel('사업자등록').selectOption({ label: '있음' });
-    await page.getByLabel('사업소득').fill('1');
+    await fillMoney(page.getByLabel('사업소득'), 1);
     await submit(page);
     await expect(result(page)).toContainText('소득요건에서 탈락할 것으로 보입니다');
     await expect(result(page)).toContainText('사업자등록이 있는 경우 사업소득이 발생하면');
@@ -119,7 +120,7 @@ test.describe('사업자등록 특례', () => {
   test('사업자등록이 없으면 사업소득 500만원까지는 통과한다', async ({ page }) => {
     await selectRelation(page, '배우자');
     await page.getByLabel('사업자등록').selectOption({ label: '없음' });
-    await page.getByLabel('사업소득').fill('5000000');
+    await fillMoney(page.getByLabel('사업소득'), 5000000);
     await submit(page);
     await expect(result(page)).toContainText('인정될 것으로 보입니다');
   });
@@ -128,14 +129,14 @@ test.describe('사업자등록 특례', () => {
 test.describe('재산요건 경계값', () => {
   test(`재산세 과세표준 ${PROPERTY_SAFE_LIMIT.toLocaleString()}원(5.4억)이면 통과한다`, async ({ page }) => {
     await selectRelation(page, '배우자');
-    await page.getByLabel('재산세 과세표준').fill(String(PROPERTY_SAFE_LIMIT));
+    await fillMoney(page.getByLabel('재산세 과세표준'), PROPERTY_SAFE_LIMIT);
     await submit(page);
     await expect(result(page)).toContainText('인정될 것으로 보입니다');
   });
 
   test(`재산세 과세표준이 ${PROPERTY_HARD_LIMIT.toLocaleString()}원(9억)을 초과하면 소득이 없어도 탈락한다`, async ({ page }) => {
     await selectRelation(page, '배우자');
-    await page.getByLabel('재산세 과세표준').fill(String(PROPERTY_HARD_LIMIT + 1));
+    await fillMoney(page.getByLabel('재산세 과세표준'), PROPERTY_HARD_LIMIT + 1);
     await submit(page);
     await expect(result(page)).toContainText('재산요건에서 탈락할 것으로 보입니다');
     await expect(result(page)).toContainText('소득이 없어도 탈락합니다');
@@ -162,7 +163,7 @@ test('결과의 근거 링크는 새 탭으로 열리고 공식 법령·공단 �
 test('결과별 신청 준비 체크리스트와 공단 문의 질문을 보여준다', async ({ page }) => {
   await selectRelation(page, '배우자');
   await page.getByLabel('사업자등록').selectOption({ label: '있음' });
-  await page.getByLabel('사업소득').fill('1');
+  await fillMoney(page.getByLabel('사업소득'), 1);
   await submit(page);
 
   await expect(result(page).locator('#evidence-checklist-title')).toBeVisible();
@@ -174,8 +175,8 @@ test('결과별 신청 준비 체크리스트와 공단 문의 질문을 보여�
 
 test('결과 화면에 입력값 요약(합산소득·재산세 과세표준)이 결론과 같은 화면에 보인다', async ({ page }) => {
   await selectRelation(page, '배우자');
-  await page.getByLabel('근로소득').fill('12000000');
-  await page.getByLabel('재산세 과세표준').fill('100000000');
+  await fillMoney(page.getByLabel('근로소득'), 12000000);
+  await fillMoney(page.getByLabel('재산세 과세표준'), 100000000);
   await submit(page);
   await expect(result(page)).toContainText('1,200만원');
 });
@@ -195,7 +196,7 @@ test('결과 화면에 확신 수준을 표시한다', async ({ page }) => {
   await submit(page);
   await expect(result(page)).toContainText('기준상 가능성이 높음');
 
-  await page.getByRole('textbox', { name: /재산세 과세표준/ }).fill(String(PROPERTY_SAFE_LIMIT));
+  await fillMoney(page.getByRole('textbox', { name: /재산세 과세표준/ }), PROPERTY_SAFE_LIMIT);
   await submit(page);
   await expect(result(page)).toContainText('추가 확인 필요');
 });

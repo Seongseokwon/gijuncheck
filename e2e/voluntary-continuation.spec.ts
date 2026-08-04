@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney } from './helpers';
 
 /**
  * P2-2 "임의계속가입 비교 공개" 화면 QA.
@@ -25,7 +26,7 @@ function field(page: Page, label: string) {
 }
 
 async function fill(page: Page, label: string, value: number) {
-  await field(page, label).fill(String(value));
+  await fillMoney(field(page, label), value);
 }
 
 async function compare(page: Page) {

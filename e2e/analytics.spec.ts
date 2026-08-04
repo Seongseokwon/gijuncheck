@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney } from './helpers';
 
 /**
  * GA4 이벤트는 측정 ID가 없는 로컬 빌드에서도 검사할 수 있도록 gtag 할당을
@@ -52,7 +53,7 @@ test('피부양자 판정 이벤트는 결과 범주만 기록하고 원본 입�
 }) => {
   await page.goto(ROUTES.dependent.path);
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
-  await page.getByLabel('근로소득').fill('1234567');
+  await fillMoney(page.getByLabel('근로소득'), 1234567);
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
   await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
     .getByRole('button', { name: '확인하고 판정하기' })
@@ -76,7 +77,7 @@ test('피부양자 판정 이벤트는 결과 범주만 기록하고 원본 입�
 
 test('지역보험료 계산 이벤트는 금액 대신 유무·상하한·진입경로만 기록한다', async ({ page }) => {
   await page.goto(ROUTES.regionalPremium.path);
-  await page.getByLabel(/^재산세 과세표준 합계/).fill('123456789');
+  await fillMoney(page.getByLabel(/^재산세 과세표준 합계/), 123456789);
   await page.getByRole('button', { name: '보험료 계산하기' }).click();
 
   const matching = (await events(page)).filter((event) => event.name === 'premium_calculate');
@@ -91,7 +92,7 @@ test('지역보험료 계산 이벤트는 금액 대신 유무·상하한·진�
 
 test('임의계속가입 이벤트는 추천 결과 범주만 기록한다', async ({ page }) => {
   await page.goto(ROUTES.voluntaryContinuation.path);
-  await page.getByLabel(/^재산금액 합계/).fill('234567890');
+  await fillMoney(page.getByLabel(/^재산금액 합계/), 234567890);
   await page.getByRole('button', { name: '어느 쪽이 유리한지 비교하기' }).click();
 
   const matching = (await events(page)).filter((event) => event.name === 'voluntary_compare');

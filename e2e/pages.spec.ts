@@ -1,10 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney } from './helpers';
 
 /**
  * P0-2 "데스크톱·모바일·태블릿 폭에서 홈·판정기·결과·가이드·검증 원칙을 확인한다".
- * playwright.config.ts 의 3개 프로젝트(desktop-1440/tablet-768/mobile-375)가
- * 이 파일을 각각 실행한다.
+ * playwright.config.ts 의 5개 프로젝트(Chromium: desktop-1440/tablet-768/
+ * mobile-375, WebKit: desktop-safari-1440/mobile-safari-375)가 이 파일을
+ * 각각 실행한다.
  */
 
 const PAGES = Object.values(ROUTES).filter((r) => r.ready);
@@ -98,7 +100,7 @@ test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async (
 
 test('임의계속가입 비교 — 자격 충족 시 보험료와 신청 기한을 보여준다', async ({ page }) => {
   await page.goto(ROUTES.voluntaryContinuation.path);
-  await page.getByLabel(/^퇴직 전 12개월 보수월액 평균/).fill('4000000');
+  await fillMoney(page.getByLabel(/^퇴직 전 12개월 보수월액 평균/), 4000000);
   await page.getByLabel(/^퇴직 전 18개월 중 직장가입 개월수/).fill('12');
   await page.getByRole('button', { name: '어느 쪽이 유리한지 비교하기' }).click();
 

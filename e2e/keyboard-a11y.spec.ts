@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { ROUTES } from '../src/lib/routes';
+import { fillMoney } from './helpers';
 
 /**
  * P0-2 "키보드만으로 폼 입력·툴팁·결과까지 이동하고,
@@ -52,7 +53,7 @@ test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더�
 test('탈락 시 이어지는 CTA(지역보험료 계산)가 연결된다 — 공식 대조 완료 상태', async ({ page }) => {
   await page.goto(ROUTES.dependent.path);
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
-  await page.getByLabel('근로소득').fill('30000000'); // 소득요건 초과로 탈락시킴
+  await fillMoney(page.getByLabel('근로소득'), 30000000); // 소득요건 초과로 탈락시킴
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
   await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
     .getByRole('button', { name: '확인하고 판정하기' })
