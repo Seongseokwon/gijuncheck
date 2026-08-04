@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Analytics from '@/components/Analytics';
 import { POLICY_KEYS, ROUTES } from '@/lib/routes';
@@ -91,7 +92,7 @@ export default function RootLayout({
         <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
           <div className="mx-auto max-w-[1120px] px-4">
             <div className="flex min-h-[68px] items-center justify-between gap-6">
-              <a
+              <Link
                 href={ROUTES.home.path}
                 aria-label={`${SITE.name} 홈`}
                 className="inline-flex min-h-[44px] items-center text-brand-950"
@@ -100,28 +101,28 @@ export default function RootLayout({
                 <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
                   {SITE.name}
                 </span>
-              </a>
+              </Link>
               <nav aria-label="데스크톱 주요 메뉴" className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
-                <a href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</a>
-                <a href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</a>
-                <a href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</a>
-                <a href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</a>
-                <a
+                <Link href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</Link>
+                <Link href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</Link>
+                <Link href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
+                <Link href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</Link>
+                <Link
                   href="/#judge"
                   className="inline-flex min-h-[44px] items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
                 >
                   내 자격 확인
-                </a>
+                </Link>
               </nav>
             </div>
             <nav
               aria-label="모바일 주요 메뉴"
               className="flex flex-wrap gap-x-5 gap-y-1 border-t border-slate-100 pb-3 pt-2 text-sm font-semibold text-slate-600 sm:hidden"
             >
-              <a href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</a>
-              <a href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</a>
-              <a href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</a>
-              <a href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</a>
+              <Link href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</Link>
+              <Link href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</Link>
+              <Link href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
+              <Link href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</Link>
             </nav>
           </div>
         </header>
