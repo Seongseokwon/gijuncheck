@@ -102,40 +102,43 @@ export function InfoTooltip({
   const [open, setOpen] = useState(false);
 
   return (
-    <button
-      type="button"
-      aria-label={`도움말: ${text}`}
-      aria-describedby={tooltipId}
-      aria-expanded={open}
-      onClick={() => setOpen((current) => !current)}
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          event.preventDefault();
-          setOpen(false);
-        }
-      }}
-      className="group relative inline-flex h-11 w-11 -my-3 shrink-0 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
-    >
-      <span
-        aria-hidden
-        className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-slate-400 transition group-hover:border-accent-700 group-hover:text-accent-700 group-focus:border-accent-700 group-focus:text-accent-700"
+    <span className="relative inline-block h-[18px] w-[18px] shrink-0 align-middle">
+      {/* 44px 터치 영역은 유지하되, 바깥 18px 래퍼만 라벨 행의 높이에 반영한다. */}
+      <button
+        type="button"
+        aria-label={`도움말: ${text}`}
+        aria-describedby={tooltipId}
+        aria-expanded={open}
+        onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            setOpen(false);
+          }
+        }}
+        className="group absolute left-1/2 top-1/2 inline-flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
       >
-        i
-      </span>
-      <span
-        id={tooltipId}
-        role="tooltip"
-        className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-lg transition-opacity ${
-          open ? 'opacity-100' : 'opacity-0'
-        } sm:group-hover:opacity-100 sm:group-focus:opacity-100 ${
-          placement === 'end'
-            ? 'right-0 w-[min(16rem,calc(100vw-2rem))] sm:w-64'
-            : 'left-1/2 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2'
-        }`}
-      >
-        {children}
-      </span>
-    </button>
+        <span
+          aria-hidden
+          className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-slate-400 transition group-hover:border-accent-700 group-hover:text-accent-700 group-focus:border-accent-700 group-focus:text-accent-700"
+        >
+          i
+        </span>
+        <span
+          id={tooltipId}
+          role="tooltip"
+          className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-lg transition-opacity ${
+            open ? 'opacity-100' : 'opacity-0'
+          } sm:group-hover:opacity-100 sm:group-focus:opacity-100 ${
+            placement === 'end'
+              ? 'right-0 w-[min(16rem,calc(100vw-2rem))] sm:w-64'
+              : 'left-1/2 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2'
+          }`}
+        >
+          {children}
+        </span>
+      </button>
+    </span>
   );
 }
 
