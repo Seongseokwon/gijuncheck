@@ -21,6 +21,8 @@ export interface RouteEntry {
   ogImage?: string;
   /** sitemap priority (0~1) */
   priority: number;
+  /** 해당 페이지의 콘텐츠·기준이 실제로 마지막 변경된 날. 배포일과 구분한다. */
+  lastModified?: string;
   /** 구현 완료 여부. false 면 sitemap 에서 제외되고 허브에서 "준비 중"으로 표시된다 */
   ready: boolean;
   /** 색인 대상이 아닌 페이지 (정책·약관 등) */
@@ -33,6 +35,7 @@ export const ROUTES = {
     label: '홈',
     ogImage: '/og/home.png',
     priority: 1,
+    lastModified: '2026-08-04',
     ready: true,
   },
 
@@ -42,6 +45,7 @@ export const ROUTES = {
     label: '피부양자 자격판정',
     ogImage: '/og/dependent.png',
     priority: 0.9,
+    lastModified: '2026-08-04',
     ready: true,
   },
   regionalPremium: {
@@ -49,6 +53,7 @@ export const ROUTES = {
     label: '지역가입자 보험료 계산',
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
+    lastModified: '2026-08-03',
     /** 2026-08-03 공단 공식 모의계산 13개 대표 입력 대조 완료 */
     ready: true,
   },
@@ -57,6 +62,7 @@ export const ROUTES = {
     label: '임의계속가입 비교',
     ogImage: '/og/voluntary-continuation.png',
     priority: 0.8,
+    lastModified: '2026-08-03',
     /** 2026-08-03 법령·공단 산식·대표 사례 대조 완료 */
     ready: true,
   },
@@ -67,6 +73,7 @@ export const ROUTES = {
     label: '재산세 과세표준 확인하는 방법',
     ogImage: '/og/property-tax-base.png',
     priority: 0.7,
+    lastModified: '2026-08-03',
     ready: true,
   },
   guideBusinessRegistration: {
@@ -74,6 +81,7 @@ export const ROUTES = {
     label: '사업자등록 전에 반드시 계산해야 하는 것',
     ogImage: '/og/before-business-registration.png',
     priority: 0.7,
+    lastModified: '2026-08-03',
     ready: true,
   },
   guideLosingEligibility: {
@@ -81,6 +89,7 @@ export const ROUTES = {
     label: '피부양자 자격상실 시점과 소급 부과',
     ogImage: '/og/losing-eligibility.png',
     priority: 0.7,
+    lastModified: '2026-08-03',
     ready: true,
   },
   guideVoluntaryContinuation: {
@@ -88,6 +97,7 @@ export const ROUTES = {
     label: '임의계속가입이 유리한 경우',
     ogImage: '/og/when-voluntary-continuation-wins.png',
     priority: 0.7,
+    lastModified: '2026-08-03',
     ready: true,
   },
   guidePensionImpact: {
@@ -95,6 +105,7 @@ export const ROUTES = {
     label: '연금 수령이 피부양자 자격에 미치는 영향',
     ogImage: '/og/pension-impact.png',
     priority: 0.7,
+    lastModified: '2026-08-03',
     ready: true,
   },
   guideNovemberReassessment: {
@@ -103,6 +114,7 @@ export const ROUTES = {
     label: '11월 건강보험 자격 일괄 재산정이란',
     ogImage: '/og/november-reassessment.png',
     priority: 0.8,
+    lastModified: '2026-08-03',
     ready: true,
   },
 
@@ -111,6 +123,7 @@ export const ROUTES = {
     label: '검증 원칙',
     ogImage: '/og/verification-policy.png',
     priority: 0.5,
+    lastModified: '2026-08-03',
     ready: true,
   },
 
@@ -136,6 +149,7 @@ export const ROUTES = {
     label: '개인정보처리방침',
     ogImage: '/og/privacy.png',
     priority: 0.1,
+    lastModified: '2026-08-04',
     ready: true,
     noindex: true,
   },
@@ -144,6 +158,7 @@ export const ROUTES = {
     label: '이용약관',
     ogImage: '/og/terms.png',
     priority: 0.1,
+    lastModified: '2026-07-31',
     ready: true,
     noindex: true,
   },
@@ -152,6 +167,7 @@ export const ROUTES = {
     label: '문의',
     ogImage: '/og/contact.png',
     priority: 0.1,
+    lastModified: '2026-07-31',
     ready: true,
     noindex: true,
   },

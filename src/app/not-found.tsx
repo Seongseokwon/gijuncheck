@@ -3,6 +3,7 @@ import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 
 export const metadata: Metadata = {
   title: '페이지를 찾을 수 없습니다',
+  alternates: { canonical: null },
   robots: { index: false, follow: true },
 };
 

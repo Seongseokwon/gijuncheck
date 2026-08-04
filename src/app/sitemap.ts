@@ -16,9 +16,8 @@ export const dynamic = 'force-static';
 export default function sitemap(): MetadataRoute.Sitemap {
   return indexableRoutes().map((route) => ({
     url: new URL(route.path, SITE.url).toString(),
-    // 빌드 시각을 넣으면 내용이 바뀌지 않아도 매 배포마다 lastmod가 변한다.
-    // 실제 기준 확인일을 운영자가 갱신해 검색엔진에 안정적인 신선도 신호를 준다.
-    lastModified: SITE.lastVerified,
+    // 공통 배포일이 아니라 각 경로의 실제 콘텐츠·기준 변경일을 사용한다.
+    lastModified: route.lastModified,
     changeFrequency: 'monthly',
     priority: route.priority,
   }));

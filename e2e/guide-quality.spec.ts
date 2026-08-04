@@ -81,6 +81,10 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
     expect(article?.dateModified, `${ROUTES[key].path} dateModified`).toMatch(
       /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/,
     );
+    const publicationTimes = page.locator('article time[dateTime]');
+    await expect(publicationTimes, `${ROUTES[key].path} 발행·확인일 time`).toHaveCount(2);
+    await expect(publicationTimes.nth(0)).toHaveAttribute('dateTime', /^\d{4}-\d{2}-\d{2}$/);
+    await expect(publicationTimes.nth(1)).toHaveAttribute('dateTime', SITE.lastVerified);
     expect(breadcrumb, `${ROUTES[key].path} BreadcrumbList`).toBeDefined();
     expect(breadcrumb?.itemListElement).toHaveLength(2);
   }

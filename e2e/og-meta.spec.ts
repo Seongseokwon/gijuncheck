@@ -32,7 +32,10 @@ test.describe('OG/canonical 메타데이터', () => {
     await expect(page).toHaveTitle(/기준체크/);
 
     const description = page.locator('meta[name="description"]');
-    await expect(description).toHaveAttribute('content', /.+/);
+    await expect(description).toHaveAttribute('content', SITE.homeDescription);
+
+    const ogDescription = page.locator('meta[property="og:description"]');
+    await expect(ogDescription).toHaveAttribute('content', SITE.homeDescription);
 
     const canonical = page.locator('link[rel="canonical"]');
     await expect(canonical).toHaveAttribute('href', 'https://gijuncheck.kr/');
@@ -73,6 +76,10 @@ test.describe('OG/canonical 메타데이터', () => {
 
       await expect(
         page.locator('link[rel="canonical"]'),
+        `${route.path} canonical 개수`,
+      ).toHaveCount(1);
+      await expect(
+        page.locator('link[rel="canonical"]'),
         `${route.path} canonical`,
       ).toHaveAttribute('href', expectedUrl);
       await expect(
@@ -88,6 +95,16 @@ test.describe('OG/canonical 메타데이터', () => {
         `${route.path} og:description`,
       ).toHaveAttribute('content', /.+/);
     }
+  });
+
+  test('404 페이지는 홈 canonical을 물려받지 않는다', async ({ page }) => {
+    const response = await page.goto('/this-page-does-not-exist/');
+
+    expect(response?.status()).toBe(404);
+    await expect(page).toHaveTitle('페이지를 찾을 수 없습니다 | 기준체크');
+    await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+    const noindexRobots = page.locator('meta[name="robots"][content*="noindex"]');
+    expect(await noindexRobots.count()).toBeGreaterThan(0);
   });
 
   test('정책 페이지(약관·개인정보·문의)는 noindex 다', async ({ page }) => {
@@ -145,15 +162,18 @@ test.describe('OG/canonical 메타데이터', () => {
     expect(paths).toEqual(expected);
   });
 
-  test('sitemap 의 lastmod 는 빌드 시각이 아닌 실제 기준 확인일을 사용한다', async ({ page }) => {
+  test('sitemap 의 lastmod 는 빌드 시각이 아닌 경로별 실제 변경일을 사용한다', async ({ page }) => {
     const res = await page.goto('/sitemap.xml');
     const xml = await res!.text();
-    const lastModified = [...xml.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map(
-      (match) => match[1],
+    const entries = [...xml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map(
+      (match) => [new URL(match[1]).pathname, match[2]] as const,
+    );
+    const expected = indexableRoutes().map(
+      (route) => [route.path, route.lastModified] as const,
     );
 
-    expect(lastModified).toHaveLength(indexableRoutes().length);
-    expect(new Set(lastModified)).toEqual(new Set([SITE.lastVerified]));
-    expect(lastModified.every((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))).toBe(true);
+    expect(entries).toEqual(expected);
+    expect(entries.every(([, value]) => /^\d{4}-\d{2}-\d{2}$/.test(value))).toBe(true);
+    expect(new Set(entries.map(([, value]) => value)).size).toBeGreaterThan(1);
   });
 });

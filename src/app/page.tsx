@@ -1,7 +1,37 @@
+import type { Metadata } from 'next';
 import DependentJudge from '@/components/DependentJudge';
 import ScenarioIcon from '@/components/ScenarioIcon';
 import TrackedLink from '@/components/TrackedLink';
 import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
+import { SITE } from '@/lib/site';
+
+const HOME_TITLE = `${SITE.name} | 건강보험 피부양자 자격 확인`;
+
+export const metadata: Metadata = {
+  description: SITE.homeDescription,
+  openGraph: {
+    type: 'website',
+    locale: 'ko_KR',
+    url: SITE.url,
+    siteName: SITE.name,
+    title: HOME_TITLE,
+    description: SITE.homeDescription,
+    images: [
+      {
+        url: SITE.ogImage,
+        width: 1200,
+        height: 630,
+        alt: SITE.homeDescription,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: HOME_TITLE,
+    description: SITE.homeDescription,
+    images: [SITE.ogImage],
+  },
+};
 
 const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
   dependent:

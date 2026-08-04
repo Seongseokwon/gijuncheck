@@ -344,8 +344,9 @@ export function RelatedList({ keys }: { keys: readonly RouteKey[] }) {
 export function GuideFooter({ published }: { published: string }) {
   return (
     <p className="border-t border-slate-200 pt-6 text-sm text-slate-600">
-      기준 · {SITE.baseYear}년 · 발행 {published} · 최종 확인{' '}
-      {SITE.lastVerified}
+      기준 · {SITE.baseYear}년 · 발행{' '}
+      <time dateTime={published}>{published}</time> · 최종 확인{' '}
+      <time dateTime={SITE.lastVerified}>{SITE.lastVerified}</time>
     </p>
   );
 }

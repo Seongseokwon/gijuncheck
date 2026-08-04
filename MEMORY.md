@@ -31,8 +31,8 @@
   생성 함수를 추가했다. 가이드는 OG type `article`, 도구·검증·정책 페이지는 `website`로
   구분하며 title·description·Twitter metadata도 페이지별로 생성한다.
 - 2026-08-04 SEO P0: `src/app/sitemap.ts`의 빌드 시각 기반 `lastmod`를 제거하고
-  `SITE.lastVerified`를 사용하도록 안정화했다. 실제 기준 확인일을 바꿀 때만
-  `src/lib/site.ts`의 날짜를 갱신한다.
+  경로별 실제 콘텐츠·기준 변경일을 `ROUTES[*].lastModified`로 관리하도록 안정화했다.
+  페이지 내용이나 기준이 바뀐 경로의 날짜만 `src/lib/routes.ts`에서 갱신한다.
 - 2026-08-04 SEO P1: 가이드 Article JSON-LD에 `author`·`publisher`·`image`를 추가하고,
   가이드 6편과 도구 3개에 `BreadcrumbList`를 추가했다. FAQPage는 화면에 실제 표시되는
   FAQ를 설명하는 보조 데이터로 유지하며 일반 사이트의 FAQ 리치 결과 노출을 전제로 하지 않는다.
@@ -41,6 +41,11 @@
   같은 경로를 사용한다. `public/logo.svg`는 기존 `public/og.png`의 둥근 맞물림 로고 스타일을
   기준으로 헤더·favicon·OG 카드에 통일 적용했다. 홈을 포함한 14개 OG 카드는 ImageGen으로
   각각 생성해 `public/og/`와 `public/og.png`에 1200×630으로 저장했다.
+- 2026-08-04 저비용 SEO 3단계 완료: 홈 고유 description, 404 canonical 제거, 공개·정책
+  페이지 canonical 자기 URL 회귀 검사, 경로별 sitemap `lastModified`, 가이드 발행일·최종
+  확인일 `<time dateTime>`을 반영했다. 관련 구현은 `src/app/page.tsx`, `src/app/not-found.tsx`,
+  `src/app/sitemap.ts`, `src/lib/routes.ts`, `src/components/guide.tsx`와
+  `e2e/og-meta.spec.ts`, `e2e/guide-quality.spec.ts`에 있다.
 
 ## 검증 기준선
 
@@ -60,7 +65,7 @@
 - 공통 레이아웃·canonical·OG·robots·네이버 소유확인·GA4·Speed Insights: `src/app/layout.tsx`
 - 페이지별 OG metadata 생성: `src/lib/metadata.ts`
 - 페이지별 OG 경로: `src/lib/routes.ts`; 정적 카드·사이트 로고: `public/og/`, `public/logo.svg`
-- sitemap 생성과 안정적인 `lastmod`: `src/app/sitemap.ts`, `src/lib/site.ts`의 `lastVerified`
+- sitemap 생성과 안정적인 `lastmod`: `src/app/sitemap.ts`, `src/lib/routes.ts`의 경로별 `lastModified`
 - 구조화 데이터: `src/lib/structured-data.ts`, `src/components/guide.tsx`
 - 0원 확인 모달: `src/components/ui.tsx`의 `ZeroValueConfirmModal`
 - 판정 제출 흐름: `src/components/DependentJudge.tsx`
