@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>기준체크 경쟁 분석 대시보드</title>
+<style>
+:root{
+  --bg:#0e1116; --panel:#161b22; --panel2:#1c232c; --line:#2a323d;
+  --tx:#e6edf3; --tx2:#9aa7b4; --tx3:#6b7684;
+  --us:#4f9cf9; --pos:#3fb950; --neg:#f85149; --warn:#d29922;
+  --c1:#a371f7; --c2:#ec8b5e; --c3:#39c5cf; --c4:#db6d9d; --c5:#8ddb6d;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans KR",sans-serif;
+  font-size:14px;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:32px 24px 80px}
+header{border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--tx2);font-size:13px}
+h2{font-size:17px;margin:0 0 4px;letter-spacing:-.01em}
+.sec{margin:36px 0}
+.sec>.hint{color:var(--tx3);font-size:12px;margin-bottom:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin-top:16px}
+nav a{color:var(--tx2);text-decoration:none;font-size:12px;padding:5px 11px;
+  border:1px solid var(--line);border-radius:99px;background:var(--panel)}
+nav a:hover{color:var(--tx);border-color:var(--us)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+.card.me{border-color:var(--us);box-shadow:inset 0 0 0 1px rgba(79,156,249,.25)}
+.card h3{margin:0 0 2px;font-size:15px;display:flex;align-items:center;gap:7px}
+.dot{width:8px;height:8px;border-radius:99px;flex:none}
+.card .tag{font-size:11px;color:var(--tx3);margin-bottom:9px}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:3px 0;font-size:12.5px;border-top:1px dashed var(--line)}
+.kv span:first-child{color:var(--tx3);flex:none}
+.kv span:last-child{text-align:right;color:var(--tx)}
+.tbl-tools{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.tbl-tools input,.tbl-tools select{background:var(--panel2);border:1px solid var(--line);
+  color:var(--tx);border-radius:7px;padding:6px 10px;font-size:12.5px;font-family:inherit}
+.tblwrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:13px;min-width:720px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+thead th{background:var(--panel2);color:var(--tx2);font-weight:600;font-size:12px;
+  position:sticky;top:0;cursor:pointer;user-select:none}
+thead th:hover{color:var(--tx)}
+thead th[data-me]{color:var(--us)}
+tbody tr:hover{background:rgba(255,255,255,.025)}
+td:first-child{white-space:normal;color:var(--tx2)}
+.mk{font-weight:600}
+.mk.y{color:var(--pos)} .mk.p{color:var(--warn)} .mk.n{color:var(--tx3)}
+.mapbox{position:relative}
+svg{display:block;width:100%;height:auto}
+.axis-lb{fill:var(--tx3);font-size:11px}
+.grid{stroke:var(--line);stroke-width:1}
+.node-lb{fill:var(--tx);font-size:11.5px;font-weight:600}
+.swot{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.swot .panel{border-left:3px solid var(--line)}
+.swot .s{border-left-color:var(--pos)} .swot .w{border-left-color:var(--neg)}
+.swot .o{border-left-color:var(--us)} .swot .t{border-left-color:var(--warn)}
+.swot h3{margin:0 0 8px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--tx2)}
+ul{margin:0;padding-left:18px} li{margin:5px 0;color:var(--tx)}
+li small{color:var(--tx3)}
+.strat{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.strat .panel{display:flex;flex-direction:column}
+.badge{display:inline-block;font-size:10.5px;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--line);color:var(--tx2);margin-bottom:8px;letter-spacing:.03em}
+.badge.hi{border-color:var(--pos);color:var(--pos)}
+.badge.mid{border-color:var(--warn);color:var(--warn)}
+.badge.lo{border-color:var(--tx3)}
+.strat h3{margin:0 0 8px;font-size:15px}
+.meta{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--tx3)}
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;
+  border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.road>div{padding:16px 18px;border-right:1px solid var(--line);background:var(--panel)}
+.road>div:last-child{border-right:none}
+.road h3{font-size:13px;color:var(--us);margin:0 0 10px}
+.road ul{padding-left:16px} .road li{font-size:12.5px}
+.mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.met{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.met .n{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.met .l{font-size:11.5px;color:var(--tx3);margin-top:2px}
+footer{margin-top:56px;padding-top:16px;border-top:1px solid var(--line);
+  color:var(--tx3);font-size:11.5px}
+footer a{color:var(--tx2)}
+@media(max-width:640px){.swot{grid-template-columns:1fr}.wrap{padding:20px 14px 60px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<script>
+const D = {
+  meta:{ service:"기준체크", market:"퇴직 전후 건강보험 자격·보험료 참고 도구 (국내)", date:"2026-08-05",
+         thesis:"도구 개수로는 이미 졌다. 기준체크가 이길 수 있는 유일한 자리는 <b>피부양자 판정 한 주제에서 관계 분기의 정밀도와 사례 단위 대조 기록을 동시에 갖는 것</b>이다. 넓은 범위 × 깊은 검증은 주 20시간으로 도달 불가능한 무덤이므로 쫓지 않는다." },
+  players:[
+    {name:"기준체크", me:true, color:"var(--us)", tag:"우리 · 2026-08 공개 · 개인 운영",
+     kv:{"범위":"건강보험 단일","도구":"3개 + 가이드 6편","검증":"공단 13건(재대조 전)",
+         "강점":"관계 분기 · 근거 노출","약점":"신규 · 색인 미확인 · 배우자 판정 없음"}, x:12, y:82},
+    {name:"건보계산기", color:"var(--c1)", tag:"퇴사자 건보 특화 · 직접 경쟁",
+     kv:{"범위":"퇴사 후 건강보험","도구":"통합 계산기 1개","검증":"출처 목록만 · 사례 대조 없음",
+         "강점":"콘텐츠 8개 섹션 · 갈림길 프레임","약점":"판정 아닌 안내 · 대조 근거 없음"}, x:22, y:38},
+    {name:"세금핏", color:"var(--c2)", tag:"세무 플랫폼 · KICPA 운영 · 최대 위협",
+     kv:{"범위":"세금·건보·사업자 전반","도구":"56개","검증":"대표사례 3 / 자동테스트 14 / 미등록 39",
+         "강점":"배우자 동반 판정 · 회계사 배지","약점":"56개 중 39개 근거 미등록 · 구간 입력"}, x:92, y:58},
+    {name:"유리지갑", color:"var(--c3)", tag:"콘텐츠형 계산기 포털 · 간접",
+     kv:{"범위":"금융·세금 계산기 전반","도구":"20개 이상","검증":"공개 없음",
+         "강점":"검색 노출 · 계산기 상호링크","약점":"피부양자 서술에 기준 누락 관찰"}, x:78, y:12},
+    {name:"국민건강보험공단", color:"var(--c4)", tag:"기준 기관 · 대체재",
+     kv:{"범위":"자격·부과 전체","도구":"공식 모의계산","검증":"기준 그 자체",
+         "강점":"최종 판정 권한","약점":"로그인 필요 · 임의값 입력 제약"}, x:45, y:96}
+  ],
+  axes:{ x:{label:"주제 범위 (건강보험 단일 → 세금·금융 전반)"},
+         y:{label:"검증 근거 공개 깊이 (없음 → 사례 단위 공개)"} },
+  features:[
+    {dim:"관계·동거·혼인·장애 분기 판정", vals:["y","n","p","n","y"]},
+    {dim:"배우자 동반(부부 합산) 판정", vals:["n","n","y","n","y"]},
+    {dim:"정확 금액 입력 (구간 선택 아님)", vals:["y","y","n","y","y"]},
+    {dim:"단계별 근거·법령 원문 링크", vals:["y","p","y","n","p"]},
+    {dim:"공단 모의계산 사례 대조 공개 건수", vals:["13건(재대조 전)","0건","4건","미공개","해당없음"]},
+    {dim:"미검증 범위·한계 명시", vals:["y","p","y","n","n"]},
+    {dim:"지역가입자 보험료 계산", vals:["p","y","y","y","y"]},
+    {dim:"임의계속가입 비교", vals:["y","y","y","p","y"]},
+    {dim:"전월세 보증금 환산", vals:["y","y","n","n","y"]},
+    {dim:"주택금융부채 공제", vals:["n","p","n","n","y"]},
+    {dim:"인접 주제 도구 (퇴직금·실업급여·세금)", vals:["n","n","y","y","n"]},
+    {dim:"운영 주체 자격 표기", vals:["개인 실명","편집팀","KICPA","미상","공공기관"]},
+    {dim:"공개 도구 수", vals:["3","1","56","20+","-"]},
+    {dim:"광고 노출", vals:["n","p","y","y","n"]},
+    {dim:"입력값 서버 미전송 명시", vals:["y","p","y","n","n"]}
+  ],
+  swot:{
+    s:["관계·동거·혼인·장애를 실제 분기로 처리하는 유일한 도구 — <small>경쟁 3곳 중 세금핏만 관계를 묻고, 동거·혼인·장애는 어디도 묻지 않음</small>",
+       "단위 테스트 136개 + Playwright 261개로 경계값이 코드에 잠겨 있음 — <small>MEMORY.md 검증 기준선</small>",
+       "미검증 범위를 먼저 공개하는 운영 원칙 — <small>지역보험료를 '재대조 전'으로 스스로 낮춰 표기</small>",
+       "연도별 상수 분리(2026.ts)로 제도 변경 추적 비용이 낮음 — <small>경쟁 계산기가 낡아 죽는 지점</small>"],
+    w:["배우자 동반 판정 미구현 — <small>세금핏은 이미 제공. 부부 은퇴 세대에서 결과가 뒤집히는 요건</small>",
+       "지역보험료가 '재대조 전' 상태 — <small>검증 깊이가 차별점인데 정작 그 표기가 사이트에 남아 있음</small>",
+       "색인 완료 미확인 — <small>GSC·네이버 요청만 완료, 실제 색인 결과 대기 중</small>",
+       "신뢰 배지 없음 — <small>세금핏 KICPA 대비 '개인 운영' 표기만</small>",
+       "유입 경로가 검색 단일 — <small>광고·제휴·커뮤니티 유통 채널 없음</small>"],
+    o:["세금핏 56개 도구 중 39개가 '근거 미등록' — <small>검증 현황판 자체 공개 수치</small>",
+       "건보계산기는 사례 대조 기록이 아예 없음 — <small>data-sources는 출처 목록일 뿐</small>",
+       "사적연금 포함 여부에서 경쟁사와 기준이 충돌 — <small>세금핏 FAQ '사적연금 포함' vs 기준체크 '개인연금 제외'</small>",
+       "11월 자격 일괄 재산정 시즌이 3개월 앞 — <small>검색 수요 집중 시점에 맞춰 검증 완료 상태를 만들 수 있음</small>"],
+    t:["세금핏이 39개 중 피부양자 1개만 근거 등록해도 격차 소멸 — <small>회계사 배지까지 있어 체감 신뢰는 더 높음</small>",
+       "검증 깊이는 클릭 전에 보이지 않음 — <small>SEO·CTR에 반영되지 않으면 자산이 아니라 비용</small>",
+       "공단이 비로그인 모의계산을 개선하면 민간 도구 수요 축소",
+       "요건 개정 시 3개 경쟁사가 동시에 갱신 — <small>최신성만으로는 우위가 남지 않음</small>"]
+  },
+  strategies:[
+    {name:"A. 판정 정밀도 심화 — 관계 판정의 기준이 된다", conf:"hi", confLabel:"권장",
+     what:"신규 계산기 0개. ① 지역보험료 금융소득 재대조를 끝내 3개 도구 전부 '대조 완료'로 승격 ② 배우자 동반 판정·손자녀 부양능력·이혼/사별 분기를 판정 모델에 추가 ③ 검증 원칙 페이지를 '입력값·기대값·실제값·오차·대조일'이 든 사례 기록표로 승격.",
+     why:"세금핏은 56개 도구를 39개 미등록으로 방치하고 있어 한 도구에 이 깊이를 넣을 유인이 구조적으로 없다(도구 1개 늘리는 편이 유입 ROI가 크다). 건보계산기는 사례 대조 프로세스 자체를 갖고 있지 않다. 이 작업은 법령 대조 시간이 드는 일이라 도구 개수 경쟁을 하는 쪽에서는 항상 후순위다.",
+     cost:"주 20시간 × 5주. 신규 도구·신규 트래픽 확보 활동 0.", risk:"검증 깊이는 클릭 전에 보이지 않는다. 색인·CTR로 이어지지 않으면 5주를 쓰고 유입은 그대로다."},
+    {name:"B. 인접 도구 확장 — 퇴직 패키지로 정면 승부", conf:"mid", confLabel:"검토",
+     what:"국민연금 조기수령×건보료 연동, 실업급여, 퇴직금 계산기를 붙여 세금핏의 '퇴사 후 실수령 패키지'와 같은 판에서 경쟁한다.",
+     why:"주제 권위와 내부 링크가 쌓이고 세션당 페이지뷰가 오른다. 다만 '왜 우리가 이기는가'가 약하다 — 세금핏은 56개, 유리지갑은 20개 이상을 이미 색인시켜 두었다.",
+     cost:"도구당 2~3주 + 검증. A와 같은 20시간을 놓고 정면 충돌한다.", risk:"도구를 늘리는 순간 도구당 검증 깊이가 떨어져, 유일한 자산을 스스로 훼손한다."},
+    {name:"C. 기준 충돌 해설 — 어느 값이 맞는지 밝힌다", conf:"lo", confLabel:"보류",
+     what:"사적연금 합산 여부처럼 도구마다 답이 갈리는 지점을 법령 원문으로 결론 내는 해설 축을 만든다.",
+     why:"'피부양자 사적연금 포함' 류 롱테일을 잡고, 클릭 전에는 안 보이는 검증 자산을 검색 결과에 노출 가능한 형태로 바꿔 A의 최대 리스크를 부분 해소한다.",
+     cost:"편당 3~5일. 우리가 틀리면 되돌릴 수 없다.", risk:"실명 저격은 평판 리스크. 상대가 조용히 고치면 콘텐츠가 죽는다. 기준 설명 형태로만 가능."}
+  ],
+  roadmap:[
+    {t:"0–30일", items:[
+      "지역보험료 금융소득 재대조 완료 → '재대조 전' 표기 제거",
+      "배우자 동반 판정 법령 근거 확인 + 판정 모델 구현",
+      "검증 원칙을 사례 기록표(입력·기대·실제·오차·일자)로 승격",
+      "GSC·네이버 색인 상태 실측, 미색인 URL 재요청"]},
+    {t:"31–60일", items: [
+      "손자녀 부양능력·이혼/사별·기혼 피부양자 분기 추가",
+      "사적연금 제외 근거를 독립 가이드로 명문화 (전략 C의 안전한 형태)",
+      "대조 사례 20건 이상으로 확대",
+      "11월 재산정 랜딩 초안"]},
+    {t:"61–90일", items:[
+      "사례 기록표를 구조화 데이터로 노출 (검증 자산을 검색에 보이게)",
+      "11월 시즌 랜딩 배포 및 내부 링크 연결",
+      "애드센스 신청 (콘텐츠 요건 충족 후)",
+      "경쟁 3사 검증 현황 재점검"]}
+  ],
+  metrics:[
+    {n:"1 → 0", l:"'재대조 전' 표기가 남은 도구 수 — 30일 내 0"},
+    {n:"? → 16", l:"색인 완료 URL 수 / 전체 16라우트 — 현재 미측정"},
+    {n:"13 → 20+", l:"공개된 공단 대조 사례 건수 — 세금핏 4건 대비"}
+  ],
+  sources:[
+    "기준체크 검증 원칙 — https://gijuncheck.kr/verification-policy/",
+    "건보계산기 — https://geonbocalc.com/",
+    "건보계산기 공공데이터 출처 (검토일 2026-06-24) — https://geonbocalc.com/data-sources",
+    "세금핏 계산기 검증 현황 (56개 / 대표사례 3 / 미등록 39) — https://www.segumfit.co.kr/calculators/verification",
+    "세금핏 피부양자 자격 점검 — https://www.segumfit.co.kr/dependent-eligibility-check",
+    "유리지갑 피부양자 자격 조건 — https://glasswallet.com/calculate/health-insurance/dependent/",
+    "국민건강보험공단 지역가입자 부과체계 — https://www.nhis.or.kr/static/html/wbma/b/wbmab0101.html"
+  ]
+};
+</script>
+
+<header>
+  <h1 id="h-title"></h1>
+  <div class="sub" id="h-sub"></div>
+  <nav>
+    <a href="#players">경쟁 구도</a><a href="#map">포지셔닝</a>
+    <a href="#matrix">기능 비교</a><a href="#swot">SWOT</a>
+    <a href="#strategy">전략안</a><a href="#road">로드맵</a>
+  </nav>
+</header>
+
+<div class="panel" style="border-left:3px solid var(--us)">
+  <h2>전략 명제</h2>
+  <div id="thesis" style="color:var(--tx2);margin-top:4px"></div>
+</div>
+
+<section class="sec" id="players">
+  <h2>경쟁 구도</h2><div class="hint">직접 2 · 간접 1 · 대체재 1 · 우리 1 (2026-08-05 관찰)</div>
+  <div class="cards" id="c-players"></div>
+</section>
+
+<section class="sec" id="map">
+  <h2>포지셔닝 맵</h2><div class="hint">우상단(넓은 범위 × 깊은 검증)이 비어 있는 이유는 기회가 아니라 비용이다 — 주 20시간으로 도달 불가</div>
+  <div class="panel mapbox"><svg viewBox="0 0 700 460" id="svg-map"></svg></div>
+</section>
+
+<section class="sec" id="matrix">
+  <h2>기능 · 검증 비교</h2><div class="hint">헤더 클릭 = 정렬 · 필터로 격차(gap)와 독점 우위(win) 확인</div>
+  <div class="tbl-tools">
+    <input id="q" placeholder="항목 검색…" style="min-width:200px">
+    <select id="f"><option value="">전체 보기</option><option value="gap">우리가 없는 것만</option><option value="win">우리만 있는 것만</option></select>
+  </div>
+  <div class="tblwrap"><table id="t-matrix"><thead></thead><tbody></tbody></table></div>
+</section>
+
+<section class="sec" id="swot">
+  <h2>SWOT</h2><div class="hint">근거 없는 항목은 넣지 않았다</div>
+  <div class="swot">
+    <div class="panel s"><h3>Strengths</h3><ul id="sw-s"></ul></div>
+    <div class="panel w"><h3>Weaknesses</h3><ul id="sw-w"></ul></div>
+    <div class="panel o"><h3>Opportunities</h3><ul id="sw-o"></ul></div>
+    <div class="panel t"><h3>Threats</h3><ul id="sw-t"></ul></div>
+  </div>
+</section>
+
+<section class="sec" id="strategy">
+  <h2>전략안</h2><div class="hint">A와 B는 같은 20시간을 놓고 상충한다 — 둘 다 하면 둘 다 실패한다</div>
+  <div class="strat" id="c-strat"></div>
+  <div class="panel" style="margin-top:12px;border-left:3px solid var(--neg)">
+    <b style="color:var(--neg)">하지 않을 것</b> — 도구 개수 경쟁. 세금핏 56개 · 유리지갑 20개 이상을 쫓지 않는다.
+  </div>
+</section>
+
+<section class="sec" id="road">
+  <h2>90일 로드맵</h2><div class="hint">전략 A 기준 · 11월 자격 일괄 재산정 시즌 역산</div>
+  <div class="road" id="c-road"></div>
+</section>
+
+<section class="sec">
+  <h2>선행 지표</h2><div class="hint">30일 안에 전략 A가 작동하는지 알려주는 신호 (수익은 후행 지표라 제외)</div>
+  <div class="mets" id="c-mets"></div>
+</section>
+
+<footer><div id="f-src"></div>
+<div style="margin-top:10px">조회일 2026-08-05 · 경쟁사 정보는 공개 웹페이지 관찰 기준이며 실제 트래픽·순위·전환율은 확인하지 않았다.</div>
+</footer>
+</div>
+
+<script>
+const $=s=>document.querySelector(s), esc=s=>String(s);
+const P=D.players, ME=P.findIndex(p=>p.me);
+
+$("#h-title").textContent=D.meta.service+" 경쟁 분석";
+$("#h-sub").textContent=D.meta.market+" · "+D.meta.date;
+$("#thesis").innerHTML=esc(D.meta.thesis);
+
+$("#c-players").innerHTML=P.map(p=>`
+ <div class="card${p.me?" me":""}">
+  <h3><span class="dot" style="background:${p.color}"></span>${esc(p.name)}</h3>
+  <div class="tag">${esc(p.tag||"")}</div>
+  ${Object.entries(p.kv||{}).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join("")}
+ </div>`).join("");
+
+(function(){
+ const W=700,H=460,m={l:64,r:28,t:24,b:56}, iw=W-m.l-m.r, ih=H-m.t-m.b;
+ const X=v=>m.l+iw*v/100, Y=v=>m.t+ih*(1-v/100);
+ let s="";
+ s+=`<rect x="${X(58)}" y="${Y(100)}" width="${X(100)-X(58)}" height="${Y(62)-Y(100)}" fill="#f85149" opacity=".05"/>`;
+ s+=`<text x="${X(79)}" y="${Y(81)}" text-anchor="middle" fill="#f85149" opacity=".55" font-size="11">비어 있음 = 무덤</text>`;
+ for(let i=0;i<=4;i++){const gx=X(i*25),gy=Y(i*25);
+   s+=`<line class="grid" x1="${gx}" y1="${m.t}" x2="${gx}" y2="${m.t+ih}"/>`;
+   s+=`<line class="grid" x1="${m.l}" y1="${gy}" x2="${m.l+iw}" y2="${gy}"/>`;}
+ s+=`<line x1="${m.l}" y1="${m.t+ih}" x2="${m.l+iw}" y2="${m.t+ih}" stroke="#3a4450" stroke-width="1.5"/>`;
+ s+=`<line x1="${m.l}" y1="${m.t}" x2="${m.l}" y2="${m.t+ih}" stroke="#3a4450" stroke-width="1.5"/>`;
+ s+=`<text class="axis-lb" x="${m.l+iw/2}" y="${H-16}" text-anchor="middle">${esc(D.axes.x.label)}</text>`;
+ s+=`<text class="axis-lb" transform="translate(18,${m.t+ih/2}) rotate(-90)" text-anchor="middle">${esc(D.axes.y.label)}</text>`;
+ P.forEach(p=>{const cx=X(p.x),cy=Y(p.y),r=p.me?12:9;
+   if(p.me) s+=`<circle cx="${cx}" cy="${cy}" r="22" fill="${p.color}" opacity=".14"/>`;
+   s+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${p.color}" stroke="var(--bg)" stroke-width="2"/>`;
+   const anc=p.x>72?"end":"middle", dx=p.x>72?-16:0, dy=p.x>72?4:-r-9;
+   s+=`<text class="node-lb" x="${cx+dx}" y="${cy+dy}" text-anchor="${anc}">${esc(p.name)}</text>`;});
+ $("#svg-map").innerHTML=s;
+})();
+
+const MK={y:['●','y'],p:['◐','p'],n:['○','n']};
+function cell(v){const m=MK[v];return m?`<span class="mk ${m[1]}">${m[0]}</span>`:esc(v);}
+$("#t-matrix thead").innerHTML="<tr><th data-i='-1'>항목</th>"+
+  P.map((p,i)=>`<th data-i="${i}" ${p.me?"data-me=1":""}>${esc(p.name)}</th>`).join("")+"</tr>";
+let sortCol=null,asc=true;
+function render(){
+ const q=$("#q").value.toLowerCase(), f=$("#f").value;
+ let rows=D.features.filter(r=>{
+   if(q && !r.dim.toLowerCase().includes(q)) return false;
+   const mine=r.vals[ME], others=r.vals.filter((_,i)=>i!==ME);
+   if(f==="gap") return mine==="n" && others.some(v=>v==="y");
+   if(f==="win") return mine==="y" && others.every(v=>v!=="y");
+   return true;});
+ if(sortCol!==null) rows=[...rows].sort((a,b)=>{
+   const A=sortCol<0?a.dim:String(a.vals[sortCol]), B=sortCol<0?b.dim:String(b.vals[sortCol]);
+   return asc?A.localeCompare(B):B.localeCompare(A);});
+ $("#t-matrix tbody").innerHTML=rows.length?rows.map(r=>
+   `<tr><td>${esc(r.dim)}</td>${r.vals.map(v=>`<td>${cell(v)}</td>`).join("")}</tr>`).join("")
+   :`<tr><td colspan="${P.length+1}" style="color:var(--tx3)">해당 항목 없음</td></tr>`;
+}
+$("#t-matrix thead").onclick=e=>{const th=e.target.closest("th");if(!th)return;
+ const i=+th.dataset.i; asc = sortCol===i ? !asc : true; sortCol=i; render();};
+$("#q").oninput=render; $("#f").onchange=render; render();
+
+["s","w","o","t"].forEach(k=>$("#sw-"+k).innerHTML=(D.swot[k]||[]).map(x=>`<li>${x}</li>`).join(""));
+
+$("#c-strat").innerHTML=D.strategies.map(s=>`
+ <div class="panel">
+  <span class="badge ${s.conf}">${esc(s.confLabel)}</span>
+  <h3>${esc(s.name)}</h3>
+  <div style="font-size:13px"><b style="color:var(--tx2)">무엇을</b> ${esc(s.what)}</div>
+  <div style="font-size:13px;margin-top:8px"><b style="color:var(--tx2)">왜 이기나</b> ${esc(s.why)}</div>
+  <div class="meta">비용 ${esc(s.cost)}<br>리스크 ${esc(s.risk)}</div>
+ </div>`).join("");
+
+$("#c-road").innerHTML=D.roadmap.map(r=>
+ `<div><h3>${esc(r.t)}</h3><ul>${r.items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul></div>`).join("");
+$("#c-mets").innerHTML=D.metrics.map(m=>
+ `<div class="met"><div class="n">${esc(m.n)}</div><div class="l">${esc(m.l)}</div></div>`).join("");
+$("#f-src").innerHTML="출처 · "+(D.sources||[]).map(esc).join(" / ");
+</script>
+</body>
+</html>
