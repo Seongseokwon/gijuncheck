@@ -119,11 +119,12 @@ export default function VerificationPolicyPage() {
         </h2>
         <div className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
           <table className="min-w-[42rem] w-full border-collapse text-sm">
+            <caption className="sr-only">기준체크 기능별 공개 범위와 확인 방식</caption>
             <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
               <tr>
-                <th className="px-5 py-4 font-bold">기능</th>
-                <th className="px-5 py-4 font-bold">확인 방식</th>
-                <th className="px-5 py-4 font-bold">제공 상태</th>
+                <th scope="col" className="px-5 py-4 font-bold">기능</th>
+                <th scope="col" className="px-5 py-4 font-bold">확인 방식</th>
+                <th scope="col" className="px-5 py-4 font-bold">제공 상태</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-700">
@@ -153,11 +154,12 @@ export default function VerificationPolicyPage() {
         </h2>
         <div className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
           <table className="min-w-[58rem] w-full border-collapse text-sm">
+            <caption className="sr-only">피부양자 판정 단계별 근거 매핑</caption>
             <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
               <tr>
-                <th className="px-5 py-4 font-bold">단계</th>
-                <th className="px-5 py-4 font-bold">코드에서 확인하는 핵심 분기·수치</th>
-                <th className="px-5 py-4 font-bold">근거 및 원문</th>
+                <th scope="col" className="px-5 py-4 font-bold">단계</th>
+                <th scope="col" className="px-5 py-4 font-bold">코드에서 확인하는 핵심 분기·수치</th>
+                <th scope="col" className="px-5 py-4 font-bold">근거 및 원문</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 text-slate-700">
@@ -174,7 +176,7 @@ export default function VerificationPolicyPage() {
                         rel="noopener noreferrer"
                         className="text-accent-700 underline underline-offset-4 hover:text-accent-600"
                       >
-                        법령 원문 ↗
+                        법령 원문 ↗ <span className="sr-only">(새 창에서 열림)</span>
                       </a>
                       <a
                         href={rule.source.nhis.href}
@@ -182,7 +184,7 @@ export default function VerificationPolicyPage() {
                         rel="noopener noreferrer"
                         className="text-accent-700 underline underline-offset-4 hover:text-accent-600"
                       >
-                        공단 안내 ↗
+                        공단 안내 ↗ <span className="sr-only">(새 창에서 열림)</span>
                       </a>
                     </p>
                   </td>
@@ -236,7 +238,7 @@ export default function VerificationPolicyPage() {
                 rel="noopener noreferrer"
                 className="text-slate-600 underline underline-offset-4 hover:text-accent-700"
               >
-                {source.label} ↗
+                {source.label} ↗ <span className="sr-only">(새 창에서 열림)</span>
               </a>
             </li>
           ))}

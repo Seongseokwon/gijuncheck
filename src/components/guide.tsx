@@ -9,6 +9,7 @@
  */
 
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { ogImageForPath, ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
@@ -30,6 +31,22 @@ export interface FaqItem {
   q: string;
   a: string;
   id?: string;
+}
+
+export function Breadcrumbs({ current }: { current: string }) {
+  return (
+    <nav aria-label="현재 위치" className="mb-5 text-sm text-slate-600">
+      <ol className="flex flex-wrap items-center gap-2">
+        <li>
+          <Link href={ROUTES.home.path} className="underline underline-offset-4 hover:text-accent-700">
+            홈
+          </Link>
+        </li>
+        <li aria-hidden>›</li>
+        <li aria-current="page" className="font-semibold text-brand-950">{current}</li>
+      </ol>
+    </nav>
+  );
 }
 
 /**
@@ -114,6 +131,7 @@ export function GuideHeader({
 }) {
   return (
     <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+      <Breadcrumbs current={title} />
       <p className="text-sm font-extrabold text-accent-700">건강보험 가이드</p>
       <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-brand-950 sm:text-4xl">{title}</h1>
       <p className="mt-5 text-base leading-8 text-slate-600">{lead}</p>
@@ -206,18 +224,22 @@ export function Callout({
 export function Table({
   head,
   rows,
+  caption,
 }: {
   head: string[];
   rows: ReactNode[][];
+  caption?: ReactNode;
 }) {
   return (
     <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
       <table className="w-full min-w-[28rem] border-collapse text-sm">
+        <caption className="sr-only">{caption ?? `표: ${head.join(' · ')}`}</caption>
         <thead>
           <tr className="border-b-2 border-slate-300 bg-canvas">
             {head.map((h) => (
               <th
                 key={h}
+                scope="col"
                 className="px-4 py-3 text-left font-bold text-slate-700"
               >
                 {h}
@@ -306,6 +328,8 @@ export function SourceList({ sources }: { sources: Source[] }) {
               className="text-slate-600 underline underline-offset-4 hover:text-accent-700"
             >
               {s.label}
+              <span aria-hidden> ↗</span>
+              <span className="sr-only"> (새 창에서 열림)</span>
             </a>
           </li>
         ))}

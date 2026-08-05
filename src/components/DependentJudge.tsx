@@ -11,7 +11,7 @@
  *    (중복 정의하면 금액 입력 개선 같은 변경이 이 도구에만 안 먹는다)
  */
 
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Field,
   FormCard,
@@ -55,23 +55,34 @@ const INCOME_FIELDS: Array<{
   hint?: string;
   helpText?: string;
 }> = [
-  { key: 'business', label: '사업소득' },
-  { key: 'wage', label: '근로소득' },
-  { key: 'pension', label: '공적연금소득', hint: '개인연금은 제외' },
+  { key: 'business', label: '사업소득 (원)' },
+  { key: 'wage', label: '근로소득 (원)' },
+  { key: 'pension', label: '공적연금소득 (원)', hint: '개인연금은 제외' },
   {
     key: 'financial',
-    label: '금융소득',
+    label: '금융소득 (원)',
     hint: '이자 + 배당 · 1,000만원 이하면 합산 제외',
     helpText: '이자·배당 합계가 연 1,000만원 이하면 소득 합산에서 제외됩니다.',
   },
-  { key: 'other', label: '기타소득' },
+  { key: 'other', label: '기타소득 (원)' },
 ];
 
 export default function DependentJudge() {
   const [input, setInput] = useState<DependentInput>(emptyInput);
   const [submitted, setSubmitted] = useState(false);
   const [showZeroValueConfirm, setShowZeroValueConfirm] = useState(false);
+  const [submissionId, setSubmissionId] = useState(0);
+  const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const judgeStarted = useRef(false);
+
+  useEffect(() => {
+    if (!submissionId) return;
+    const frame = requestAnimationFrame(() => {
+      resultHeadingRef.current?.focus();
+      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [submissionId]);
 
   const result = useMemo(() => judgeDependent(input), [input]);
 
@@ -127,6 +138,7 @@ export default function DependentJudge() {
   const completeJudge = () => {
     recordJudgeStart();
     setSubmitted(true);
+    setSubmissionId((current) => current + 1);
     // 어느 요건에서 걸리는지가 다음 가이드 주제를 정해준다.
     // 금액은 분석 이벤트로 보내지 않는다 — 보험료 계산기 핸드오프는 같은 탭에만 임시 보관한다.
     track('judge_complete', {
@@ -302,13 +314,14 @@ export default function DependentJudge() {
           </Field>
 
           <Field
-            label="재산세 과세표준"
+            label="재산세 과세표준 (원)"
             hint="실거래가·공시가격 아님"
             helpText="실거래가·공시가격이 아니라 지방세 재산세 과세표준을 입력합니다."
           >
             <MoneyInput
               value={input.propertyTaxBase}
               onChange={(v) => set('propertyTaxBase', v)}
+              max={999_900_000_000}
             />
           </Field>
           </div>
@@ -346,18 +359,26 @@ export default function DependentJudge() {
       */}
       {submitted && (
         <section
-          // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
           role="status"
-          aria-live="polite"
+          aria-live="off"
+          data-testid="dependent-result"
+          aria-labelledby="dependent-result-title"
           className="w-full min-w-0 max-w-full overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm"
         >
           <div className="min-w-0 border-b border-slate-200 bg-slate-50 px-5 py-6 sm:px-7">
           <div className="flex min-w-0 flex-wrap items-center gap-3">
-            <p className="min-w-0 max-w-full text-xl font-extrabold tracking-tight text-brand-950">
+            <h2
+              id="dependent-result-title"
+              ref={resultHeadingRef}
+              tabIndex={-1}
+              aria-live="polite"
+              aria-atomic="true"
+              className="min-w-0 max-w-full scroll-mt-28 text-xl font-extrabold tracking-tight text-brand-950 outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
+            >
               {result.eligible
                 ? '피부양자 자격이 인정될 것으로 보입니다'
                 : `${STEP_LABEL[result.failedAt!]}에서 탈락할 것으로 보입니다`}
-            </p>
+            </h2>
             <span className="rounded-full border border-slate-400 bg-white px-3 py-1 text-xs font-bold text-slate-700">
               {confidence.label}
             </span>
@@ -434,6 +455,8 @@ export default function DependentJudge() {
                     className="text-accent-700 underline underline-offset-2 hover:text-accent-600"
                   >
                     {s.basis}
+                    <span aria-hidden> ↗</span>
+                    <span className="sr-only"> (새 창에서 열림)</span>
                   </a>
                   <span aria-hidden> · </span>
                   <a
@@ -443,6 +466,8 @@ export default function DependentJudge() {
                     className="text-accent-700 underline underline-offset-2 hover:text-accent-600"
                   >
                     공단 안내
+                    <span aria-hidden> ↗</span>
+                    <span className="sr-only"> (새 창에서 열림)</span>
                   </a>
                 </p>
               </li>

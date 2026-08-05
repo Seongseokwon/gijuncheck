@@ -138,6 +138,8 @@ function ExternalLink({ href, children }: { href: string; children: ReactNode })
       className="font-semibold text-accent-700 underline underline-offset-2 hover:text-accent-600"
     >
       {children}
+      <span aria-hidden> ↗</span>
+      <span className="sr-only"> (새 창에서 열림)</span>
     </a>
   );
 }

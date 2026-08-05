@@ -9,7 +9,7 @@
  *  - 재산은 과세표준과 임차주택 전월세를 분리해 입력받고 공단 공식 계산식으로 합산한다.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Field,
   FormCard,
@@ -66,8 +66,19 @@ export default function RegionalPremiumCalc() {
   const [rentDeposit, setRentDeposit] = useState(0);
   const [monthlyRent, setMonthlyRent] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submissionId, setSubmissionId] = useState(0);
+  const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   /** 판정기에서 넘어왔는지. 퍼널이 작동하는지 보려고 이벤트에 담는다 */
   const [fromJudge, setFromJudge] = useState(false);
+
+  useEffect(() => {
+    if (!submissionId) return;
+    const frame = requestAnimationFrame(() => {
+      resultHeadingRef.current?.focus();
+      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [submissionId]);
 
   // 판정기에서 넘어온 값이 있으면 같은 탭의 임시 핸드오프를 소비한다.
   useEffect(() => {
@@ -114,7 +125,7 @@ export default function RegionalPremiumCalc() {
 
         <div className="grid gap-5 sm:grid-cols-3">
           {FULL_FIELDS.map((f) => (
-            <Field key={f.key} label={`${f.label} (100%)`} hint={f.hint}>
+            <Field key={f.key} label={`${f.label} (100%) (원)`} hint={f.hint}>
               <MoneyInput
                 value={income[f.key]}
                 onChange={(v) => set(f.key, v)}
@@ -125,7 +136,7 @@ export default function RegionalPremiumCalc() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           {HALF_FIELDS.map((f) => (
-            <Field key={f.key} label={`${f.label} (50%)`} hint={f.hint}>
+            <Field key={f.key} label={`${f.label} (50%) (원)`} hint={f.hint}>
               <MoneyInput
                 value={income[f.key]}
                 onChange={(v) => set(f.key, v)}
@@ -143,12 +154,13 @@ export default function RegionalPremiumCalc() {
 
         <FormSection number="2" title="재산을 입력해 주세요">
         <Field
-          label="재산세 과세표준 합계"
+          label="재산세 과세표준 합계 (원)"
           hint="주택·건물·토지·선박·항공기 과세표준 합계"
         >
           <MoneyInput
             value={property}
             onChange={setProperty}
+            max={999_900_000_000}
           />
         </Field>
         <p className="text-sm leading-6 text-slate-600">
@@ -168,10 +180,10 @@ export default function RegionalPremiumCalc() {
 
         {rentEligible && (
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            <Field label="전세·월세 보증금">
+            <Field label="전세·월세 보증금 (원)">
               <MoneyInput value={rentDeposit} onChange={setRentDeposit} />
             </Field>
-            <Field label="월세">
+            <Field label="월세 (원)">
               <MoneyInput value={monthlyRent} onChange={setMonthlyRent} />
             </Field>
             <p className="sm:col-span-2 text-sm leading-6 text-slate-600">
@@ -192,6 +204,7 @@ export default function RegionalPremiumCalc() {
         <SubmitButton
           onClick={() => {
             setSubmitted(true);
+            setSubmissionId((current) => current + 1);
             track('premium_calculate', {
               has_property: propertyAmount > 0,
               limit_applied: result.limitApplied ?? 'none',
@@ -208,10 +221,21 @@ export default function RegionalPremiumCalc() {
       {submitted && (
         <section
           role="status"
-          aria-live="polite"
+          aria-live="off"
+          data-testid="regional-result"
+          aria-labelledby="regional-result-title"
           className="space-y-5 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7"
         >
-          <h2 className="text-2xl font-extrabold tracking-tight text-brand-950">월 보험료</h2>
+          <h2
+            id="regional-result-title"
+            ref={resultHeadingRef}
+            tabIndex={-1}
+            aria-live="polite"
+            aria-atomic="true"
+            className="scroll-mt-28 text-2xl font-extrabold tracking-tight text-brand-950 outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
+          >
+            월 보험료
+          </h2>
 
           <ReferenceOnlyNotice crossChecked={result.crossChecked} />
 

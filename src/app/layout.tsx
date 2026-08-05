@@ -66,6 +66,12 @@ export default function RootLayout({
     <html lang="ko">
       <Analytics />
       <body className="min-h-screen bg-canvas text-slate-900 antialiased">
+        <a
+          href="#main"
+          className="sr-only z-[200] rounded-md bg-brand-950 px-4 py-3 text-sm font-bold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
+        >
+          본문 바로가기
+        </a>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: ldJson(siteJsonLd()) }}
@@ -91,7 +97,7 @@ export default function RootLayout({
           </div>
         )}
 
-        <header className="sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
+        <header className="site-header sticky top-0 z-20 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
           <div className="mx-auto max-w-[1120px] px-4">
             <div className="flex min-h-[68px] items-center justify-between gap-6">
               <Link
@@ -136,9 +142,9 @@ export default function RootLayout({
           </div>
         </header>
 
-        <main className="w-full">{children}</main>
+        <main id="main" className="w-full">{children}</main>
 
-        <footer className="border-t border-slate-200 bg-white">
+        <footer className="site-footer border-t border-slate-200 bg-white">
           <div className="mx-auto max-w-[1120px] px-4 py-10 text-sm leading-relaxed text-slate-600">
             <p>
               {SITE.name}의 판정·계산 결과는 모의 결과이며 법적 효력이 없습니다.
@@ -151,7 +157,7 @@ export default function RootLayout({
             <nav className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
               <a
                 href={ROUTES.verificationPolicy.path}
-                className="underline hover:text-brand-900"
+                className="inline-flex min-h-[44px] items-center underline hover:text-brand-900"
               >
                 {ROUTES.verificationPolicy.label}
               </a>
@@ -159,7 +165,7 @@ export default function RootLayout({
                 <a
                   key={k}
                   href={ROUTES[k].path}
-                  className="underline hover:text-brand-900"
+                  className="inline-flex min-h-[44px] items-center underline hover:text-brand-900"
                 >
                   {ROUTES[k].label}
                 </a>

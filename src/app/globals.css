@@ -100,3 +100,41 @@ input[type='number']::-webkit-inner-spin-button {
 input[type='number'] {
   -moz-appearance: textfield;
 }
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: #fff;
+    color: #000;
+  }
+
+  .site-header,
+  .site-footer,
+  body > a,
+  [role='status'][aria-live='polite'] {
+    display: none !important;
+  }
+
+  main,
+  article {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  section,
+  div {
+    box-shadow: none !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}

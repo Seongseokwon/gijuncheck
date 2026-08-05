@@ -62,7 +62,7 @@ export function toEok(amount: number): string {
 
 /** 만원 단위 — 20000000 → "2,000만원" */
 export function toManwon(amount: number): string {
-  return `${(amount / 10_000).toLocaleString('ko-KR')}만원`;
+  return `${Math.round(amount / 10_000).toLocaleString('ko-KR')}만원`;
 }
 
 /** 비율 — 0.0719 → "7.19%" */

@@ -44,7 +44,7 @@ export { won } from '@/lib/format';
 export const inputCls =
   'min-h-12 w-full rounded-[10px] border border-slate-500 bg-white px-3.5 py-2.5 ' +
   'text-base text-slate-900 placeholder:text-slate-500 ' +
-  'transition focus:border-accent-700 focus:outline-none focus:ring-4 focus:ring-accent-100';
+  'transition focus:border-accent-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-accent-100';
 
 export function Field({
   label,
@@ -59,13 +59,21 @@ export function Field({
 }) {
   const labelId = useId();
   const controlId = useId();
+  const helpId = useId();
+  const existingDescribedBy = isValidElement(children)
+    ? (children.props as { 'aria-describedby'?: string })['aria-describedby']
+    : undefined;
+  const describedBy = [existingDescribedBy, helpText ? helpId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined;
   const control = isValidElement(children)
     ? cloneElement(
         children as ReactElement<{
           id?: string;
           'aria-labelledby'?: string;
+          'aria-describedby'?: string;
         }>,
-        { id: controlId, 'aria-labelledby': labelId },
+        { id: controlId, 'aria-labelledby': labelId, 'aria-describedby': describedBy },
       )
     : children;
 
@@ -82,7 +90,7 @@ export function Field({
       </div>
       <div className="mt-1">{control}</div>
       {helpText && (
-        <p className="mt-2 text-sm leading-5 text-slate-600">{helpText}</p>
+        <p id={helpId} className="mt-2 text-sm leading-5 text-slate-600">{helpText}</p>
       )}
     </div>
   );
@@ -121,11 +129,11 @@ export function InfoTooltip({
             setOpen(false);
           }
         }}
-        className="group absolute left-1/2 top-1/2 inline-flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus:ring-4 focus:ring-accent-100"
+        className="group absolute left-1/2 top-1/2 inline-flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 cursor-help items-center justify-center rounded-full text-[11px] font-bold leading-none text-slate-600 outline-none transition focus-visible:ring-4 focus-visible:ring-accent-100"
       >
         <span
           aria-hidden
-          className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-slate-400 transition group-hover:border-accent-700 group-hover:text-accent-700 group-focus:border-accent-700 group-focus:text-accent-700"
+          className="inline-flex h-[18px] w-[18px] items-center justify-center rounded-full border border-slate-400 transition group-hover:border-accent-700 group-hover:text-accent-700 group-focus-visible:border-accent-700 group-focus-visible:text-accent-700"
         >
           i
         </span>
@@ -134,7 +142,7 @@ export function InfoTooltip({
           role="tooltip"
           className={`pointer-events-none absolute bottom-full z-30 mb-2 rounded-[10px] bg-brand-950 px-3 py-2 text-left text-xs font-normal leading-5 text-white shadow-lg transition-opacity ${
             open ? 'opacity-100' : 'opacity-0'
-          } sm:group-hover:opacity-100 sm:group-focus:opacity-100 ${
+          } sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100 ${
             placement === 'end'
               ? 'right-0 w-[min(16rem,calc(100vw-2rem))] sm:w-64'
               : 'left-1/2 w-64 max-w-[calc(100vw-2rem)] -translate-x-1/2'
@@ -167,53 +175,72 @@ export function MoneyInput({
   showReading = true,
   id,
   'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  max = 99_900_000_000,
 }: {
   value: number;
   onChange: (v: number) => void;
   showReading?: boolean;
   id?: string;
   'aria-labelledby'?: string;
+  'aria-describedby'?: string;
+  /** 기본 최대 입력값: 999억원. 재산 과표처럼 더 큰 범위는 호출부에서 조정한다. */
+  max?: number;
 }) {
   const errorId = useId();
+  const readingId = useId();
   const [tooManyDigits, setTooManyDigits] = useState(false);
+  const maxLabel = max >= 100_000_000
+    ? `${(max / 100_000_000).toLocaleString('ko-KR')}억원`
+    : `${max.toLocaleString('ko-KR')}원`;
+  const describedBy = [
+    ariaDescribedBy,
+    showReading ? readingId : undefined,
+    tooManyDigits ? errorId : undefined,
+  ].filter(Boolean).join(' ') || undefined;
 
   return (
     <>
-      <input
-        type="text"
-        id={id}
-        aria-labelledby={ariaLabelledBy}
-        aria-invalid={tooManyDigits}
-        aria-describedby={tooManyDigits ? errorId : undefined}
-        // 모바일 숫자 키패드. type=number 없이도 숫자 입력이 편해진다
-        inputMode="numeric"
-        autoComplete="off"
-        className={`${inputCls} text-right tabular-nums`}
-        value={value === 0 ? '' : value.toLocaleString('ko-KR')}
-        placeholder="0"
-        onChange={(e) => {
-          // 숫자만 남긴다. 콤마·원·공백을 붙여넣어도 받아준다
-          const digits = e.target.value.replace(/[^0-9]/g, '');
-          if (digits === '') {
+      <div className="relative">
+        <input
+          type="text"
+          id={id}
+          aria-labelledby={ariaLabelledBy}
+          aria-invalid={tooManyDigits}
+          aria-describedby={describedBy}
+          // 모바일 숫자 키패드. type=number 없이도 숫자 입력이 편해진다
+          inputMode="numeric"
+          autoComplete="off"
+          className={`${inputCls} pr-12 text-right tabular-nums`}
+          value={value === 0 ? '' : value.toLocaleString('ko-KR')}
+          placeholder="예: 30,000,000"
+          onChange={(e) => {
+            // 숫자만 남긴다. 콤마·원·공백을 붙여넣어도 받아준다
+            const digits = e.target.value.replace(/[^0-9]/g, '');
+            if (digits === '') {
+              setTooManyDigits(false);
+              return onChange(0);
+            }
+            const next = Number(digits);
+            if (digits.length > 16 || !Number.isSafeInteger(next) || next > max) {
+              setTooManyDigits(true);
+              return;
+            }
             setTooManyDigits(false);
-            return onChange(0);
-          }
-          // 16자리는 허용하되, 초과 입력은 조용히 버리지 않고 이유를 알린다.
-          if (digits.length > 16) {
-            setTooManyDigits(true);
-            return;
-          }
-          setTooManyDigits(false);
-          onChange(Number(digits));
-        }}
-      />
+            onChange(next);
+          }}
+        />
+        <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-semibold text-slate-600" aria-hidden>
+          원
+        </span>
+      </div>
       {tooManyDigits && (
         <p id={errorId} role="alert" className="mt-1.5 text-right text-sm text-red-700">
-          금액은 16자리 이하로 입력해 주세요.
+          금액은 최대 {maxLabel}까지 입력할 수 있습니다.
         </p>
       )}
-      {showReading && value > 0 && (
-        <p className="mt-1.5 text-right text-sm text-slate-600">
+      {showReading && (
+        <p id={readingId} className="mt-1.5 text-right text-sm text-slate-600">
           {toKoreanAmount(value)}
         </p>
       )}
@@ -232,6 +259,8 @@ export function NumberInput({
   max,
   id,
   'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  unit,
 }: {
   value: number;
   onChange: (v: number) => void;
@@ -239,24 +268,57 @@ export function NumberInput({
   max?: number;
   id?: string;
   'aria-labelledby'?: string;
+  'aria-describedby'?: string;
+  unit?: string;
 }) {
   const clamp = (n: number) =>
     Math.min(max ?? Number.MAX_SAFE_INTEGER, Math.max(min, n));
+  const errorId = useId();
+  const unitId = useId();
+  const [tooLarge, setTooLarge] = useState(false);
+  const describedBy = [ariaDescribedBy, unit ? unitId : undefined, tooLarge ? errorId : undefined]
+    .filter(Boolean).join(' ') || undefined;
 
   return (
-    <input
-      type="text"
-      id={id}
-      aria-labelledby={ariaLabelledBy}
-      inputMode="numeric"
-      autoComplete="off"
-      className={`${inputCls} tabular-nums`}
-      value={value}
-      onChange={(e) => {
-        const digits = e.target.value.replace(/[^0-9]/g, '');
-        onChange(digits === '' ? min : clamp(Number(digits)));
-      }}
-    />
+    <>
+      <div className="relative">
+        <input
+          type="text"
+          id={id}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={describedBy}
+          aria-invalid={tooLarge}
+          inputMode="numeric"
+          autoComplete="off"
+          className={`${inputCls} ${unit ? 'pr-16' : ''} tabular-nums`}
+          value={value}
+          onChange={(e) => {
+            const digits = e.target.value.replace(/[^0-9]/g, '');
+            if (digits === '') {
+              setTooLarge(false);
+              return onChange(min);
+            }
+            const next = Number(digits);
+            if (max !== undefined && next > max) {
+              setTooLarge(true);
+              return;
+            }
+            setTooLarge(false);
+            onChange(clamp(next));
+          }}
+        />
+        {unit && (
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-sm font-semibold text-slate-600">
+            <span id={unitId}>{unit}</span>
+          </span>
+        )}
+      </div>
+      {tooLarge && max !== undefined && (
+        <p id={errorId} role="alert" className="mt-1.5 text-sm text-red-700">
+          {min}~{max}{unit ?? ''} 범위로 입력해 주세요.
+        </p>
+      )}
+    </>
   );
 }
 
@@ -331,7 +393,7 @@ export function Card({
   children: ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm print:hidden">
       {title && <h2 className="border-b border-slate-200 px-7 py-6 text-xl font-bold tracking-tight text-brand-950">{title}</h2>}
       <div className="space-y-6 p-7">{children}</div>
     </section>
@@ -371,7 +433,7 @@ export function FormCard({
   children: ReactNode;
 }) {
   return (
-    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-[22px] border border-slate-200 bg-white shadow-sm print:hidden">
       <header className="flex items-start justify-between gap-5 border-b border-slate-200 px-5 py-6 sm:px-7">
         <div className="min-w-0">
           <h2 className="text-2xl font-bold tracking-tight text-brand-950">{title}</h2>
@@ -395,7 +457,7 @@ export function SubmitButton({
     <button
       type="button"
       onClick={onClick}
-      className="min-h-[54px] w-full rounded-xl bg-brand-900 px-5 py-3 text-base font-bold text-white shadow-[0_8px_20px_rgba(23,50,77,.14)] transition hover:bg-brand-800"
+      className="min-h-[54px] w-full rounded-xl bg-brand-900 px-5 py-3 text-base font-bold text-white shadow-[0_8px_20px_rgba(23,50,77,.14)] transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
     >
       {children}
     </button>

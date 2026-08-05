@@ -6,6 +6,7 @@ import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
+import { Breadcrumbs } from '@/components/guide';
 
 const TITLE = `지역가입자 보험료 계산 — ${YEAR}년 요율 ${toPercent(RATE.HEALTH)} 반영`;
 const DESCRIPTION =
@@ -87,6 +88,7 @@ export default function Page() {
 
       <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
         <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <Breadcrumbs current={ROUTES.regionalPremium.label} />
           <p className="text-sm font-extrabold text-accent-700">건강보험 지역가입자</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">{ROUTES.regionalPremium.label}</h1>
           <p className="mt-5 text-base leading-8 text-slate-600">

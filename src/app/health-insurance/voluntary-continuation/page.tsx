@@ -4,6 +4,7 @@ import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';
 import TrustSignal from '@/components/TrustSignal';
+import { Breadcrumbs } from '@/components/guide';
 
 const TITLE = '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인';
 const DESCRIPTION =
@@ -82,6 +83,7 @@ export default function Page() {
 
       <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
         <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <Breadcrumbs current={ROUTES.voluntaryContinuation.label} />
           <p className="text-sm font-extrabold text-accent-700">퇴직 후 건강보험</p>
           <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-brand-950 sm:text-4xl">
             {ROUTES.voluntaryContinuation.label}

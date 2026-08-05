@@ -189,7 +189,7 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="mt-6 grid max-w-xl grid-cols-2 gap-x-5 gap-y-3 text-[13px] font-semibold text-slate-500 sm:flex sm:flex-wrap">
+            <div className="mt-6 grid max-w-xl grid-cols-2 gap-x-5 gap-y-3 text-[13px] font-semibold text-slate-600 sm:flex sm:flex-wrap">
               {['약 3분', '회원가입 없음', '입력값 서버 전송 없음', '판정 근거 표시'].map(
                 (point) => (
                   <span key={point}>
@@ -207,7 +207,7 @@ export default function Home() {
             className="relative rounded-[26px] border border-slate-200/80 bg-white/90 p-7 shadow-[0_14px_38px_rgba(16,42,67,.09)]"
             aria-label="판정 과정 예시"
           >
-            <p className="text-[12px] font-bold uppercase tracking-[.08em] text-slate-500">판정 결과 예시</p>
+            <p className="text-[12px] font-bold uppercase tracking-[.08em] text-slate-600">판정 결과 예시</p>
             <h2 className="mt-2 text-[21px] font-bold tracking-[-.025em] text-brand-950">
               어느 조건에서 결정됐는지 보여드려요
             </h2>

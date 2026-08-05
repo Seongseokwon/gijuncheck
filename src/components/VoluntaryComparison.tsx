@@ -11,7 +11,7 @@
  * 최초 지역보험료 납부기한부터 2개월이므로 숫자로 카운트다운하지 않는다.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Field,
   FormCard,
@@ -49,6 +49,17 @@ export default function VoluntaryComparison() {
     VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS,
   );
   const [submitted, setSubmitted] = useState(false);
+  const [submissionId, setSubmissionId] = useState(0);
+  const resultHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (!submissionId) return;
+    const frame = requestAnimationFrame(() => {
+      resultHeadingRef.current?.focus();
+      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [submissionId]);
 
   useEffect(() => {
     const handoff = consumePremiumHandoff();
@@ -84,7 +95,7 @@ export default function VoluntaryComparison() {
       >
         <FormSection number="1" title="퇴직 전 상황을 입력해 주세요">
         <div className="grid gap-5 sm:grid-cols-2">
-          <Field label="퇴직 전 12개월 보수월액 평균" hint="세전 월급 평균">
+          <Field label="퇴직 전 12개월 보수월액 평균 (원)" hint="세전 월급 평균">
             <MoneyInput value={avgWage} onChange={setAvgWage} />
           </Field>
           <Field
@@ -103,15 +114,17 @@ export default function VoluntaryComparison() {
               }
               min={0}
               max={VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}
+              unit="개월"
             />
           </Field>
           <Field
-            label="재산금액 합계"
+            label="재산금액 합계 (원)"
             hint="재산세 과세표준 기준"
           >
             <MoneyInput
               value={property}
               onChange={setProperty}
+              max={999_900_000_000}
             />
           </Field>
         </div>
@@ -123,31 +136,31 @@ export default function VoluntaryComparison() {
             50%, 사업·금융·기타소득은 100% 반영합니다.
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="근로소득 (50%)">
+            <Field label="근로소득 (50%) (원)">
               <MoneyInput
                 value={income.wage}
                 onChange={(v) => set('wage', v)}
               />
             </Field>
-            <Field label="연금소득 (50%)">
+            <Field label="연금소득 (50%) (원)">
               <MoneyInput
                 value={income.pension}
                 onChange={(v) => set('pension', v)}
               />
             </Field>
-            <Field label="사업소득 (100%)">
+            <Field label="사업소득 (100%) (원)">
               <MoneyInput
                 value={income.business}
                 onChange={(v) => set('business', v)}
               />
             </Field>
-            <Field label="금융소득 (100%)">
+            <Field label="금융소득 (100%) (원)">
               <MoneyInput
                 value={income.financial}
                 onChange={(v) => set('financial', v)}
               />
             </Field>
-            <Field label="기타소득 (100%)" hint="과세자료 기준">
+            <Field label="기타소득 (100%) (원)" hint="과세자료 기준">
               <MoneyInput
                 value={income.other}
                 onChange={(v) => set('other', v)}
@@ -165,6 +178,7 @@ export default function VoluntaryComparison() {
         <SubmitButton
           onClick={() => {
             setSubmitted(true);
+            setSubmissionId((current) => current + 1);
             track('voluntary_compare', { recommendation });
           }}
         >
@@ -176,12 +190,24 @@ export default function VoluntaryComparison() {
 
       {submitted && (
         // 버튼을 눌러 결과가 나타나므로 스크린리더에 변화를 알린다
-        <div role="status" aria-live="polite">
+        <div
+          role="status"
+          aria-live="off"
+          data-testid="voluntary-result"
+          aria-labelledby="voluntary-result-title"
+        >
           {recommendation === 'notEligible' ? (
             <section className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm">
-              <p className="text-xl font-extrabold tracking-tight text-brand-950">
+              <h2
+                id="voluntary-result-title"
+                ref={resultHeadingRef}
+                tabIndex={-1}
+                aria-live="polite"
+                aria-atomic="true"
+                className="scroll-mt-28 text-xl font-extrabold tracking-tight text-brand-950 outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
+              >
                 임의계속가입을 신청할 수 없습니다
-              </p>
+              </h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-700">
                 {result.notes.ineligibleReason}
               </p>
@@ -195,7 +221,14 @@ export default function VoluntaryComparison() {
             </section>
           ) : (
             <section className="space-y-5 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-              <p className="text-xl font-extrabold tracking-tight text-brand-950">
+              <h2
+                id="voluntary-result-title"
+                ref={resultHeadingRef}
+                tabIndex={-1}
+                aria-live="polite"
+                aria-atomic="true"
+                className="scroll-mt-28 text-xl font-extrabold tracking-tight text-brand-950 outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
+              >
                 {isTie ? (
                   <>두 제도의 월 보험료가 {won(regional.total)}으로 같습니다</>
                 ) : (
@@ -205,7 +238,7 @@ export default function VoluntaryComparison() {
                   </>
                 )}
                 {/* 비교 결과 강조 */}
-              </p>
+              </h2>
 
               <ReferenceOnlyNotice crossChecked={voluntary?.crossChecked ?? false} />
               {voluntary?.assumption && (
