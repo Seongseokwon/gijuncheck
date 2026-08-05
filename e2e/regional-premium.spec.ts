@@ -6,7 +6,7 @@ import { fillMoney as fill } from './helpers';
 /**
  * 지역가입자 보험료 참고 계산의 공개 화면 QA.
  *
- * 금융소득 기준 수정 후 공단 대표 사례 재대조 전 상태이므로, 화면은 참고용 경고를
+ * 공단 대표 사례와 대조한 상태이지만, 화면은 실제 고지액이 아닌 참고 계산임을
  * 함께 보여준다. 판정기와 달리
  * 여기서 틀리면 사용자가 "얼마 내는지"를 잘못 알고 간다.
  *
@@ -175,11 +175,11 @@ test('판정기에서 넘어온 소득·재산이 다시 입력하지 않아도 
   await expect(result(page)).toBeVisible();
 });
 
-test('공단 재대조 전 계산기는 참고용 경고를 표시한다', async ({ page }) => {
+test('공단 대조 완료 계산기도 실제 고지액이 아닌 참고 계산임을 표시한다', async ({ page }) => {
   await calculate(page);
 
   await expect(result(page)).toBeVisible();
-  await expect(page.getByText('대조 검증이 아직 완료되지 않았습니다')).toBeVisible();
+  await expect(page.getByText('공단 모의계산 대표 사례와 대조한 참고 계산입니다')).toBeVisible();
 });
 
 test('결과에 근거와 면책, 입력값 비전송 고지가 함께 있다', async ({ page }) => {

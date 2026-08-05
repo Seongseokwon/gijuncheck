@@ -26,8 +26,8 @@ import {
   longTermCareRatio,
 } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
-import { DISCLAIMER, RATE, REGIONAL_INCOME } from '@/lib/constants/2026';
-import { toManwon, toPercent, wonExact } from '@/lib/format';
+import { DISCLAIMER, RATE } from '@/lib/constants/2026';
+import { toPercent, wonExact } from '@/lib/format';
 import { rentEvaluationAmount } from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
@@ -41,7 +41,7 @@ const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = 
   {
     key: 'financial',
     label: '금융소득',
-    hint: `이자 + 배당 · ${toManwon(REGIONAL_INCOME.FINANCIAL_INCLUSION_THRESHOLD)} 이하면 부과 제외`,
+    hint: '이자 + 배당 · 지역보험료에 100% 반영',
   },
   { key: 'other', label: '기타소득' },
 ];
@@ -120,9 +120,7 @@ export default function RegionalPremiumCalc() {
             {' '}
             근로·연금소득은 50%
           </strong>
-          만 반영됩니다. 금융소득은 이자·배당 합계가 연{' '}
-          {toManwon(REGIONAL_INCOME.FINANCIAL_INCLUSION_THRESHOLD)} 이하이면
-          부과대상 소득에서 제외되고, 초과하면 전액 반영됩니다.
+          만 반영됩니다. 금융소득(이자·배당)은 입력한 금액을 전액 반영합니다.
         </p>
 
         <div className="grid gap-5 sm:grid-cols-3">

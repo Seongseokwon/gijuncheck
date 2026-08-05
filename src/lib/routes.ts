@@ -64,9 +64,9 @@ export const ROUTES = {
     label: '지역가입자 보험료 계산',
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
-    lastModified: '2026-08-03',
+    lastModified: '2026-08-05',
     changeFrequency: 'monthly',
-    /** 금융소득 기준 수정 후 공단 공식 모의계산 대표 사례 재대조 필요 */
+    /** 2026-08-05 공단 모의계산 대표 사례 13건 재대조 완료 */
     ready: true,
   },
   voluntaryContinuation: {

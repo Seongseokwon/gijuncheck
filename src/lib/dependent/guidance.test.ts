@@ -26,18 +26,18 @@ describe('판정 확신 수준', () => {
     expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('추가 확인 필요');
   });
 
-  it('labels a married dependent as needing the spouse review', () => {
+  it('blocks a married dependent when spouse data is missing', () => {
     const input = {
       ...emptyInput(),
       relation: 'linealDescendant' as const,
       cohabiting: true,
       maritalStatus: 'married' as const,
       married: true,
+      spouse: undefined,
     };
-    expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('추가 확인 필요');
-    expect(getConfidenceSummary(input, judgeDependent(input)).detail).toContain(
-      '배우자도 소득·재산 요건',
-    );
+    const result = judgeDependent(input);
+    expect(getConfidenceSummary(input, result).label).toBe('기준상 어려움');
+    expect(result.steps[1].message).toContain('배우자 소득·사업자등록 자료');
   });
 
   it('labels divorced or widowed status as needing confirmation', () => {

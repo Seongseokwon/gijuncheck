@@ -11,7 +11,7 @@ export const RELATION_GUIDANCE: Record<Relation, RelationGuidance> = {
   spouse: {
     title: '배우자',
     summary: '배우자는 동거 여부와 무관하게 부양요건을 먼저 통과합니다.',
-    checks: ['혼인·가족관계를 확인하고 소득·재산 요건을 별도로 확인합니다.'],
+    checks: ['혼인·가족관계를 확인하고 배우자 본인의 소득·재산 요건을 확인합니다.'],
   },
   linealAscendant: {
     title: '부모·조부모',
@@ -85,22 +85,22 @@ export function getConfidenceSummary(
 
   const maritalStatus =
     input.maritalStatus ?? (input.married ? 'married' : 'single');
-  const needsMarriedCoupleReview =
-    maritalStatus === 'married' && input.relation !== 'spouse';
+  const needsSpouseReview =
+    maritalStatus === 'married' && input.relation !== 'spouse' && !input.spouse;
   const needsDivorcedWidowedReview = maritalStatus === 'divorcedOrWidowed';
   const needsExtraCheck =
     input.businessRegistered ||
     input.propertyTaxBase >= PROPERTY.SAFE_LIMIT ||
     result.totalIncome >= INCOME.TOTAL_LIMIT ||
-    needsMarriedCoupleReview ||
+    needsSpouseReview ||
     needsDivorcedWidowedReview;
 
   if (needsExtraCheck) {
     return {
       level: 'verify',
       label: '추가 확인 필요',
-      detail: needsMarriedCoupleReview
-        ? '모든 단계는 통과했지만 기혼 피부양자는 배우자도 소득·재산 요건을 충족해야 합니다. 배우자 자료를 함께 확인한 뒤 공단에 문의하세요.'
+      detail: needsSpouseReview
+        ? '기혼 피부양자의 배우자 소득·재산 자료가 입력되지 않았습니다. 배우자 자료를 입력한 뒤 공단에 문의하세요.'
         : needsDivorcedWidowedReview
           ? '이혼·사별은 관계와 사실관계에 따라 미혼으로 인정되는 범위를 확인해야 합니다. 공단에 최종 요건을 문의하세요.'
           : '모든 단계는 통과했지만 경계 또는 특례 입력이 있어 관련 자료의 기준일·반영 여부를 공단에 확인하세요.',

@@ -23,7 +23,14 @@ import {
   SubmitButton,
   ZeroValueConfirmModal,
 } from './ui';
-import { emptyInput, judgeDependent, toEok, toManwon } from '@/lib/dependent/judge';
+import {
+  emptyInput,
+  emptySpouseDetails,
+  judgeDependent,
+  sumIncome,
+  toEok,
+  toManwon,
+} from '@/lib/dependent/judge';
 import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import {
   RELATION_LABEL,
@@ -32,6 +39,7 @@ import {
   type JudgeStep,
   type MaritalStatus,
   type Relation,
+  type SpouseDetails,
 } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
@@ -66,6 +74,11 @@ const INCOME_FIELDS: Array<{
   },
   { key: 'other', label: '기타소득 (원)' },
 ];
+
+const SPOUSE_INCOME_FIELDS = INCOME_FIELDS.map((field) => ({
+  ...field,
+  label: `배우자 ${field.label}`,
+}));
 
 export default function DependentJudge() {
   const [input, setInput] = useState<DependentInput>(emptyInput);
@@ -111,8 +124,35 @@ export default function DependentJudge() {
     }));
   };
 
+  const setSpouse = <K extends keyof SpouseDetails>(
+    key: K,
+    value: SpouseDetails[K],
+  ) => {
+    recordJudgeStart();
+    setInput((prev) => ({
+      ...prev,
+      spouse: { ...(prev.spouse ?? emptySpouseDetails()), [key]: value },
+    }));
+  };
+
+  const setSpouseIncome = (key: keyof SpouseDetails['income'], value: number) => {
+    recordJudgeStart();
+    setInput((prev) => ({
+      ...prev,
+      spouse: {
+        ...(prev.spouse ?? emptySpouseDetails()),
+        income: {
+          ...(prev.spouse?.income ?? emptySpouseDetails().income),
+          [key]: value,
+        },
+      },
+    }));
+  };
+
   const maritalStatus: MaritalStatus =
     input.maritalStatus ?? (input.married ? 'married' : 'single');
+  const needsSpouseDetails = maritalStatus === 'married' && input.relation !== 'spouse';
+  const spouse = input.spouse ?? emptySpouseDetails();
 
   const isSibling = input.relation === 'sibling';
   const needsSiblingIncomeFlag =
@@ -132,10 +172,21 @@ export default function DependentJudge() {
       (field) => field.label,
     ),
     ...(input.propertyTaxBase === 0 ? ['재산세 과세표준'] : []),
+    ...(needsSpouseDetails
+      ? [
+          ...SPOUSE_INCOME_FIELDS.filter((field) => spouse.income[field.key] === 0).map(
+            (field) => field.label,
+          ),
+          ...(spouse.propertyTaxBase === 0 ? ['배우자 재산세 과세표준'] : []),
+        ]
+      : []),
   ];
   const nothingEntered =
     INCOME_FIELDS.every((field) => input.income[field.key] === 0) &&
-    input.propertyTaxBase === 0;
+    input.propertyTaxBase === 0 &&
+    (!needsSpouseDetails ||
+      (SPOUSE_INCOME_FIELDS.every((field) => spouse.income[field.key] === 0) &&
+        spouse.propertyTaxBase === 0));
 
   const completeJudge = () => {
     recordJudgeStart();
@@ -302,7 +353,70 @@ export default function DependentJudge() {
           </p>
         </FormSection>
 
-        <FormSection number="3" title="사업자등록과 재산을 확인해 주세요">
+        {needsSpouseDetails && (
+          <FormSection number="3" title="배우자의 소득·재산도 확인해 주세요">
+            <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
+              기혼 피부양자는 대상자 본인뿐 아니라 배우자도 소득·재산 요건을 충족해야 합니다. 두 사람의
+              소득을 단순히 한 사람의 소득으로 합산하는 것이 아니라, 각각의 기준을 확인합니다.
+            </p>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {SPOUSE_INCOME_FIELDS.map((f) => (
+                <Field
+                  key={f.key}
+                  label={f.label}
+                  hint={f.hint}
+                  helpText={f.helpText}
+                >
+                  <MoneyInput
+                    value={spouse.income[f.key]}
+                    onChange={(v) => setSpouseIncome(f.key, v)}
+                  />
+                </Field>
+              ))}
+            </div>
+            <p className="mt-5 flex items-center justify-between rounded-[11px] bg-canvas px-4 py-3 text-sm text-slate-600">
+              <span>배우자 합산소득</span>
+              <strong className="text-base font-extrabold text-brand-950">
+                {toManwon(sumIncome(spouse.income))}
+              </strong>
+            </p>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <Field label="배우자 사업자등록">
+                <Select
+                  value={spouse.businessRegistered ? 'y' : 'n'}
+                  onChange={(v) => setSpouse('businessRegistered', v === 'y')}
+                  options={[
+                    { value: 'n', label: '없음' },
+                    { value: 'y', label: '있음' },
+                  ]}
+                />
+              </Field>
+              <Field label="배우자 장애인 · 국가유공상이자">
+                <Select
+                  value={spouse.disabled ? 'y' : 'n'}
+                  onChange={(v) => setSpouse('disabled', v === 'y')}
+                  options={[
+                    { value: 'n', label: '해당 없음' },
+                    { value: 'y', label: '해당' },
+                  ]}
+                />
+              </Field>
+              <Field
+                label="배우자 재산세 과세표준 (원)"
+                hint="실거래가·공시가격 아님"
+                helpText="실거래가·공시가격이 아니라 지방세 재산세 과세표준을 입력합니다."
+              >
+                <MoneyInput
+                  value={spouse.propertyTaxBase}
+                  onChange={(v) => setSpouse('propertyTaxBase', v)}
+                  max={999_900_000_000}
+                />
+              </Field>
+            </div>
+          </FormSection>
+        )}
+
+        <FormSection number={needsSpouseDetails ? '4' : '3'} title="사업자등록과 재산을 확인해 주세요">
           <div className="grid gap-5 sm:grid-cols-2">
           <Field label="사업자등록">
             <Select

@@ -388,6 +388,52 @@ describe('부양요건 — 관계별', () => {
 });
 
 /* ------------------------------------------------------------------ */
+describe('기혼 피부양자 — 배우자 동반 요건', () => {
+  const marriedDependent = (spouseOverrides: Partial<NonNullable<DependentInput['spouse']>> = {}) =>
+    make({
+      relation: 'linealDescendant',
+      cohabiting: true,
+      married: true,
+      maritalStatus: 'married',
+      spouse: {
+        ...emptyInput().spouse!,
+        ...spouseOverrides,
+        income: {
+          ...emptyInput().spouse!.income,
+          ...(spouseOverrides.income ?? {}),
+        },
+      },
+    });
+
+  it('대상자와 배우자가 각각 소득·재산 기준 이하면 통과한다', () => {
+    const r = judgeDependent(
+      marriedDependent({ income: { ...emptyInput().spouse!.income, pension: 20_000_000 } }),
+    );
+    expect(r.eligible).toBe(true);
+    expect(r.spouseTotalIncome).toBe(20_000_000);
+    expect(r.steps[1].message).toContain('배우자도 소득요건을 충족');
+  });
+
+  it('배우자 합산소득이 2,000만원을 1원 초과하면 소득요건에서 탈락한다', () => {
+    const r = judgeDependent(
+      marriedDependent({ income: { ...emptyInput().spouse!.income, pension: 20_000_001 } }),
+    );
+    expect(r.eligible).toBe(false);
+    expect(r.failedAt).toBe('income');
+    expect(r.steps[1].message).toContain('배우자');
+  });
+
+  it('배우자 재산세 과세표준이 9억원을 넘으면 재산요건에서 탈락한다', () => {
+    const r = judgeDependent(
+      marriedDependent({ propertyTaxBase: 900_000_001 }),
+    );
+    expect(r.eligible).toBe(false);
+    expect(r.failedAt).toBe('property');
+    expect(r.steps[2].message).toContain('배우자');
+  });
+});
+
+/* ------------------------------------------------------------------ */
 describe('결과에 근거가 포함된다', () => {
   it('모든 단계에 근거 조항이 붙는다', () => {
     const r = judgeDependent(make());

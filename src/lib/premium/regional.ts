@@ -18,7 +18,6 @@ import {
   INCOME_REFLECTION,
   PREMIUM_LIMIT,
   RATE,
-  REGIONAL_INCOME,
   VOLUNTARY_CONTINUATION,
 } from '../constants/2026';
 import {
@@ -47,17 +46,13 @@ export interface IncomeBase {
  *  - 이자·배당·사업·기타소득: 100%
  *  - 근로·연금소득: 50%
  *
- * 지역보험료에서는 사업·이자·배당·기타소득이 100% 반영되지만,
- * 이자·배당 금융소득 합계가 연 1,000만원 이하이면 부과대상 소득에서 제외된다.
- * 이 기준은 피부양자 판정의 금융소득 문턱과 금액은 같지만 적용 근거가 다르다.
+ * 지역보험료에서는 사업·이자·배당·기타소득이 모두 100% 반영된다.
+ * 공단 모의계산기의 ‘사업소득 등’ 입력란도 사업·이자·배당·기타소득을 합산하도록
+ * 안내한다. 연 1,000만원 금융소득 문턱은 피부양자 판정에만 적용한다.
  */
 export function incomeBaseForPremium(income: Income): IncomeBase {
-  const countableFinancial =
-    income.financial > REGIONAL_INCOME.FINANCIAL_INCLUSION_THRESHOLD
-      ? income.financial
-      : 0;
   const full =
-    (income.business + countableFinancial + income.other) *
+    (income.business + income.financial + income.other) *
     INCOME_REFLECTION.FULL;
   const half = (income.wage + income.pension) * INCOME_REFLECTION.HALF;
 

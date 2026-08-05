@@ -53,6 +53,9 @@ export function buildEvidenceChecklist(
   const incomeDetail = [
     incomeDetailBase,
     '1~10월에는 전전년도 자료(공적연금은 전년도), 11~12월에는 전년도 자료가 반영됩니다.',
+    input.maritalStatus === 'married' && input.relation !== 'spouse'
+      ? '기혼 피부양자는 배우자의 소득·사업자등록 자료도 함께 확인합니다.'
+      : null,
     input.disabled
       ? '장애인·국가유공상이자·보훈보상대상자 특례를 적용받는다면 관련 등록·상이등급 증명서류도 공단이 요청할 수 있습니다.'
       : null,

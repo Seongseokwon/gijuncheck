@@ -67,6 +67,15 @@ test.describe('관계 유형별 조건부 입력', () => {
     await expect(page.getByLabel('대상자와 동거하는 형제자매의 소득')).toHaveCount(0);
   });
 
+  test('기혼 피부양자를 선택하면 배우자 소득·재산 입력이 나타난다', async ({ page }) => {
+    await selectRelation(page, '직계비속 (자녀)');
+    await page.getByLabel('혼인 여부').selectOption({ label: '기혼' });
+
+    await expect(page.getByLabel('배우자 근로소득 (원)')).toBeVisible();
+    await expect(page.getByLabel('배우자 재산세 과세표준 (원)')).toBeVisible();
+    await expect(page.getByLabel('배우자 사업자등록')).toBeVisible();
+  });
+
   test('관계를 바꾸면 관계별로 먼저 확인할 기준이 바뀐다', async ({ page }) => {
     await selectRelation(page, '형제자매');
     await expect(page.getByText('형제자매 관계별로 먼저 확인할 기준')).toBeVisible();
@@ -203,6 +212,26 @@ test('결과 화면에 확신 수준을 표시한다', async ({ page }) => {
 
 test('제출 전에는 결과 영역이 렌더링되지 않는다', async ({ page }) => {
   await expect(page.getByRole('status')).toHaveCount(0);
+});
+
+test.describe('기혼 피부양자 — 배우자 소득 경계', () => {
+  test('배우자 소득이 정확히 2,000만원이면 통과한다', async ({ page }) => {
+    await selectRelation(page, '직계비속 (자녀)');
+    await page.getByLabel('혼인 여부').selectOption({ label: '기혼' });
+    await fillMoney(page.getByLabel('배우자 근로소득 (원)'), INCOME_TOTAL_LIMIT);
+    await submit(page);
+    await expect(result(page)).toContainText('인정될 것으로 보입니다');
+    await expect(result(page)).toContainText('배우자도 소득요건을 충족');
+  });
+
+  test('배우자 소득이 1원 초과하면 소득요건에서 탈락한다', async ({ page }) => {
+    await selectRelation(page, '직계비속 (자녀)');
+    await page.getByLabel('혼인 여부').selectOption({ label: '기혼' });
+    await fillMoney(page.getByLabel('배우자 근로소득 (원)'), INCOME_TOTAL_LIMIT + 1);
+    await submit(page);
+    await expect(result(page)).toContainText('소득요건에서 탈락할 것으로 보입니다');
+    await expect(result(page)).toContainText('배우자');
+  });
 });
 
 test('금액 상한을 넘으면 입력을 반영하지 않고 피드백한다', async ({ page }) => {

@@ -38,6 +38,17 @@ export interface Income {
   other: number;
 }
 
+/** 기혼 피부양자의 배우자 확인에 사용하는 연간 소득·재산 정보 */
+export interface SpouseDetails {
+  income: Income;
+  /** 배우자의 사업자등록 보유 여부 */
+  businessRegistered: boolean;
+  /** 배우자의 장애인·국가유공상이자 등 특례 여부 */
+  disabled: boolean;
+  /** 배우자의 재산세 과세표준 (원) */
+  propertyTaxBase: number;
+}
+
 export type MaritalStatus = 'single' | 'married' | 'divorcedOrWidowed';
 
 export interface DependentInput {
@@ -63,6 +74,8 @@ export interface DependentInput {
    * 이 경우 그 형제자매가 부양하는 것으로 보아 신청인의 피부양자가 될 수 없다.
    */
   cohabitingSiblingHasIncome?: boolean;
+  /** 기혼 피부양자(가입자의 배우자가 아닌 경우)의 배우자 자료 */
+  spouse?: SpouseDetails;
 }
 
 export type JudgeStep = 'support' | 'income' | 'property';
@@ -87,6 +100,8 @@ export interface JudgeResult {
   eligible: boolean;
   /** 합산소득 (원) */
   totalIncome: number;
+  /** 기혼 피부양자 동반 확인에 사용한 배우자의 합산소득 (원) */
+  spouseTotalIncome?: number;
   /** 단계별 결과 — 탈락 시 그 단계까지만 채워진다 */
   steps: StepResult[];
   /** 탈락한 단계 */

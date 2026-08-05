@@ -19,6 +19,7 @@ import type {
   DependentInput,
   Income,
   JudgeResult,
+  SpouseDetails,
   StepResult,
 } from './types';
 import { josa, toEok, toManwon } from '../format';
@@ -54,15 +55,24 @@ export function sumIncome(income: Income): number {
   );
 }
 
+function isMarried(input: DependentInput): boolean {
+  return (
+    input.maritalStatus === 'married' ||
+    (input.maritalStatus === undefined && input.married)
+  );
+}
+
+function needsSpouseCheck(input: DependentInput): boolean {
+  return isMarried(input) && input.relation !== 'spouse';
+}
+
 /* ------------------------------------------------------------------ */
 /* 1단 — 부양요건                                                      */
 /* ------------------------------------------------------------------ */
 
 function judgeSupport(input: DependentInput): StepResult {
   const { relation, cohabiting, age, disabled } = input;
-  const married =
-    input.maritalStatus === 'married' ||
-    (input.maritalStatus === undefined && input.married);
+  const married = isMarried(input);
   const basis = BASIS.SUPPORT;
   const step = 'support' as const;
 
@@ -176,8 +186,13 @@ function judgeSupport(input: DependentInput): StepResult {
 /* 2단 — 소득요건                                                      */
 /* ------------------------------------------------------------------ */
 
-function judgeIncome(input: DependentInput, total: number): StepResult {
-  const { businessRegistered, disabled, income } = input;
+function judgeIncomeForPerson(
+  income: Income,
+  businessRegistered: boolean,
+  disabled: boolean,
+  total: number,
+  subject: string,
+): StepResult {
   const basis = BASIS.INCOME;
   const step = 'income' as const;
 
@@ -191,7 +206,7 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
         message:
           `장애인·국가유공상이자는 사업자등록 여부와 무관하게 사업소득이 ` +
           `${toManwon(INCOME.BUSINESS_LIMIT_DISABLED)} 이하여야 합니다. ` +
-          `(입력: ${toManwon(income.business)})`,
+          `(${subject} 입력: ${toManwon(income.business)})`,
         basis,
       };
     }
@@ -202,7 +217,7 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
         passed: false,
         message:
           '사업자등록이 있는 경우 사업소득이 발생하면 금액과 무관하게 탈락합니다. ' +
-          `(입력: ${toManwon(income.business)})`,
+          `(${subject} 입력: ${toManwon(income.business)})`,
         basis,
       };
     }
@@ -214,7 +229,7 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
         message:
           `사업자등록이 없는 경우 사업소득이 연 ${toManwon(
             INCOME.BUSINESS_LIMIT_UNREGISTERED,
-          )} 이하여야 합니다. (입력: ${toManwon(income.business)})`,
+          )} 이하여야 합니다. (${subject} 입력: ${toManwon(income.business)})`,
         basis,
       };
     }
@@ -226,7 +241,7 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
       passed: false,
       message:
         `합산소득이 연 ${josa(toManwon(INCOME.TOTAL_LIMIT), '을')} 초과합니다. ` +
-        `(입력 합계: ${toManwon(total)}) 1원만 초과해도 탈락합니다.`,
+        `(${subject} 합계: ${toManwon(total)}) 1원만 초과해도 탈락합니다.`,
       basis,
     };
   }
@@ -237,8 +252,51 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
     message:
       `합산소득 ${toManwon(total)}으로 연 ${toManwon(
         INCOME.TOTAL_LIMIT,
-      )} 이하이며, 사업소득 요건도 충족합니다.`,
+      )} 이하이며 ${subject}의 사업소득 요건도 충족합니다.`,
     basis,
+  };
+}
+
+function judgeIncome(input: DependentInput, total: number): StepResult {
+  const primary = judgeIncomeForPerson(
+    input.income,
+    input.businessRegistered,
+    input.disabled,
+    total,
+    '대상자',
+  );
+  if (!primary.passed) return primary;
+
+  if (!needsSpouseCheck(input)) return primary;
+
+  const spouse = input.spouse;
+  if (!spouse) {
+    return {
+      step: 'income',
+      passed: false,
+      message: '기혼 피부양자의 배우자 소득·사업자등록 자료가 입력되지 않았습니다.',
+      basis: BASIS.INCOME,
+    };
+  }
+
+  const spouseTotal = sumIncome(spouse.income);
+  const spouseResult = judgeIncomeForPerson(
+    spouse.income,
+    spouse.businessRegistered,
+    spouse.disabled,
+    spouseTotal,
+    '배우자',
+  );
+  if (!spouseResult.passed) {
+    return {
+      ...spouseResult,
+      message: `대상자는 소득요건을 충족했지만 ${spouseResult.message}`,
+    };
+  }
+
+  return {
+    ...primary,
+    message: `${primary.message} 배우자도 소득요건을 충족합니다 (${toManwon(spouseTotal)}).`,
   };
 }
 
@@ -246,8 +304,12 @@ function judgeIncome(input: DependentInput, total: number): StepResult {
 /* 3단 — 재산요건                                                      */
 /* ------------------------------------------------------------------ */
 
-function judgeProperty(input: DependentInput, total: number): StepResult {
-  const { relation, propertyTaxBase } = input;
+function judgePropertyForPerson(
+  relation: DependentInput['relation'],
+  propertyTaxBase: number,
+  total: number,
+  subject: string,
+): StepResult {
   const basis = BASIS.PROPERTY;
   const step = 'property' as const;
   const p = propertyTaxBase;
@@ -259,16 +321,16 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
         step,
         passed: false,
         message:
-          `형제자매는 재산세 과세표준이 ${toEok(
+          `${subject}의 재산세 과세표준이 ${toEok(
             PROPERTY.SIBLING_LIMIT,
-          )} 이하여야 합니다. (입력: ${toEok(p)})`,
+          )} 이하여야 합니다. (${subject} 입력: ${toEok(p)})`,
         basis,
       };
     }
     return {
       step,
       passed: true,
-      message: `재산세 과세표준 ${toEok(p)}으로 형제자매 기준 ${toEok(
+      message: `${subject}의 재산세 과세표준 ${toEok(p)}으로 형제자매 기준 ${toEok(
         PROPERTY.SIBLING_LIMIT,
       )} 이하입니다.`,
       basis,
@@ -279,7 +341,7 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
     return {
       step,
       passed: true,
-      message: `재산세 과세표준 ${toEok(p)}으로 ${toEok(
+      message: `${subject}의 재산세 과세표준 ${toEok(p)}으로 ${toEok(
         PROPERTY.SAFE_LIMIT,
       )} 이하입니다.`,
       basis,
@@ -292,10 +354,10 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
         step,
         passed: true,
         message:
-          `재산세 과세표준이 ${toEok(PROPERTY.SAFE_LIMIT)} 초과 ${toEok(
+          `${subject}의 재산세 과세표준이 ${toEok(PROPERTY.SAFE_LIMIT)} 초과 ${toEok(
             PROPERTY.HARD_LIMIT,
           )} 이하 구간이지만, ` +
-          `연소득이 ${toManwon(
+          `${subject}의 연소득이 ${toManwon(
             INCOME.MID_PROPERTY_INCOME_LIMIT,
           )} 이하이므로 인정됩니다.`,
         basis,
@@ -305,12 +367,12 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
       step,
       passed: false,
       message:
-        `재산세 과세표준이 ${toEok(PROPERTY.SAFE_LIMIT)} 초과 ${toEok(
+        `${subject}의 재산세 과세표준이 ${toEok(PROPERTY.SAFE_LIMIT)} 초과 ${toEok(
           PROPERTY.HARD_LIMIT,
         )} 이하 구간에서는 ` +
-        `연소득이 ${toManwon(
+        `${subject}의 연소득이 ${toManwon(
           INCOME.MID_PROPERTY_INCOME_LIMIT,
-        )} 이하여야 합니다. (입력 소득: ${toManwon(total)})`,
+        )} 이하여야 합니다. (${subject} 소득: ${toManwon(total)})`,
       basis,
     };
   }
@@ -319,10 +381,50 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
     step,
     passed: false,
     message:
-      `재산세 과세표준이 ${toEok(
+      `${subject}의 재산세 과세표준이 ${toEok(
         PROPERTY.HARD_LIMIT,
-      )}을 초과하면 소득이 없어도 탈락합니다. (입력: ${toEok(p)})`,
+      )}을 초과하면 소득이 없어도 탈락합니다. (${subject} 입력: ${toEok(p)})`,
     basis,
+  };
+}
+
+function judgeProperty(input: DependentInput, total: number): StepResult {
+  const primary = judgePropertyForPerson(
+    input.relation,
+    input.propertyTaxBase,
+    total,
+    '대상자',
+  );
+  if (!primary.passed) return primary;
+
+  if (!needsSpouseCheck(input)) return primary;
+
+  const spouse = input.spouse;
+  if (!spouse) {
+    return {
+      step: 'property',
+      passed: false,
+      message: '기혼 피부양자의 배우자 재산세 과세표준 자료가 입력되지 않았습니다.',
+      basis: BASIS.PROPERTY,
+    };
+  }
+
+  const spouseResult = judgePropertyForPerson(
+    'spouse',
+    spouse.propertyTaxBase,
+    sumIncome(spouse.income),
+    '배우자',
+  );
+  if (!spouseResult.passed) {
+    return {
+      ...spouseResult,
+      message: `대상자는 재산요건을 충족했지만 ${spouseResult.message}`,
+    };
+  }
+
+  return {
+    ...primary,
+    message: `${primary.message} 배우자도 재산요건을 충족합니다 (${toEok(spouse.propertyTaxBase)}).`,
   };
 }
 
@@ -332,27 +434,39 @@ function judgeProperty(input: DependentInput, total: number): StepResult {
 
 export function judgeDependent(input: DependentInput): JudgeResult {
   const totalIncome = sumIncome(input.income);
+  const spouseTotalIncome = needsSpouseCheck(input) && input.spouse
+    ? sumIncome(input.spouse.income)
+    : undefined;
   const steps: StepResult[] = [];
 
   const support = judgeSupport(input);
   steps.push(support);
   if (!support.passed) {
-    return { eligible: false, totalIncome, steps, failedAt: 'support', year: YEAR };
+    return { eligible: false, totalIncome, spouseTotalIncome, steps, failedAt: 'support', year: YEAR };
   }
 
   const incomeResult = judgeIncome(input, totalIncome);
   steps.push(incomeResult);
   if (!incomeResult.passed) {
-    return { eligible: false, totalIncome, steps, failedAt: 'income', year: YEAR };
+    return { eligible: false, totalIncome, spouseTotalIncome, steps, failedAt: 'income', year: YEAR };
   }
 
   const property = judgeProperty(input, totalIncome);
   steps.push(property);
   if (!property.passed) {
-    return { eligible: false, totalIncome, steps, failedAt: 'property', year: YEAR };
+    return { eligible: false, totalIncome, spouseTotalIncome, steps, failedAt: 'property', year: YEAR };
   }
 
-  return { eligible: true, totalIncome, steps, year: YEAR };
+  return { eligible: true, totalIncome, spouseTotalIncome, steps, year: YEAR };
+}
+
+export function emptySpouseDetails(): SpouseDetails {
+  return {
+    income: { business: 0, wage: 0, pension: 0, financial: 0, other: 0 },
+    businessRegistered: false,
+    disabled: false,
+    propertyTaxBase: 0,
+  };
 }
 
 /** 빈 입력값 — 폼 초기화용 */
@@ -367,6 +481,7 @@ export function emptyInput(): DependentInput {
     businessRegistered: false,
     propertyTaxBase: 0,
     cohabitingSiblingHasIncome: false,
+    spouse: emptySpouseDetails(),
   };
 }
 
