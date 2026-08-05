@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기준체크 UI 감사 리포트 · 2026-08-05</title>
+<style>
+  :root{
+    --bg:#f6f8fa; --card:#fff; --ink:#111a24; --muted:#5b6b7c; --line:#dde5ec;
+    --crit:#b3261e; --high:#c2610a; --med:#8a6d00; --low:#4a5b6b; --good:#0f7a5f;
+    --crit-bg:#fdecea; --high-bg:#fdf1e5; --med-bg:#fdf8e3; --low-bg:#eef2f6; --good-bg:#e6f5ef;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.7 -apple-system,BlinkMacSystemFont,"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;}
+  .wrap{max-width:960px;margin:0 auto;padding:40px 20px 80px}
+  header.top{background:#102a43;color:#fff;padding:36px 20px;margin:-40px -20px 32px}
+  header.top .inner{max-width:960px;margin:0 auto}
+  header.top h1{margin:0 0 8px;font-size:28px;letter-spacing:-.02em}
+  header.top p{margin:0;color:#c3d3e2;font-size:14px}
+  h2{font-size:20px;margin:44px 0 14px;padding-bottom:8px;border-bottom:2px solid var(--line)}
+  h3{font-size:16px;margin:0 0 6px}
+  .lead{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:8px}
+  .lead p{margin:0 0 10px}
+  .lead p:last-child{margin:0}
+  .scores{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:18px 0 4px}
+  .score{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .score .n{font-size:26px;font-weight:800;line-height:1.2}
+  .score .l{font-size:12px;color:var(--muted);margin-top:2px}
+  .c-crit{color:var(--crit)} .c-high{color:var(--high)} .c-med{color:var(--med)} .c-low{color:var(--low)} .c-good{color:var(--good)}
+  .item{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:12px;padding:18px 20px;margin:12px 0}
+  .item.crit{border-left-color:var(--crit)} .item.high{border-left-color:var(--high)}
+  .item.med{border-left-color:var(--med)} .item.low{border-left-color:var(--low)}
+  .item.good{border-left-color:var(--good)}
+  .tag{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;margin-right:8px;vertical-align:2px}
+  .t-crit{background:var(--crit-bg);color:var(--crit)} .t-high{background:var(--high-bg);color:var(--high)}
+  .t-med{background:var(--med-bg);color:var(--med)} .t-low{background:var(--low-bg);color:var(--low)}
+  .t-good{background:var(--good-bg);color:var(--good)}
+  .meta{font-size:12.5px;color:var(--muted);margin:2px 0 10px}
+  .item p{margin:8px 0}
+  .fix{background:#f2f7fb;border:1px solid #d6e4f0;border-radius:9px;padding:11px 14px;margin-top:12px;font-size:14.5px}
+  .fix strong{color:#0b3d63}
+  code{background:#eef2f6;border-radius:5px;padding:1.5px 6px;font-size:13px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:#0f1f2e;color:#dbe7f2;border-radius:10px;padding:14px 16px;overflow-x:auto;font-size:13px;line-height:1.6}
+  pre code{background:none;color:inherit;padding:0}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;font-size:14.5px}
+  th,td{padding:10px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  th{background:#eef3f7;font-size:13px;color:#3d4f60}
+  tr:last-child td{border-bottom:none}
+  ul{margin:8px 0;padding-left:20px} li{margin:4px 0}
+  .note{background:#fffbe8;border:1px solid #f0e2b0;border-radius:11px;padding:14px 17px;font-size:14.5px;margin:16px 0}
+  footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top"><div class="inner">
+  <h1>기준체크 UI 감사 리포트</h1>
+  <p>https://gijuncheck.kr · 감사일 2026-08-05 · 데스크톱 Chrome 실제 렌더링 + DOM/CSS/성능 계측</p>
+</div></header>
+
+<div class="lead">
+  <p><strong>총평.</strong> 완성도가 상당히 높은 사이트입니다. 시맨틱 구조, 구조화 데이터, 성능, 면책 고지, 근거 조항 노출은 이 카테고리 평균을 크게 웃돕니다. 특히 <strong>0원 입력 확인 모달</strong>과 <strong>단계별 판정 근거 + 법령 원문 링크</strong>는 제품의 차별점이 UI로 제대로 구현된 사례입니다.</p>
+  <p>다만 <strong>금액 입력 필드의 단위 문제 하나가 나머지 장점을 무력화할 수 있는 수준</strong>입니다. 입력 단위는 <code>원</code>인데 화면 어디에도 "원"이라고 쓰여 있지 않고, 사이트의 모든 카피·FAQ·결과 요약은 <code>만원</code>/<code>억원</code>을 씁니다. 판정 결과가 정반대로 뒤집힐 수 있는 경로이므로 최우선 처리 대상입니다.</p>
+</div>
+
+<div class="scores">
+  <div class="score"><div class="n c-crit">1</div><div class="l">Critical</div></div>
+  <div class="score"><div class="n c-high">2</div><div class="l">High</div></div>
+  <div class="score"><div class="n c-med">5</div><div class="l">Medium</div></div>
+  <div class="score"><div class="n c-low">7</div><div class="l">Low</div></div>
+  <div class="score"><div class="n c-good">14</div><div class="l">잘된 점</div></div>
+</div>
+
+<h2>1. Critical</h2>
+
+<div class="item crit">
+  <h3><span class="tag t-crit">CRITICAL</span>금액 입력 단위가 화면에 표시되지 않음</h3>
+  <div class="meta">피부양자 판정 · 지역가입자 보험료 · 임의계속가입 — 전 계산기 공통 · 소득/재산 입력 필드 전체</div>
+  <p>모든 금액 필드의 실제 입력 단위는 <strong>원</strong>입니다. 그런데 라벨은 <code>사업소득</code>, 플레이스홀더는 <code>0</code>일 뿐이고, 필드 안이나 옆에 단위 표기가 없습니다. 반면 같은 화면의 요약은 <code>현재 합산소득 0만원</code>, FAQ는 <code>연 2,000만원</code>, 결과는 <code>재산세 과세표준 0억원</code>으로 전부 만원·억원 단위입니다.</p>
+  <p>실제로 확인한 동작입니다.</p>
+  <table>
+    <tr><th>사용자가 입력한 값</th><th>시스템이 해석한 금액</th><th>판정 결과</th></tr>
+    <tr><td>3000 <span style="color:var(--muted)">(3,000만원이라 생각)</span></td><td>3,000원 = 0.3만원</td><td><strong style="color:var(--crit)">"자격이 인정될 것으로 보입니다"</strong></td></tr>
+    <tr><td>30000000</td><td>3,000만원</td><td>"소득요건에서 탈락할 것으로 보입니다" (정상)</td></tr>
+  </table>
+  <p style="margin-top:12px">즉 <strong>탈락해야 할 사람에게 "인정" 결과가 나옵니다.</strong> 재산 필드는 더 위험합니다. 6억을 뜻하며 <code>6</code>을 치면 6원으로 계산되어 재산요건을 무조건 통과합니다.</p>
+  <p>현재 유일한 단서는 입력 <em>후에</em> 필드 아래 작은 회색 글씨로 나타나는 <code>3,000원</code> 에코 하나뿐입니다. 우측 정렬된 숫자 아래 13px 보조 텍스트라 놓치기 쉽고, 스크린리더에는 <code>aria-describedby</code>로 연결조차 되어 있지 않습니다.</p>
+  <div class="fix">
+    <strong>권장 조치</strong>
+    <ul>
+      <li>필드 안에 고정 접미사 <code>원</code>을 항상 표시 (입력 전에도 보이도록)</li>
+      <li>라벨을 <code>사업소득 (원)</code>으로 변경, 플레이스홀더를 <code>예: 30,000,000</code>으로</li>
+      <li><strong>이미 잘 하고 있는 패턴이 사내에 있습니다</strong> — 임의계속가입 페이지의 <code>퇴직 전 12개월 보수월액 평균</code>은 <code>3,000,000</code>을 프리필해서 <code>300만원</code> 에코를 처음부터 보여줍니다. 이 방식을 전 필드로 확대하는 것만으로도 상당 부분 해소됩니다.</li>
+      <li>보조안: 만원 단위 입력 토글 제공</li>
+    </ul>
+  </div>
+</div>
+
+<h2>2. High</h2>
+
+<div class="item high">
+  <h3><span class="tag t-high">HIGH</span>판정 후 결과로 포커스·스크롤이 이동하지 않음</h3>
+  <div class="meta">전 계산기 공통 · 결과 렌더링 직후</div>
+  <p>버튼 클릭 후 결과는 버튼에서 약 <strong>150px 아래</strong>에 렌더링됩니다. 그런데 <code>document.activeElement</code>는 <code>BODY</code>로 남고 스크롤도 <code>0px</code> 움직이지 않습니다(계측값). 긴 폼을 다 채우고 화면 하단에서 버튼을 누른 사용자에게는 <strong>아무 일도 일어나지 않은 것처럼</strong> 보일 수 있습니다.</p>
+  <p>흥미롭게도 0원 확인 모달에서는 포커스 이동이 정상 구현되어 있습니다(<code>입력 수정하기</code> 버튼으로 진입). 결과 영역에만 빠져 있습니다.</p>
+  <div class="fix"><strong>권장 조치</strong>
+<pre><code>&lt;h3 tabIndex={-1} ref={resultRef}&gt;소득요건에서 탈락할 것으로 보입니다&lt;/h3&gt;
+
+// 판정 완료 후
+resultRef.current?.focus();
+resultRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });</code></pre>
+  포커스를 결과 헤딩으로 옮기면 시각 사용자에게는 스크롤이, 스크린리더 사용자에게는 낭독이 동시에 해결됩니다.
+  </div>
+</div>
+
+<div class="item high">
+  <h3><span class="tag t-high">HIGH</span>입력 상한이 없어 결과 문자열이 깨짐</h3>
+  <div class="meta">피부양자 판정 · 소득/재산 필드</div>
+  <p><code>999999999999999</code>를 입력해도 그대로 수용되며, 결과 요약이 다음과 같이 출력됩니다.</p>
+  <pre><code>확인에 사용한 입력 · 합산소득 100,000,003,000.01만원 · 재산세 과세표준 6억원</code></pre>
+  <p>자릿수 문제 외에 <strong><code>.01</code>이라는 부동소수점 오차가 그대로 노출</strong>됩니다. "근거까지 보여준다"를 내세운 서비스에서 신뢰를 직접 깎는 표시입니다.</p>
+  <div class="fix"><strong>권장 조치</strong> 필드별 현실적 상한 설정(예: 소득 999억, 재산 9,999억)과 초과 시 안내 메시지. 만원 환산 시 <code>Math.round()</code> 적용해 소수점 제거. 참고로 임의계속가입의 <code>개월수</code> 필드는 이미 18로 클램프되고 있으므로 동일 유틸을 재사용할 수 있습니다.</p>
+</div>
+
+<h2>3. Medium</h2>
+
+<div class="item med">
+  <h3><span class="tag t-med">MEDIUM</span>입력 필드에 <code>aria-describedby</code>가 연결되어 있지 않음</h3>
+  <div class="meta">전 계산기 · 11개 필드 전수 확인 — <code>aria-describedby</code> 모두 <code>null</code></div>
+  <p>필드 아래 보조 설명이 스크린리더에 전달되지 않습니다. 누락되는 정보가 하필 이 서비스의 핵심입니다.</p>
+  <ul>
+    <li>"실거래가·공시가격이 아니라 지방세 재산세 과세표준을 입력합니다" — 사이트가 <em>가장 많이 틀리는 지점</em>이라고 직접 명시한 내용</li>
+    <li>"이자·배당 합계가 연 1,000만원 이하면 소득 합산에서 제외됩니다"</li>
+    <li>단위 에코 <code>3,000원</code> (Critical 항목과 직결)</li>
+  </ul>
+  <p>라벨 자체는 <code>aria-labelledby</code>로 잘 연결되어 있으므로, 같은 방식으로 설명 텍스트에 id를 부여해 연결하면 됩니다.</p>
+  <div class="fix"><strong>권장 조치</strong> <code>&lt;input aria-labelledby="lbl-x" aria-describedby="hint-x unit-x"&gt;</code></div>
+</div>
+
+<div class="item med">
+  <h3><span class="tag t-med">MEDIUM</span>모달을 닫은 뒤 포커스가 트리거로 복원되지 않음</h3>
+  <div class="meta">0원 확인 모달 · Esc 및 확인 후 공통</div>
+  <p>모달 자체는 훌륭합니다 — <code>role="dialog"</code>, <code>aria-modal="true"</code>, <code>aria-labelledby</code>, 진입 시 포커스 이동, Esc로 닫힘까지 모두 구현되어 있습니다. 다만 닫은 뒤 <code>document.activeElement</code>가 <code>BODY</code>로 돌아갑니다. 키보드 사용자는 폼 맨 위부터 다시 Tab해야 합니다. (WCAG 2.4.3 Focus Order)</p>
+  <div class="fix"><strong>권장 조치</strong> 모달 언마운트 시 <code>내 자격 판정하기</code> 버튼으로 <code>.focus()</code> 복원.</div>
+</div>
+
+<div class="item med">
+  <h3><span class="tag t-med">MEDIUM</span>명도 대비 WCAG AA 미달 2건</h3>
+  <div class="meta">홈 · 전 페이지 공통 요소 — 전체 텍스트 노드 계산 결과 17개소</div>
+  <table>
+    <tr><th>대상</th><th>전경 / 배경</th><th>대비</th><th>기준</th></tr>
+    <tr><td>히어로 신뢰 배지 4개<br><span style="color:var(--muted);font-size:13px">약 3분 / 회원가입 없음 / 입력값 서버 전송 없음 / 판정 근거 표시</span></td><td><code>#64748B</code> on <code>#F4F8FA</code></td><td><strong>4.45</strong></td><td>4.5</td></tr>
+    <tr><td>강조 뱃지 13개소<br><span style="color:var(--muted);font-size:13px">이용 가능 · 단계 번호 1·2·3 · 법령 태그(시행령 제41조 등) · 약 3분</span></td><td><code>#087E8B</code> on <code>#DFF5F3</code></td><td><strong>4.23</strong></td><td>4.5</td></tr>
+  </table>
+  <div class="fix"><strong>권장 조치</strong> 둘 다 아슬아슬한 차이라 색을 한 단계만 어둡게 하면 해결됩니다. <code>#64748B → #566575</code>(5.59), <code>#087E8B → #056D78</code>(5.34)이면 여유 있게 통과합니다. 주 사용자층이 퇴직 전후 연령대라 대비 여유를 두는 편이 특히 유리합니다.</div>
+</div>
+
+<div class="item med">
+  <h3><span class="tag t-med">MEDIUM</span>Skip link 없음</h3>
+  <div class="meta">전 페이지 · <code>&lt;body&gt;</code> 첫 링크가 로고</div>
+  <p>키보드·스크린리더 사용자가 페이지를 열 때마다 헤더 내비게이션 5개 링크를 통과해야 본문에 도달합니다. (WCAG 2.4.1 Bypass Blocks)</p>
+  <div class="fix"><strong>권장 조치</strong> <code>&lt;body&gt;</code> 최상단에 <code>&lt;a href="#main" class="sr-only focus:not-sr-only"&gt;본문 바로가기&lt;/a&gt;</code> 추가. <code>&lt;main&gt;</code>은 이미 1개만 존재하므로 id만 부여하면 됩니다.</div>
+</div>
+
+<div class="item med">
+  <h3><span class="tag t-med">MEDIUM</span>판정 결과 전체가 <code>aria-live="polite"</code> 영역</h3>
+  <div class="meta">전 계산기 · 계측된 결과 텍스트 약 900자</div>
+  <p>결과 컨테이너 전체가 live region이라 3단계 판정·근거 조항·다음 확인 사항이 <strong>한 번에 통째로 낭독</strong>됩니다. 중간에 건너뛰거나 되돌아가기 어렵습니다.</p>
+  <div class="fix"><strong>권장 조치</strong> live region은 <code>"소득요건에서 탈락 — 자세한 내용은 아래"</code> 수준의 짧은 요약만 담고, 본문은 위 High 항목의 포커스 이동으로 처리.</div>
+</div>
+
+<h2>4. Low</h2>
+
+<div class="item low">
+  <h3><span class="tag t-low">LOW</span>세부 개선 항목</h3>
+  <table>
+    <tr><th style="width:30%">항목</th><th>내용 및 권장</th></tr>
+    <tr><td>푸터 링크 터치 타깃</td><td>검증 원칙·개인정보처리방침·이용약관·문의 모두 높이 <strong>23px</strong>. 권장 44px. 헤더 로고·툴팁은 이미 44px을 지키고 있어 푸터만 예외입니다.</td></tr>
+    <tr><td>가이드 표 접근성</td><td>가이드 문서의 표에 <code>&lt;caption&gt;</code>과 <code>th[scope]</code>가 없습니다. 재산 구간표처럼 판정에 직결되는 표라 스크린리더 탐색성을 높일 가치가 있습니다.</td></tr>
+    <tr><td>Breadcrumb 시각 노출</td><td><code>BreadcrumbList</code> JSON-LD는 있으나 화면에는 breadcrumb이 없습니다. 가이드 → 판정기 간 이동이 잦은 구조라 상단 경로 표시가 유용합니다.</td></tr>
+    <tr><td>개월수 필드 서식</td><td>임의계속가입의 <code>퇴직 전 18개월 중 직장가입 개월수</code>가 금액 필드와 동일한 우측정렬·콤마 서식이라 단위 혼동을 유발합니다. 또한 <code>999</code> 입력 시 조용히 <code>18</code>로 클램프되며 안내가 없습니다.</td></tr>
+    <tr><td>포커스 링 트리거</td><td><code>:focus-visible</code> 대신 <code>:focus</code>를 사용해 마우스 클릭에도 링이 표시됩니다. 접근성상 문제는 아니나 시각적 노이즈입니다.</td></tr>
+    <tr><td>새 창 링크 안내</td><td>법령·위택스 등 외부 링크가 <code>target="_blank"</code>인데 새 창이 열린다는 표시가 없습니다. (WCAG 3.2.5) <code>rel</code>은 정상입니다.</td></tr>
+    <tr><td>결과 저장 수단</td><td>인쇄·이미지 저장·링크 공유가 없습니다. 공단 상담(1577-1000)에 결과를 들고 가는 것이 자연스러운 흐름이므로 인쇄용 스타일시트만 추가해도 효용이 큽니다.</td></tr>
+  </table>
+</div>
+
+<h2>5. 잘 되어 있는 점</h2>
+
+<div class="item good">
+  <h3><span class="tag t-good">GOOD</span>계측으로 확인된 강점</h3>
+  <table>
+    <tr><th style="width:26%">영역</th><th>확인 내용</th></tr>
+    <tr><td>0원 확인 모달</td><td>빈 폼 제출 시 <code>0원 입력 항목을 확인해 주세요</code> 모달이 항목을 나열하며 되묻습니다. <code>role="dialog"</code> + <code>aria-modal</code> + <code>aria-labelledby</code> + 포커스 진입 + Esc 닫힘까지 정석대로 구현되어 있습니다. <strong>이 감사에서 가장 인상적인 부분입니다.</strong></td></tr>
+    <tr><td>결과 설계</td><td>부양·소득·재산 3단계를 각각 통과/탈락 + 사유 + 다음 확인 사항 + 법령 원문 링크로 제시합니다. "결과보다 근거까지"라는 약속이 실제 UI로 구현되어 있습니다.</td></tr>
+    <tr><td>툴팁</td><td><code>&lt;button&gt;</code> + <code>aria-label="도움말: …"</code> + <code>aria-describedby</code> + <code>aria-expanded</code> + <strong>44×44px</strong> 타깃. 교과서적입니다.</td></tr>
+    <tr><td>모바일 기본기</td><td>입력 필드 폰트 <strong>전부 16px</strong>(iOS 자동 확대 방지), <code>inputmode="numeric"</code>, viewport 메타 정상, <code>user-scalable</code> 제한 없음, 고정 <code>min-width</code> 0건, 모바일 우선 Tailwind(<code>sm:</code> 42회).</td></tr>
+    <tr><td>성능</td><td>CLS <strong>0</strong>, TTFB ~14ms, HTML 11KB(gzip)/55KB, 리소스 14개, <strong>웹폰트 0개</strong>(시스템 폰트 스택 → FOIT/FOUT 없음). 계산기 페이지 DOM 258노드로 매우 가볍습니다.</td></tr>
+    <tr><td>구조화 데이터</td><td><code>Organization</code>, <code>WebSite</code>, <code>WebPage</code>, <code>Article</code>, <code>BreadcrumbList</code>, <code>FAQPage</code>, <code>ItemList</code> 완비.</td></tr>
+    <tr><td>SEO 기본</td><td>canonical, OG/Twitter 카드 전 페이지, 페이지별 og:image, robots.txt + sitemap.xml(<code>lastmod</code> 포함), <strong>404가 실제 404 상태 반환</strong>.</td></tr>
+    <tr><td>시맨틱·랜드마크</td><td>페이지당 h1 1개, 헤딩 레벨 건너뛰기 없음, <code>&lt;main&gt;</code> 1개, nav에 <code>aria-label</code>("데스크톱 주요 메뉴"/"모바일 주요 메뉴"), aside에도 라벨 부여.</td></tr>
+    <tr><td>포커스 관리 기반</td><td>양수 <code>tabindex</code> 0건, <code>outline:none</code> 남용 0건, 대체 링(<code>focus:ring-4</code>) 적용.</td></tr>
+    <tr><td>모션</td><td><code>prefers-reduced-motion</code> 대응 규칙 존재.</td></tr>
+    <tr><td>입력 정제</td><td><code>abc-99</code> → <code>99</code>로 자동 정제. 개월수는 18로 자동 클램프.</td></tr>
+    <tr><td>상태 표시</td><td>통과/탈락이 색뿐 아니라 ✓/✕ 글리프로 구분되고, <code>sr-only</code> 텍스트로도 제공됩니다.</td></tr>
+    <tr><td>면책 고지</td><td>상단 배너 + 결과 내부 + 푸터 3중 노출. 기준연도와 최종 확인일까지 명시.</td></tr>
+    <tr><td>외부 링크</td><td>전부 <code>rel="noopener noreferrer"</code>.</td></tr>
+  </table>
+</div>
+
+<h2>6. 처리 순서 제안</h2>
+<table>
+  <tr><th style="width:8%">순위</th><th>작업</th><th style="width:18%">예상 난이도</th></tr>
+  <tr><td><strong>1</strong></td><td>금액 필드에 <code>원</code> 단위 상시 표시 (라벨·플레이스홀더·접미사)</td><td>낮음 · 영향 매우 큼</td></tr>
+  <tr><td><strong>2</strong></td><td>판정 결과 헤딩으로 포커스 + 스크롤 이동</td><td>낮음</td></tr>
+  <tr><td><strong>3</strong></td><td>입력 상한 설정 및 만원 환산 반올림</td><td>낮음</td></tr>
+  <tr><td><strong>4</strong></td><td>보조 설명·단위 에코에 <code>aria-describedby</code> 연결</td><td>낮음</td></tr>
+  <tr><td><strong>5</strong></td><td>모달 닫힘 시 포커스 복원</td><td>낮음</td></tr>
+  <tr><td><strong>6</strong></td><td>대비 미달 2색 조정</td><td>매우 낮음</td></tr>
+  <tr><td><strong>7</strong></td><td>Skip link 추가, 푸터 터치 타깃 확대</td><td>매우 낮음</td></tr>
+  <tr><td><strong>8</strong></td><td>결과 인쇄 스타일, 시각 breadcrumb, 표 <code>scope</code>/<code>caption</code></td><td>중간</td></tr>
+</table>
+
+<div class="note">
+  <strong>감사 범위와 한계</strong>
+  <ul>
+    <li><strong>확인한 페이지</strong> — 홈, 피부양자 자격판정, 지역가입자 보험료 계산, 임의계속가입 비교, 가이드(재산세 과세표준), robots.txt, sitemap.xml, 404</li>
+    <li><strong>방법</strong> — 실제 Chrome 렌더링 스크린샷, DOM/ARIA 전수 조사, 전체 텍스트 노드 명도 대비 계산, 폼 입력·제출·모달·결과 흐름 직접 실행, Navigation/Resource/LayoutShift Timing 계측</li>
+    <li><strong>검증하지 못한 것</strong> — 브라우저 창 리사이즈가 탭 뷰포트에 반영되지 않아 <strong>실제 모바일 폭(360~430px) 렌더링은 육안 확인하지 못했습니다.</strong> 위 모바일 항목은 CSS·마크업 구조 분석에 근거한 것이므로, 실기기 또는 DevTools 디바이스 모드로 한 번 확인하시길 권합니다.</li>
+    <li><strong>범위 밖</strong> — 판정 로직의 법령 정확성, 보안, 크로스 브라우저(Safari/Firefox), 실사용자 테스트</li>
+  </ul>
+</div>
+
+<footer>
+  기준체크 UI 감사 · 2026년 8월 5일 · 대상 https://gijuncheck.kr<br>
+  본 리포트의 수치는 감사 시점 실측값이며, 명도 대비는 WCAG 2.1 상대 휘도 공식으로 계산했습니다.
+</footer>
+</div>
+</body>
+</html>
