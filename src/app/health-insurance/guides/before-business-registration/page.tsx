@@ -18,6 +18,7 @@ import { INCOME } from '@/lib/constants/2026';
 import { toManwon, won } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
+import { ldJson } from '@/lib/structured-data';
 
 const PATH = ROUTES.guideBusinessRegistration.path;
 const PUBLISHED = '2026-07-30';
@@ -105,7 +106,7 @@ export default function Page() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
+          __html: ldJson(
             guideJsonLd({
               title: TITLE,
               description: metadata.description as string,

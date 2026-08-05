@@ -3,7 +3,7 @@ import { ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
 import { BASIS } from '@/lib/constants/2026';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
-import { breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
+import { breadcrumbJsonLd, ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 export const metadata = createPageMetadata({
   title: '검증 원칙',
@@ -72,7 +72,7 @@ export default function VerificationPolicyPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }}
       />
       <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
       <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

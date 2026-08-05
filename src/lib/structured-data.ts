@@ -38,6 +38,15 @@ export function siteJsonLd() {
   };
 }
 
+/**
+ * JSON-LD를 `<script>` 태그에 안전하게 삽입하기 위해 `<`를 이스케이프한다.
+ * 값이 전부 저자 통제 상수라 현재 실질 위험은 없지만, 직렬화 지점을
+ * 하나로 모아두면 이후 사용자 입력이 섞여도 별도 조치가 필요 없다.
+ */
+export function ldJson(data: unknown): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
 export interface BreadcrumbItem {
   name: string;
   path?: string;

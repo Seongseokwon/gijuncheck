@@ -4,7 +4,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import Analytics from '@/components/Analytics';
 import { POLICY_KEYS, ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
-import { siteJsonLd } from '@/lib/structured-data';
+import { ldJson, siteJsonLd } from '@/lib/structured-data';
 import './globals.css';
 
 // 주의: 이 파일에서 SITE 같은 임의 상수를 export 하면 빌드가 실패한다.
@@ -66,7 +66,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-canvas text-slate-900 antialiased">
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd()) }}
+          dangerouslySetInnerHTML={{ __html: ldJson(siteJsonLd()) }}
         />
         <SpeedInsights />
         {/*

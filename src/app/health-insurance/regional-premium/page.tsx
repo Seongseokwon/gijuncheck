@@ -2,7 +2,7 @@ import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
 import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
-import { breadcrumbJsonLd } from '@/lib/structured-data';
+import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 
@@ -81,7 +81,7 @@ export default function Page() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }}
       />
 
       <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">

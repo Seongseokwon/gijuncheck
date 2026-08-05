@@ -18,6 +18,7 @@ import {
 import { INCOME } from '@/lib/constants/2026';
 import { toManwon } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
+import { ldJson } from '@/lib/structured-data';
 import { ROUTES } from '@/lib/routes';
 
 const PATH = ROUTES.guideNovemberReassessment.path;
@@ -96,7 +97,7 @@ export default function Page() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(
+          __html: ldJson(
             guideJsonLd({
               title: TITLE,
               description: metadata.description as string,
