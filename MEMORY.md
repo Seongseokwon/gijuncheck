@@ -60,6 +60,26 @@
   `reports/critic-beta.md`, `reports/action-plan.md`에 기록하고, 재사용 가능한 비평
   에이전트 정의를 `.claude/agents/`에 추가했다. 이 리포트들은 감사 당시의 스냅샷이므로
   현재 코드 상태와 대조해 다음 작업을 선택한다.
+- 2026-08-05 `action-plan.md` 1-F 후반부: `.github/workflows/ci.yml`을 추가해 push/PR마다
+  lint → typecheck → 단위테스트 → build → Playwright(chromium·webkit) 순으로 `npm run verify`에
+  해당하는 단계를 실행한다. 실패 시 `playwright-report`를 아티팩트로 업로드한다.
+- 2026-08-05 `action-plan.md` Phase 2 마무리:
+  - 2-C 홈 내부 링크: `src/app/page.tsx`의 `#judge` 섹션 사이드바에 피부양자 전용 페이지
+    (`/health-insurance/dependent/`) 실경로 링크를 추가했다. 도구 카드는 기존 `#judge` 스크롤
+    동작을 유지해 전환 리스크를 만들지 않았다(action-plan B안). `e2e/links.spec.ts`에 홈이
+    이 경로로 실경로 링크를 2개 이상 갖는지 확인하는 회귀 테스트를 추가했다.
+  - 2-E JSON-LD 이스케이프: `src/lib/structured-data.ts`에 `ldJson()` 헬퍼(꺾쇠괄호 여는
+    문자를 유니코드 이스케이프로 치환)를 추가하고 `dangerouslySetInnerHTML`을 쓰는 11곳
+    (레이아웃 공통 엔티티, 도구 3개, 검증 원칙, 가이드 6편) 전부를 `JSON.stringify` 대신
+    이 헬퍼로 교체했다.
+  - 2-E 보안 헤더: `vercel.json`에 `Referrer-Policy`, `X-Content-Type-Options`,
+    `Strict-Transport-Security`를 추가했다. `output: 'export'`라 `next.config.mjs`의
+    `headers()`는 쓸 수 없어 Vercel 엣지 설정으로 대체했다. CSP는 JSON-LD를
+    `dangerouslySetInnerHTML`로 9곳 이상 인라인 주입하는 구조상 `unsafe-inline`이
+    강제되어 방어력 없이 장식만 되므로 의도적으로 넣지 않았다(action-plan 3절 사유와 동일).
+  - 로컬 `npm run lint`·`npm run typecheck`·`npm test`(136개)·`npm run build`·
+    `npx playwright test --project=desktop-1440`(관련 스펙 40개) 전부 통과 확인.
+    Phase 2 2-F(배포 후 Rich Results Test·Search Console 재크롤 기록)는 아직 남아 있다.
 
 ## 검증 기준선
 
@@ -140,9 +160,12 @@
 5. 국민건강보험공단 로그인 모의계산은 2026-08-03 부모·배우자 관계 조회 결과를 부분 확인했다. 로그인 사용자의 현재 자료를 조회하는 방식이라 D01·D02 합성 경계값의 공식 대조로 승격하지 않았고, 임의 금액 입력이 필요한 D03·D04는 미확인 상태다. 임의입력 가능한 공단 경로 또는 실제 처리 결과를 확보하면 `docs/03-검증기록.md`의 D01~D04 표를 추가 갱신한다.
 6. 최신 Production 배포 후 페이지별 OG 이미지 14개가 200으로 열리는지와 카카오·SNS 공유
    미리보기 캐시를 확인한다.
-7. 4단계 GEO·AEO 변경을 배포한 뒤 Rich Results Test·Search Console·PageSpeed 결과를
-   날짜·URL과 함께 `docs/06-QA-전수점검.md`에 기록한다.
-8. GitHub Actions가 아직 없으므로 `npm run verify`를 push/PR마다 실행하는 CI를 추가한다.
+7. 4단계 GEO·AEO 변경과 2026-08-05 Phase 2 마무리(홈 내부 링크, JSON-LD 이스케이프, 보안
+   헤더)를 배포한 뒤 Rich Results Test·Search Console·PageSpeed 결과를 날짜·URL과 함께
+   `docs/06-QA-전수점검.md`에 기록한다. `vercel.json`의 보안 헤더는 `curl -I`로 실제
+   응답에 반영됐는지 배포 후 확인한다.
+8. ~~GitHub Actions CI 추가~~ — 2026-08-05 `.github/workflows/ci.yml` 추가로 완료. 이후
+   과제는 CI가 실제로 초록불로 도는지 GitHub Actions 탭에서 1회 확인하는 것이다.
 
 ## 작업 시작 순서
 
