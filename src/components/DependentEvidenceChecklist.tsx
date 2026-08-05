@@ -177,10 +177,10 @@ export default function DependentEvidenceChecklist({
                 <p className="font-semibold text-slate-900">{item.title}</p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">{item.detail}</p>
                 <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                  <ExternalLink href={item.href}>{item.linkLabel} ↗</ExternalLink>
+                  <ExternalLink href={item.href}>{item.linkLabel}</ExternalLink>
                   {item.secondaryHref && item.secondaryLinkLabel ? (
                     <ExternalLink href={item.secondaryHref}>
-                      {item.secondaryLinkLabel} ↗
+                      {item.secondaryLinkLabel}
                     </ExternalLink>
                   ) : null}
                 </p>
