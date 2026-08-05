@@ -33,7 +33,7 @@ export { won } from '@/lib/format';
  * 모바일에서는 16px(text-base), 넓은 화면에서만 14px(text-sm) 로 되돌린다.
  *
  * 테두리를 border-slate-500 로 쓰는 이유 (border-slate-300 아님):
- * docs/design-debate/00-brief.md 의 대비 기준선 표가 border-slate-300 on white 를
+ * docs/archive/design-debate/00-brief.md 의 대비 기준선 표가 border-slate-300 on white 를
  * 1.48:1(비텍스트 UI 기준 3:1 미달)로 이미 확인했다. slate-500 은 4.01:1 로 통과한다.
  * design-preview/index3.html 에서 같은 문제를 같은 방식으로 고쳤다(ADR-002).
  *
