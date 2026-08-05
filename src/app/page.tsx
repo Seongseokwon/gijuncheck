@@ -37,7 +37,7 @@ const DESCRIPTIONS: Record<(typeof TOOL_KEYS)[number], string> = {
   dependent:
     '관계·소득·재산을 순서대로 확인하고, 어느 요건에서 왜 걸리는지 근거 조항까지 보여줍니다.',
   regionalPremium:
-    '2026년 공단 모의계산 대조를 마친 지역가입자 보험료를 참고 계산합니다.',
+    '2026년 기준을 적용한 지역가입자 보험료 참고 계산입니다. 금융소득 기준은 공단 재대조 전입니다.',
   voluntaryContinuation:
     '현행 법령·공단 안내와 보험료 산식을 적용해 지역가입자와 비교합니다.',
 };

@@ -354,6 +354,18 @@ describe('부양요건 — 관계별', () => {
     ).toBe(true);
   });
 
+  it('이혼·사별 상태는 현재 혼인 상태가 아닌 것으로 우선 판정한다', () => {
+    const r = judgeDependent(
+      make({
+        relation: 'linealDescendant',
+        cohabiting: false,
+        maritalStatus: 'divorcedOrWidowed',
+        married: false,
+      }),
+    );
+    expect(r.eligible).toBe(true);
+  });
+
   it('동거 직계비속은 기혼이어도 부양요건을 통과한다', () => {
     const r = judgeDependent(
       make({ relation: 'linealDescendant', cohabiting: true, married: true }),

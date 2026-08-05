@@ -30,6 +30,7 @@ import {
   STEP_LABEL,
   type DependentInput,
   type JudgeStep,
+  type MaritalStatus,
   type Relation,
 } from '@/lib/dependent/types';
 import { ROUTES } from '@/lib/routes';
@@ -94,6 +95,9 @@ export default function DependentJudge() {
       income: { ...prev.income, [key]: value },
     }));
   };
+
+  const maritalStatus: MaritalStatus =
+    input.maritalStatus ?? (input.married ? 'married' : 'single');
 
   const isSibling = input.relation === 'sibling';
   const needsSiblingIncomeFlag =
@@ -181,11 +185,20 @@ export default function DependentJudge() {
 
           <Field label="혼인 여부">
             <Select
-              value={input.married ? 'y' : 'n'}
-              onChange={(v) => set('married', v === 'y')}
+              value={maritalStatus}
+              onChange={(v) => {
+                const status = v as MaritalStatus;
+                recordJudgeStart();
+                setInput((prev) => ({
+                  ...prev,
+                  maritalStatus: status,
+                  married: status === 'married',
+                }));
+              }}
               options={[
-                { value: 'n', label: '미혼' },
-                { value: 'y', label: '기혼' },
+                { value: 'single', label: '미혼' },
+                { value: 'married', label: '기혼' },
+                { value: 'divorcedOrWidowed', label: '이혼·사별 (공단 확인 필요)' },
               ]}
             />
           </Field>

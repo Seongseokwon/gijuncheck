@@ -6,7 +6,7 @@ export type Relation =
   | 'spouse'
   /** 직계존속 — 부모, 조부모 */
   | 'linealAscendant'
-  /** 직계비속 — 자녀, 손자녀 */
+  /** 직계비속 — 현재 공개 모델은 자녀만 지원 */
   | 'linealDescendant'
   /** 배우자의 직계존속 — 시부모, 장인장모 */
   | 'spouseAscendant'
@@ -18,7 +18,7 @@ export type Relation =
 export const RELATION_LABEL: Record<Relation, string> = {
   spouse: '배우자',
   linealAscendant: '직계존속 (부모·조부모)',
-  linealDescendant: '직계비속 (자녀·손자녀)',
+  linealDescendant: '직계비속 (자녀)',
   spouseAscendant: '배우자의 직계존속 (시부모·장인장모)',
   spouseDescendant: '배우자의 직계비속',
   sibling: '형제자매',
@@ -38,6 +38,8 @@ export interface Income {
   other: number;
 }
 
+export type MaritalStatus = 'single' | 'married' | 'divorcedOrWidowed';
+
 export interface DependentInput {
   relation: Relation;
   /** 가입자와 동거 여부 */
@@ -46,6 +48,8 @@ export interface DependentInput {
   age: number;
   /** 혼인 여부 */
   married: boolean;
+  /** 현재 혼인 상태. 기존 boolean 입력과의 호환을 위해 married도 함께 유지한다. */
+  maritalStatus?: MaritalStatus;
   /** 장애인 · 국가유공상이자 · 보훈보상대상자 */
   disabled: boolean;
   income: Income;

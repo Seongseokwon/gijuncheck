@@ -26,6 +26,29 @@ describe('판정 확신 수준', () => {
     expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('추가 확인 필요');
   });
 
+  it('labels a married dependent as needing the spouse review', () => {
+    const input = {
+      ...emptyInput(),
+      relation: 'linealDescendant' as const,
+      cohabiting: true,
+      maritalStatus: 'married' as const,
+      married: true,
+    };
+    expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('추가 확인 필요');
+    expect(getConfidenceSummary(input, judgeDependent(input)).detail).toContain(
+      '배우자도 소득·재산 요건',
+    );
+  });
+
+  it('labels divorced or widowed status as needing confirmation', () => {
+    const input = {
+      ...emptyInput(),
+      relation: 'linealDescendant' as const,
+      maritalStatus: 'divorcedOrWidowed' as const,
+    };
+    expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('추가 확인 필요');
+  });
+
   it('keeps an explicit failed condition as difficult under the rule', () => {
     const input = { ...emptyInput(), relation: 'spouse' as const, propertyTaxBase: 900_000_001 };
     expect(getConfidenceSummary(input, judgeDependent(input)).label).toBe('기준상 어려움');

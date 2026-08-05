@@ -59,6 +59,12 @@ export const INCOME = {
   FINANCIAL_INCLUSION_THRESHOLD: 10_000_000,
 } as const;
 
+/** 지역가입자 보험료 산정용 소득 기준 */
+export const REGIONAL_INCOME = {
+  /** 이자·배당 금융소득 합계가 이 금액 이하이면 부과대상 소득에서 제외 */
+  FINANCIAL_INCLUSION_THRESHOLD: 10_000_000,
+} as const;
+
 /** 재산요건 — 재산세 "과세표준" 기준 (실거래가·공시가격 아님) */
 export const PROPERTY = {
   /** 이 금액 이하면 소득요건만 보면 됨 */

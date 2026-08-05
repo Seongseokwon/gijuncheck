@@ -54,7 +54,7 @@ export const ROUTES = {
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
     lastModified: '2026-08-03',
-    /** 2026-08-03 공단 공식 모의계산 13개 대표 입력 대조 완료 */
+    /** 금융소득 기준 수정 후 공단 공식 모의계산 대표 사례 재대조 필요 */
     ready: true,
   },
   voluntaryContinuation: {

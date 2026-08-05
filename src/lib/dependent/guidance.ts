@@ -19,9 +19,13 @@ export const RELATION_GUIDANCE: Record<Relation, RelationGuidance> = {
     checks: ['가족관계와 동거 여부를 확인합니다.', '비동거라면 대상자와 동거하는 형제자매의 소득 여부를 확인합니다.'],
   },
   linealDescendant: {
-    title: '자녀·손자녀',
-    summary: '동거하는 직계비속은 인정되지만, 비동거 직계비속은 미혼 여부를 함께 확인합니다.',
-    checks: ['가족관계와 동거 여부를 확인합니다.', '비동거라면 혼인 여부를 확인합니다.'],
+    title: '자녀',
+    summary: '현재 모델은 자녀를 대상으로 하며, 손자녀·외손자녀는 별도 요건 때문에 공단 확인이 필요합니다.',
+    checks: [
+      '가족관계와 동거 여부를 확인합니다.',
+      '비동거라면 혼인 여부를 확인합니다.',
+      '손자녀·외손자녀는 부모의 부양능력 요건이 별도로 적용되므로 이 도구에서 단정하지 않습니다.',
+    ],
   },
   spouseAscendant: {
     title: '시부모·장인장모',
@@ -79,16 +83,27 @@ export function getConfidenceSummary(
     };
   }
 
+  const maritalStatus =
+    input.maritalStatus ?? (input.married ? 'married' : 'single');
+  const needsMarriedCoupleReview =
+    maritalStatus === 'married' && input.relation !== 'spouse';
+  const needsDivorcedWidowedReview = maritalStatus === 'divorcedOrWidowed';
   const needsExtraCheck =
     input.businessRegistered ||
     input.propertyTaxBase >= PROPERTY.SAFE_LIMIT ||
-    result.totalIncome >= INCOME.TOTAL_LIMIT;
+    result.totalIncome >= INCOME.TOTAL_LIMIT ||
+    needsMarriedCoupleReview ||
+    needsDivorcedWidowedReview;
 
   if (needsExtraCheck) {
     return {
       level: 'verify',
       label: '추가 확인 필요',
-      detail: '모든 단계는 통과했지만 경계 또는 특례 입력이 있어 관련 자료의 기준일·반영 여부를 공단에 확인하세요.',
+      detail: needsMarriedCoupleReview
+        ? '모든 단계는 통과했지만 기혼 피부양자는 배우자도 소득·재산 요건을 충족해야 합니다. 배우자 자료를 함께 확인한 뒤 공단에 문의하세요.'
+        : needsDivorcedWidowedReview
+          ? '이혼·사별은 관계와 사실관계에 따라 미혼으로 인정되는 범위를 확인해야 합니다. 공단에 최종 요건을 문의하세요.'
+          : '모든 단계는 통과했지만 경계 또는 특례 입력이 있어 관련 자료의 기준일·반영 여부를 공단에 확인하세요.',
     };
   }
 

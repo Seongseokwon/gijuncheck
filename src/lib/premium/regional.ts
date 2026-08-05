@@ -18,6 +18,7 @@ import {
   INCOME_REFLECTION,
   PREMIUM_LIMIT,
   RATE,
+  REGIONAL_INCOME,
   VOLUNTARY_CONTINUATION,
 } from '../constants/2026';
 import {
@@ -46,12 +47,17 @@ export interface IncomeBase {
  *  - 이자·배당·사업·기타소득: 100%
  *  - 근로·연금소득: 50%
  *
- * 지역보험료에서는 사업·이자·배당·기타소득이 모두 100% 반영된다.
- * 금융소득 1,000만원 문턱은 피부양자 자격 판정 기준과 혼동하지 않는다.
+ * 지역보험료에서는 사업·이자·배당·기타소득이 100% 반영되지만,
+ * 이자·배당 금융소득 합계가 연 1,000만원 이하이면 부과대상 소득에서 제외된다.
+ * 이 기준은 피부양자 판정의 금융소득 문턱과 금액은 같지만 적용 근거가 다르다.
  */
 export function incomeBaseForPremium(income: Income): IncomeBase {
+  const countableFinancial =
+    income.financial > REGIONAL_INCOME.FINANCIAL_INCLUSION_THRESHOLD
+      ? income.financial
+      : 0;
   const full =
-    (income.business + income.financial + income.other) *
+    (income.business + countableFinancial + income.other) *
     INCOME_REFLECTION.FULL;
   const half = (income.wage + income.pension) * INCOME_REFLECTION.HALF;
 
@@ -102,6 +108,8 @@ export interface PremiumBreakdown {
    * false 인 동안은 UI에 "참고용" 표시를 함께 노출할 것.
    */
   crossChecked: boolean;
+  /** 직접 대조가 끝나지 않은 계산의 적용 가정 */
+  assumption?: string;
   basis: string[];
 }
 
@@ -255,6 +263,8 @@ export function calculateVoluntaryPremium(
     // 법령·공단 산식 기반 참고 계산이며 공단 모의계산 직접 대조 전이다.
     verified: true,
     crossChecked: false,
+    assumption:
+      '보수 외 소득이 여러 종류인 경우 초과분에 가중 평균 평가율을 적용한 참고 계산입니다. 실제 산정은 공단 자료와 소득별 적용 방식에 따라 달라질 수 있습니다.',
     basis: [
       BASIS.RATE,
       BASIS.PREMIUM_LIMIT,
@@ -291,6 +301,8 @@ export interface ComparisonResult {
   monthlySaving: number;
   /** 최대 유지 기간 동안의 총 절약액 (원) */
   totalSaving: number;
+  /** 보험료가 유지된다는 가정 아래 산출한 총액의 한계 */
+  totalSavingAssumption: string;
   /** 최대 유지 개월 */
   maxMonths: number;
   /**
@@ -339,6 +351,8 @@ export function compareAfterRetirement(params: {
       recommendation: 'notEligible',
       monthlySaving: 0,
       totalSaving: 0,
+      totalSavingAssumption:
+        '임의계속가입 보험료 비교가 성립하지 않아 총 절약액을 계산하지 않습니다.',
       maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
       applyDeadlineRule: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE,
       notes,
@@ -357,6 +371,8 @@ export function compareAfterRetirement(params: {
     recommendation: monthlySaving > 0 ? 'voluntary' : 'regional',
     monthlySaving,
     totalSaving: monthlySaving * VOLUNTARY_CONTINUATION.MAX_MONTHS,
+    totalSavingAssumption:
+      `현재 입력 조건과 보험료가 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월 동안 유지된다고 가정한 단순 추정액입니다. 지역가입자 보험료는 매년 11월 소득·재산 자료가 재산정되므로 실제 차액은 달라질 수 있습니다.`,
     maxMonths: VOLUNTARY_CONTINUATION.MAX_MONTHS,
     applyDeadlineRule: VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE,
     notes,

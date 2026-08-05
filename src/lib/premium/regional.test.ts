@@ -7,7 +7,12 @@ import {
   incomeBaseForPremium,
   longTermCareRatio,
 } from './regional';
-import { INCOME_REFLECTION, PREMIUM_LIMIT, RATE } from '../constants/2026';
+import {
+  INCOME_REFLECTION,
+  PREMIUM_LIMIT,
+  RATE,
+  REGIONAL_INCOME,
+} from '../constants/2026';
 import {
   BASIC_DEDUCTION,
   PROPERTY_BRACKETS,
@@ -85,15 +90,16 @@ describe('소득 종류별 반영률 — 가장 조심해야 하는 지점', () 
     expect(r.annualRaw).toBe(32_000_000);
   });
 
-  it('지역보험료에서는 금융소득 1,000만원 이하도 100% 반영된다', () => {
+  it('지역보험료에서는 금융소득 1,000만원 이하를 부과대상 소득에서 제외한다', () => {
     const r = incomeBaseForPremium(income({ financial: 9_000_000 }));
-    expect(r.annualReflected).toBe(9_000_000);
+    expect(REGIONAL_INCOME.FINANCIAL_INCLUSION_THRESHOLD).toBe(10_000_000);
+    expect(r.annualReflected).toBe(0);
     expect(r.annualRaw).toBe(9_000_000);
   });
 
-  it('금융소득이 1,000만원을 넘어도 전액 반영된다', () => {
-    const r = incomeBaseForPremium(income({ financial: 11_000_000 }));
-    expect(r.annualReflected).toBe(11_000_000);
+  it('금융소득이 1,000만원을 넘으면 초과분이 아니라 전액 반영된다', () => {
+    const r = incomeBaseForPremium(income({ financial: 10_000_001 }));
+    expect(r.annualReflected).toBe(10_000_001);
   });
 
   it('소득월액은 반영 후 금액을 12로 나눈 값이다', () => {
@@ -196,14 +202,14 @@ describe('검증 플래그', () => {
     expect(VERIFIED).toBe(true);
   });
 
-  it('공단 대조 검증이 완료됐다', () => {
-    expect(VERIFIED_AGAINST_NHIS).toBe(true);
+  it('금융소득 기준 수정 후 공단 재대조 전 상태다', () => {
+    expect(VERIFIED_AGAINST_NHIS).toBe(false);
   });
 
   it('보험료 결과에 두 플래그가 모두 실려 나온다', () => {
     const r = calculateRegionalPremium(noIncome, 0);
     expect(r.verified).toBe(true);
-    expect(r.crossChecked).toBe(true);
+    expect(r.crossChecked).toBe(false);
   });
 
   it('근거 조항이 배열로 실려 나온다', () => {
@@ -278,7 +284,7 @@ describe('국민건강보험공단 모의계산 대표 사례 — 2026-08-03', (
       [noIncome, 360_000_000, 659, 139_378, 159_530, 20_960, 180_490],
       [income({ business: 800_000_000 }), 0, 0, 0, 4_591_740, 603_370, 5_195_110],
       [noIncome, rentEvaluationAmount(400_000_000, 500_000), 146, 30_879, 51_030, 6_700, 57_730],
-      [income({ financial: 9_000_000 }), 0, 0, 0, 53_920, 7_080, 61_000],
+      [income({ financial: 9_000_000 }), 0, 0, 0, 20_160, 2_640, 22_800],
     ] as const;
 
     for (const [caseIncome, property, score, propertyPart, health, longTermCare, total] of cases) {
@@ -360,6 +366,7 @@ describe('임의계속가입 보험료', () => {
     const r = calculateVoluntaryPremium(4_000_000);
     expect(r.verified).toBe(true);
     expect(r.crossChecked).toBe(false);
+    expect(r.assumption).toContain('가중 평균 평가율');
   });
 
   it('보수 외 소득이 연 2,000만원 이하면 추가 보험료가 없다', () => {
@@ -462,6 +469,7 @@ describe('퇴직 후 비교', () => {
     expect(r.notes.join(' ')).toContain('납부기한으로부터 2개월');
     expect(r.applyDeadlineRule).toContain('2개월');
     expect(r.maxMonths).toBe(36);
+    expect(r.totalSavingAssumption).toContain('11월');
   });
 
   it('연금 수령 은퇴자 시나리오 — 반영률이 비교 결과에 반영된다', () => {

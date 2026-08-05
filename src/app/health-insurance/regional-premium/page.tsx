@@ -1,5 +1,6 @@
 import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
 import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
+import { VERIFIED_AGAINST_NHIS } from '@/lib/constants/property-score-table';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
@@ -95,8 +96,17 @@ export default function Page() {
             계산합니다.
           </p>
           <TrustSignal
-            status="공단 모의계산 13건 대조 완료"
-            detail="국민건강보험공단 모의계산 대표 사례와 대조한 참고 계산입니다. 실제 고지액·개별 심사 결과를 대신하지 않습니다."
+            status={
+              VERIFIED_AGAINST_NHIS
+                ? '공단 모의계산 대표 사례 대조 완료'
+                : '공단 재대조 전 참고 계산'
+            }
+            detail={
+              VERIFIED_AGAINST_NHIS
+                ? '국민건강보험공단 모의계산 대표 사례와 대조한 참고 계산입니다. 실제 고지액·개별 심사 결과를 대신하지 않습니다.'
+                : '금융소득 기준을 수정했으며 기존 공단 대표 사례의 재대조 전입니다. 실제 고지액·개별 심사 결과를 대신하지 않습니다.'
+            }
+            tone={VERIFIED_AGAINST_NHIS ? 'verified' : 'reference'}
           />
         </header>
 

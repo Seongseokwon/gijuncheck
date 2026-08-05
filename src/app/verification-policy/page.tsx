@@ -49,7 +49,7 @@ const DEPENDENT_RULE_COVERAGE = [
     label: '부양요건',
     basis: BASIS.SUPPORT,
     coverage:
-      '배우자·직계존속·직계비속·형제자매의 관계, 동거, 혼인, 형제자매 연령·장애 분기',
+      '배우자·직계존속·자녀·형제자매의 관계, 동거, 혼인, 형제자매 연령·장애 분기',
     source: DEPENDENT_SOURCES.support,
   },
   {
@@ -133,8 +133,8 @@ export default function VerificationPolicyPage() {
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">지역가입자 보험료 계산</td>
-                <td className="px-5 py-4 leading-6">2026년 공단 모의계산 13개 대표 사례와 대조했습니다. 재산 0원·공제 경계·등급 경계·소득 조합·전월세·상한을 포함하며 모든 차이는 0원입니다.</td>
-                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-accent-100 px-3 py-1 text-xs font-bold text-accent-700">검증된 참고 계산</span></td>
+                <td className="px-5 py-4 leading-6">금융소득 기준을 수정했으며 공단 대표 사례 재대조 전입니다. 재산·요율·등급표 자체의 확인 범위와 금융소득 입력 의미를 분리해 관리합니다.</td>
+                <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">재대조 전 참고 계산</span></td>
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">임의계속가입 비교</td>
@@ -191,9 +191,10 @@ export default function VerificationPolicyPage() {
           </table>
         </div>
         <p className="text-sm leading-6 text-slate-600">
-          위 표는 코드가 적용하는 모델의 범위를 보여줍니다. 주택임대소득 제외, 기혼자 부부 요건,
-          공단이 관계 자료로 인정하는 예외처럼 개별 사실관계가 필요한 항목은 입력 모델에 모두
-          포함하지 않았으므로 최종 신고 전 공단 확인이 필요합니다.
+          위 표는 코드가 적용하는 모델의 범위를 보여줍니다. 손자녀·외손자녀의 부모 부양능력
+          요건은 현재 모델에 포함하지 않으며, 기혼 피부양자의 배우자 소득·재산 요건도 별도
+          자료 확인이 필요합니다. 이혼·사별과 공단이 관계 자료로 인정하는 예외처럼 개별
+          사실관계가 필요한 항목은 최종 신고 전 공단에 확인해 주세요.
         </p>
       </section>
 

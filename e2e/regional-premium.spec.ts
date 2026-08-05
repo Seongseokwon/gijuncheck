@@ -4,10 +4,10 @@ import { PREMIUM_HANDOFF_STORAGE_KEY } from '../src/lib/premium-handoff';
 import { fillMoney as fill } from './helpers';
 
 /**
- * P2-1 "지역가입자 보험료 공식 대조" 이후의 공개 화면 QA.
+ * 지역가입자 보험료 참고 계산의 공개 화면 QA.
  *
- * 이 계산기는 공단 모의계산 13건 대조를 마치고 공개됐지만(`routes.ts` 의
- * `regionalPremium.ready`), 화면 동작을 고정하는 E2E 가 없었다. 판정기와 달리
+ * 금융소득 기준 수정 후 공단 대표 사례 재대조 전 상태이므로, 화면은 참고용 경고를
+ * 함께 보여준다. 판정기와 달리
  * 여기서 틀리면 사용자가 "얼마 내는지"를 잘못 알고 간다.
  *
  * 기대 금액은 `src/lib/premium/regional.test.ts` 의 공단 모의계산 대조 사례와
@@ -175,11 +175,11 @@ test('판정기에서 넘어온 소득·재산이 다시 입력하지 않아도 
   await expect(result(page)).toBeVisible();
 });
 
-test('공식 대조가 끝난 계산기이므로 "참고용" 미검증 배지를 띄우지 않는다', async ({ page }) => {
+test('공단 재대조 전 계산기는 참고용 경고를 표시한다', async ({ page }) => {
   await calculate(page);
 
   await expect(result(page)).toBeVisible();
-  await expect(page.getByText('대조 검증이 아직 완료되지 않았습니다')).toHaveCount(0);
+  await expect(page.getByText('대조 검증이 아직 완료되지 않았습니다')).toBeVisible();
 });
 
 test('결과에 근거와 면책, 입력값 비전송 고지가 함께 있다', async ({ page }) => {
@@ -192,7 +192,7 @@ test('결과에 근거와 면책, 입력값 비전송 고지가 함께 있다', 
   await expect(result(page)).toContainText('1577-1000');
 });
 
-test('공식 대조가 끝난 임의계속가입 CTA가 재산금액을 들고 이어진다', async ({ page }) => {
+test('임의계속가입 CTA가 재산금액을 들고 이어진다', async ({ page }) => {
   test.skip(!ROUTES.voluntaryContinuation.ready, '임의계속가입 공개 전에는 적용하지 않는다');
   await fillMoney(page, '재산세 과세표준 합계', 200_000_000);
   await calculate(page);

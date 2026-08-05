@@ -59,7 +59,10 @@ export function sumIncome(income: Income): number {
 /* ------------------------------------------------------------------ */
 
 function judgeSupport(input: DependentInput): StepResult {
-  const { relation, cohabiting, age, married, disabled } = input;
+  const { relation, cohabiting, age, disabled } = input;
+  const married =
+    input.maritalStatus === 'married' ||
+    (input.maritalStatus === undefined && input.married);
   const basis = BASIS.SUPPORT;
   const step = 'support' as const;
 
