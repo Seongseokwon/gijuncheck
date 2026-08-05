@@ -95,6 +95,13 @@ test('내부 링크는 404 없이 열린다 (사이트 전체 크롤)', async ({
   expect(broken, broken.join('\n')).toEqual([]);
 });
 
+test('홈은 피부양자 판정기 실경로로 최소 2개의 내부 링크를 가진다', async ({ page }) => {
+  await page.goto(ROUTES.home.path);
+  const links = await collectLinks(page);
+  const dependentLinks = links.filter((link) => link.href === ROUTES.dependent.path);
+  expect(dependentLinks.length).toBeGreaterThanOrEqual(2);
+});
+
 test('sitemap.xml 의 모든 URL이 200으로 열린다', async ({ page, baseURL }) => {
   const res = await page.goto('/sitemap.xml');
   expect(res?.status()).toBe(200);

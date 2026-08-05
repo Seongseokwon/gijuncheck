@@ -422,6 +422,12 @@ export default function Home() {
                 모의 판정이며 법적 효력이 없습니다. 최종 자격은
                 국민건강보험공단 심사에 따라 결정됩니다.
               </p>
+              <a
+                href={ROUTES.dependent.path}
+                className="mt-4 inline-flex min-h-[44px] items-center text-sm font-semibold text-accent-700 underline underline-offset-4 hover:text-accent-600"
+              >
+                전용 페이지에서 이 판정기 열기 →
+              </a>
             </aside>
           </div>
         </div>
