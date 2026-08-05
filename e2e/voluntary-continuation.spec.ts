@@ -63,6 +63,14 @@ test('12개월을 채우면 두 선택지를 금액으로 비교한다', async (
   await expect(result(page)).toContainText('대조 검증이 아직 완료되지 않았습니다');
 });
 
+test('두 보험료가 같으면 동률이라고 안내한다', async ({ page }) => {
+  await fill(page, '퇴직 전 12개월 보수월액 평균', 100_000);
+  await compare(page);
+
+  await expect(result(page)).toContainText('두 제도의 월 보험료가');
+  await expect(result(page)).not.toContainText('유리합니다');
+});
+
 test.describe('결론은 조건에 따라 뒤집힌다', () => {
   /**
    * "임의계속가입이 항상 싸다"는 오해를 화면이 만들지 않는지 본다.
@@ -73,7 +81,7 @@ test.describe('결론은 조건에 따라 뒤집힌다', () => {
     await fill(page, '재산금액 합계', 900_000_000);
     await compare(page);
 
-    await expect(result(page)).toContainText('임의계속가입가 월');
+    await expect(result(page)).toContainText('임의계속가입이 월');
     await expect(result(page)).toContainText('재산 미반영');
   });
 

@@ -47,7 +47,7 @@ export interface PremiumCalculateParams {
 }
 
 export interface VoluntaryCompareParams {
-  recommendation: 'voluntary' | 'regional' | 'notEligible';
+  recommendation: 'voluntary' | 'regional' | 'tie' | 'notEligible';
 }
 
 /**

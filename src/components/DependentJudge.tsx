@@ -53,6 +53,7 @@ const INCOME_FIELDS: Array<{
   key: keyof DependentInput['income'];
   label: string;
   hint?: string;
+  helpText?: string;
 }> = [
   { key: 'business', label: '사업소득' },
   { key: 'wage', label: '근로소득' },
@@ -61,6 +62,7 @@ const INCOME_FIELDS: Array<{
     key: 'financial',
     label: '금융소득',
     hint: '이자 + 배당 · 1,000만원 이하면 합산 제외',
+    helpText: '이자·배당 합계가 연 1,000만원 이하면 소득 합산에서 제외됩니다.',
   },
   { key: 'other', label: '기타소득' },
 ];
@@ -118,6 +120,9 @@ export default function DependentJudge() {
     ),
     ...(input.propertyTaxBase === 0 ? ['재산세 과세표준'] : []),
   ];
+  const nothingEntered =
+    INCOME_FIELDS.every((field) => input.income[field.key] === 0) &&
+    input.propertyTaxBase === 0;
 
   const completeJudge = () => {
     recordJudgeStart();
@@ -133,7 +138,7 @@ export default function DependentJudge() {
   };
 
   const requestJudge = () => {
-    if (zeroValueFields.length > 0) {
+    if (nothingEntered) {
       setShowZeroValueConfirm(true);
       return;
     }
@@ -264,7 +269,12 @@ export default function DependentJudge() {
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {INCOME_FIELDS.map((f) => (
-              <Field key={f.key} label={f.label} hint={f.hint}>
+              <Field
+                key={f.key}
+                label={f.label}
+                hint={f.hint}
+                helpText={f.helpText}
+              >
                 <MoneyInput
                   value={input.income[f.key]}
                   onChange={(v) => setIncome(f.key, v)}
@@ -291,7 +301,11 @@ export default function DependentJudge() {
             />
           </Field>
 
-          <Field label="재산세 과세표준" hint="실거래가·공시가격 아님">
+          <Field
+            label="재산세 과세표준"
+            hint="실거래가·공시가격 아님"
+            helpText="실거래가·공시가격이 아니라 지방세 재산세 과세표준을 입력합니다."
+          >
             <MoneyInput
               value={input.propertyTaxBase}
               onChange={(v) => set('propertyTaxBase', v)}

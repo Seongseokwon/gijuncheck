@@ -290,7 +290,14 @@ export function canApplyVoluntary({
   return insuredMonthsInLookback >= VOLUNTARY_CONTINUATION.REQUIRED_MONTHS;
 }
 
-export type Recommendation = 'voluntary' | 'regional' | 'notEligible';
+export type Recommendation = 'voluntary' | 'regional' | 'tie' | 'notEligible';
+
+export interface ComparisonNotes {
+  /** 자격 미달일 때 표시할 사유 */
+  ineligibleReason?: string;
+  /** 자격과 관계없이 표시할 일반 안내 */
+  general: string[];
+}
 
 export interface ComparisonResult {
   regional: PremiumBreakdown;
@@ -310,7 +317,7 @@ export interface ComparisonResult {
    * 고정 일수가 아니라 "최초 고지 납부기한 + 2개월"이라 숫자로 못 박지 않는다.
    */
   applyDeadlineRule: string;
-  notes: string[];
+  notes: ComparisonNotes;
 }
 
 /**
@@ -333,18 +340,19 @@ export function compareAfterRetirement(params: {
     insuredMonthsInLookback: params.insuredMonthsInLookback,
   });
 
-  const notes: string[] = [
-    `임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 퇴사일로 소급 인정됩니다.`,
-    `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월까지 직장가입자 자격을 유지할 수 있습니다.`,
-    '임의계속가입자는 재산이 보험료에 반영되지 않고, 피부양자를 등재할 수 있습니다.',
-  ];
+  const notes: ComparisonNotes = {
+    general: [
+      `임의계속가입은 ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신청하면 퇴사일로 소급 인정됩니다.`,
+      `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월까지 직장가입자 자격을 유지할 수 있습니다.`,
+      '임의계속가입자는 재산이 보험료에 반영되지 않고, 피부양자를 등재할 수 있습니다.',
+    ],
+  };
 
   if (!eligible) {
-    notes.unshift(
+    notes.ineligibleReason =
       `임의계속가입은 퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 중 ` +
         `직장가입 기간이 통산 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상이어야 신청할 수 있습니다. ` +
-        `(입력: ${params.insuredMonthsInLookback}개월)`,
-    );
+        `(입력: ${params.insuredMonthsInLookback}개월)`;
     return {
       regional,
       voluntary: null,
@@ -368,7 +376,12 @@ export function compareAfterRetirement(params: {
   return {
     regional,
     voluntary,
-    recommendation: monthlySaving > 0 ? 'voluntary' : 'regional',
+    recommendation:
+      monthlySaving > 0
+        ? 'voluntary'
+        : monthlySaving < 0
+          ? 'regional'
+          : 'tie',
     monthlySaving,
     totalSaving: monthlySaving * VOLUNTARY_CONTINUATION.MAX_MONTHS,
     totalSavingAssumption:

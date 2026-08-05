@@ -49,10 +49,12 @@ export const inputCls =
 export function Field({
   label,
   hint,
+  helpText,
   children,
 }: {
   label: ReactNode;
   hint?: ReactNode;
+  helpText?: ReactNode;
   children: ReactNode;
 }) {
   const labelId = useId();
@@ -79,6 +81,9 @@ export function Field({
         {hint && <InfoTooltip>{hint}</InfoTooltip>}
       </div>
       <div className="mt-1">{control}</div>
+      {helpText && (
+        <p className="mt-2 text-sm leading-5 text-slate-600">{helpText}</p>
+      )}
     </div>
   );
 }

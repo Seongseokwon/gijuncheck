@@ -456,7 +456,7 @@ describe('퇴직 후 비교', () => {
     expect(r.recommendation).toBe('notEligible');
     expect(r.voluntary).toBeNull();
     expect(r.totalSaving).toBe(0);
-    expect(r.notes[0]).toContain('12개월 이상');
+    expect(r.notes.ineligibleReason).toContain('12개월 이상');
   });
 
   it('신청 기한 소급 안내가 항상 포함된다', () => {
@@ -466,10 +466,21 @@ describe('퇴직 후 비교', () => {
       avgMonthlyWage: 3_000_000,
       insuredMonthsInLookback: 24,
     });
-    expect(r.notes.join(' ')).toContain('납부기한으로부터 2개월');
+    expect(r.notes.general.join(' ')).toContain('납부기한으로부터 2개월');
     expect(r.applyDeadlineRule).toContain('2개월');
     expect(r.maxMonths).toBe(36);
     expect(r.totalSavingAssumption).toContain('11월');
+  });
+
+  it('두 제도의 보험료가 같으면 동률로 안내한다', () => {
+    const r = compareAfterRetirement({
+      income: noIncome,
+      propertyAmount: 0,
+      avgMonthlyWage: 100_000,
+      insuredMonthsInLookback: 24,
+    });
+    expect(r.recommendation).toBe('tie');
+    expect(r.monthlySaving).toBe(0);
   });
 
   it('연금 수령 은퇴자 시나리오 — 반영률이 비교 결과에 반영된다', () => {

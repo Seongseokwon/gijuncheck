@@ -251,6 +251,15 @@ test('0원 확인 모달은 화면 중앙에 전체 backdrop과 함께 표시된
   await expect(backdrop).toHaveCSS('backdrop-filter', 'blur(4px)');
 });
 
+test('일부 금액을 입력하면 0원 확인 모달 없이 바로 판정한다', async ({ page }) => {
+  await selectRelation(page, '배우자');
+  await fillMoney(page.getByRole('textbox', { name: '사업소득' }), 1_000_000);
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+
+  await expect(page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })).toHaveCount(0);
+  await expect(page.getByRole('status')).toBeVisible();
+});
+
 test('결과 화면도 뷰포트 폭을 넘어 가로 스크롤을 만들지 않는다', async ({ page }) => {
   await selectRelation(page, '형제자매'); // 필드 수가 가장 많은 관계 — 오버플로가 가장 잘 드러남
   await setCohabiting(page, true);

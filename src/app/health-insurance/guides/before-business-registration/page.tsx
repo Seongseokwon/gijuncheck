@@ -14,8 +14,9 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { INCOME } from '@/lib/constants/2026';
-import { toManwon, won } from '@/lib/format';
+import { INCOME, RATE } from '@/lib/constants/2026';
+import { longTermCareRatio } from '@/lib/premium/regional';
+import { toManwon, toPercent, won, wonExact } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 import { ldJson } from '@/lib/structured-data';
@@ -212,9 +213,9 @@ export default function Page() {
           </P>
 
           <Callout tone="info">
-            건강보험료 = (소득월액 × 7.19%) + (재산 부과점수 × 211.5원)
+            건강보험료 = (소득월액 × {toPercent(RATE.HEALTH)}) + (재산 부과점수 × {wonExact(RATE.PROPERTY_POINT_VALUE)})
             <br />
-            여기에 장기요양보험료(건강보험료의 약 13.14%)가 더해집니다.
+            여기에 장기요양보험료(건강보험료의 약 {toPercent(longTermCareRatio())})가 더해집니다.
           </Callout>
 
           <P>

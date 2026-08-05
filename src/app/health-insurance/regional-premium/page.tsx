@@ -1,5 +1,5 @@
 import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
-import { PREMIUM_LIMIT, RATE } from '@/lib/constants/2026';
+import { PREMIUM_LIMIT, RATE, YEAR } from '@/lib/constants/2026';
 import { VERIFIED_AGAINST_NHIS } from '@/lib/constants/property-score-table';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
@@ -7,7 +7,7 @@ import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 
-const TITLE = '지역가입자 보험료 계산 — 2026년 요율 7.19% 반영';
+const TITLE = `지역가입자 보험료 계산 — ${YEAR}년 요율 ${toPercent(RATE.HEALTH)} 반영`;
 const DESCRIPTION =
   '퇴직 후 지역가입자가 되면 월 보험료가 얼마인지 계산합니다. ' +
   '근로·연금소득 50% 반영, 재산 60등급표, 기본공제 1억원, 상한·하한까지 적용. ' +

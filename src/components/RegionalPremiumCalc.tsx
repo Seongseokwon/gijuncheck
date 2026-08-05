@@ -23,10 +23,11 @@ import {
 import {
   calculateRegionalPremium,
   incomeBaseForPremium,
+  longTermCareRatio,
 } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
-import { DISCLAIMER, REGIONAL_INCOME } from '@/lib/constants/2026';
-import { toManwon } from '@/lib/format';
+import { DISCLAIMER, RATE, REGIONAL_INCOME } from '@/lib/constants/2026';
+import { toManwon, toPercent, wonExact } from '@/lib/format';
 import { rentEvaluationAmount } from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
@@ -217,7 +218,7 @@ export default function RegionalPremiumCalc() {
           <div className="divide-y divide-slate-100">
             <ResultRow
               label="소득보험료"
-              hint={`소득월액 × 7.19%`}
+              hint={`소득월액 × ${toPercent(RATE.HEALTH)}`}
               value={won(result.incomePortion)}
             />
             <ResultRow
@@ -226,7 +227,7 @@ export default function RegionalPremiumCalc() {
                 result.propertyScore === 0
                   ? '기본공제 후 0원 → 재산점수 0점'
                   : result.propertyGrade
-                  ? `${result.propertyGrade}등급 ${result.propertyScore}점 × 211.5원`
+                  ? `${result.propertyGrade}등급 ${result.propertyScore}점 × ${wonExact(RATE.PROPERTY_POINT_VALUE)}`
                   : undefined
               }
               value={won(result.propertyPortion)}
@@ -234,7 +235,7 @@ export default function RegionalPremiumCalc() {
             <ResultRow label="건강보험료" value={won(result.health)} />
             <ResultRow
               label="장기요양보험료"
-              hint="건강보험료 × 13.14%"
+              hint={`건강보험료 × ${toPercent(longTermCareRatio())}`}
               value={won(result.longTermCare)}
             />
             <div className="pt-2">

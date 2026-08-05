@@ -23,6 +23,7 @@ import {
   SubmitButton,
   won,
 } from './ui';
+import { josa } from '@/lib/format';
 import { compareAfterRetirement } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
 import {
@@ -73,6 +74,7 @@ export default function VoluntaryComparison() {
 
   const { regional, voluntary, recommendation } = result;
   const voluntaryWins = recommendation === 'voluntary';
+  const isTie = recommendation === 'tie';
 
   return (
     <div className="w-full min-w-0 space-y-8 overflow-x-hidden">
@@ -181,7 +183,7 @@ export default function VoluntaryComparison() {
                 임의계속가입을 신청할 수 없습니다
               </p>
               <p className="mt-2 text-sm leading-relaxed text-slate-700">
-                {result.notes[0]}
+                {result.notes.ineligibleReason}
               </p>
               <div className="mt-5 rounded-xl bg-canvas p-4">
                 <ResultRow
@@ -194,8 +196,14 @@ export default function VoluntaryComparison() {
           ) : (
             <section className="space-y-5 rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
               <p className="text-xl font-extrabold tracking-tight text-brand-950">
-                {voluntaryWins ? '임의계속가입' : '지역가입자'}가 월{' '}
-                {won(Math.abs(result.monthlySaving))} 유리합니다
+                {isTie ? (
+                  <>두 제도의 월 보험료가 {won(regional.total)}으로 같습니다</>
+                ) : (
+                  <>
+                    {josa(voluntaryWins ? '임의계속가입' : '지역가입자', '가')} 월{' '}
+                    {won(Math.abs(result.monthlySaving))} 유리합니다
+                  </>
+                )}
                 {/* 비교 결과 강조 */}
               </p>
 
@@ -228,8 +236,9 @@ export default function VoluntaryComparison() {
                   <p className="mt-2 text-sm text-slate-600">
                     소득 {won(regional.incomePortion)} + 재산{' '}
                     {won(regional.propertyPortion)}
-                    {regional.propertyGrade &&
-                      ` (${regional.propertyGrade}등급)`}
+                    {regional.propertyGrade
+                      ? ` (${regional.propertyGrade}등급)`
+                      : null}
                   </p>
                 </div>
 
@@ -289,7 +298,7 @@ export default function VoluntaryComparison() {
               </div>
 
               <ul className="space-y-1.5 border-t border-slate-100 pt-3">
-                {result.notes.slice(1).map((n) => (
+                {result.notes.general.map((n) => (
                   <li key={n} className="text-sm leading-relaxed text-slate-600">
                     · {n}
                   </li>
