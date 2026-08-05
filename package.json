@@ -1,8 +1,16 @@
 {
-  "name": "sabohum",
+  "name": "gijuncheck",
   "version": "0.1.0",
   "private": true,
   "description": "건강보험 피부양자 자격을 관계·소득·재산 기준으로 확인하는 도구",
+  "homepage": "https://gijuncheck.kr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Seongseokwon/gijuncheck.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Seongseokwon/gijuncheck/issues"
+  },
   "engines": {
     "node": ">=20.9.0"
   },
@@ -22,23 +30,23 @@
   },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0",
-    "next": "^15.1.0",
+    "next": "^15.5.22",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.6",
     "@playwright/test": "^1.62.1",
-    "@types/node": "^22.10.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/node": "^22.20.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.39.5",
     "eslint-config-next": "^15.5.22",
     "postcss": "^8.4.49",
     "serve": "^14.2.4",
-    "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "vitest": "^2.1.9"
   }
 }
