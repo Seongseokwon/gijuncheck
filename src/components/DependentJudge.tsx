@@ -85,6 +85,7 @@ export default function DependentJudge() {
   const [submitted, setSubmitted] = useState(false);
   const [showZeroValueConfirm, setShowZeroValueConfirm] = useState(false);
   const [submissionId, setSubmissionId] = useState(0);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
   const judgeStarted = useRef(false);
 
@@ -209,6 +210,11 @@ export default function DependentJudge() {
     }
 
     completeJudge();
+  };
+
+  const closeZeroValueConfirm = () => {
+    setShowZeroValueConfirm(false);
+    window.requestAnimationFrame(() => submitButtonRef.current?.focus());
   };
 
   return (
@@ -445,6 +451,7 @@ export default function DependentJudge() {
 
         <div className="px-5 py-6 sm:px-7 sm:py-7">
           <SubmitButton
+            ref={submitButtonRef}
             onClick={requestJudge}
           >
             내 자격 판정하기
@@ -458,7 +465,7 @@ export default function DependentJudge() {
       {showZeroValueConfirm && (
         <ZeroValueConfirmModal
           fields={zeroValueFields}
-          onCancel={() => setShowZeroValueConfirm(false)}
+          onCancel={closeZeroValueConfirm}
           onConfirm={() => {
             setShowZeroValueConfirm(false);
             completeJudge();

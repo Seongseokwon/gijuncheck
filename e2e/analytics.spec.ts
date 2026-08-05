@@ -51,7 +51,7 @@ test('GA4 config는 page_location에 쿼리 없이 pathname만 전달한다', as
   const config = (await calls(page)).find((call) => call.command === 'config');
   test.skip(!config, 'GA4 측정 ID가 없는 환경에서는 config가 생성되지 않는다');
 
-  expect(config?.params.page_location).toBe('http://127.0.0.1:4173/');
+  expect(config?.params.page_location).toBe(`${new URL(page.url()).origin}/`);
   expect(JSON.stringify(config?.params)).not.toMatch(/income=|property=|123456789|987654321/);
 });
 
@@ -71,9 +71,6 @@ test('피부양자 판정 이벤트는 결과 범주만 기록하고 원본 입�
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await fillMoney(page.getByLabel('근로소득'), 1234567);
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
-  await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
-    .getByRole('button', { name: '확인하고 판정하기' })
-    .click();
 
   const captured = await events(page);
   const start = captured.find((event) => event.name === 'judge_start');

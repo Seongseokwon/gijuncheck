@@ -16,14 +16,12 @@ import { expect, type Locator } from '@playwright/test';
 export async function fillMoney(input: Locator, value: number) {
   const formatted = value.toLocaleString('ko-KR');
 
-  // 1,000 미만은 포맷이 숫자와 같아 확인할 신호가 없다 — 한 번만 넣는다.
-  if (formatted === String(value)) {
-    await input.fill(String(value));
-    return;
-  }
-
   await expect(async () => {
-    await input.fill(String(value));
+    // WebKit의 text input은 fill()만으로 React의 input 이벤트가 반영되지
+    // 않는 경우가 있다. 실제 키 입력 경로를 사용하면 Safari에서도 포맷터가
+    // 실행되어 상태값과 화면값이 함께 갱신된다.
+    await input.fill('');
+    await input.pressSequentially(String(value));
     await expect(input).toHaveValue(formatted, { timeout: 1_000 });
   }).toPass({ timeout: 15_000 });
 }

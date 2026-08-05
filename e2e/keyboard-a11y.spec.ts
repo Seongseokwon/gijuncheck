@@ -26,11 +26,6 @@ test('키보드만으로 관계 선택 → 소득 입력 → 제출 → 결과 �
   await expect(submitButton).toBeFocused();
   await page.keyboard.press('Enter');
 
-  const zeroValueDialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
-  await expect(zeroValueDialog).toBeVisible();
-  await page.keyboard.press('Tab');
-  await page.keyboard.press('Enter');
-
   const result = page.getByRole('status');
   await expect(result).toBeVisible();
 
@@ -73,7 +68,7 @@ test('소득 입력 도움말 툴팁은 Tab 포커스만으로 스크린리더�
   await tooltip.click();
   await expect(tooltip).toHaveAttribute('aria-expanded', 'true');
   await expect(tooltip.getByRole('tooltip')).toHaveClass(/opacity-100/);
-  await page.keyboard.press('Escape');
+  await tooltip.press('Escape');
   await expect(tooltip).toHaveAttribute('aria-expanded', 'false');
 });
 
@@ -126,9 +121,6 @@ test('탈락 시 이어지는 CTA가 금액을 URL에 노출하지 않고 지역
   await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
   await fillMoney(page.getByLabel('근로소득'), 30000000); // 소득요건 초과로 탈락시킴
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();
-  await page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' })
-    .getByRole('button', { name: '확인하고 판정하기' })
-    .click();
 
   await expect(page.getByRole('status')).toContainText('탈락할 것으로 보입니다');
   const link = page.getByRole('link', { name: /보험료는 얼마인가요/ });

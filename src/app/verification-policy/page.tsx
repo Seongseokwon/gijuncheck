@@ -153,7 +153,7 @@ export default function VerificationPolicyPage() {
           피부양자 판정의 근거 매핑
         </h2>
         <div className="min-w-0 max-w-full overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
-          <table className="w-full min-w-0 table-fixed border-collapse text-sm sm:min-w-[58rem]">
+          <table className="w-full min-w-0 table-fixed border-collapse text-sm lg:min-w-[58rem]">
             <caption className="sr-only">피부양자 판정 단계별 근거 매핑</caption>
             <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
               <tr>

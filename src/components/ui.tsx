@@ -9,9 +9,11 @@
 
 import {
   cloneElement,
+  forwardRef,
   isValidElement,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
   type ReactElement,
@@ -446,15 +448,13 @@ export function FormCard({
   );
 }
 
-export function SubmitButton({
-  onClick,
-  children,
-}: {
+export const SubmitButton = forwardRef<HTMLButtonElement, {
   onClick: () => void;
   children: ReactNode;
-}) {
+}>(function SubmitButton({ onClick, children }, ref) {
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
       onKeyDown={(event) => {
@@ -470,7 +470,7 @@ export function SubmitButton({
       {children}
     </button>
   );
-}
+});
 
 /**
  * 0원 입력 누락 여부를 제출 직전에 확인하는 모달.
@@ -493,7 +493,7 @@ export function ZeroValueConfirmModal({
 
   onCancelRef.current = onCancel;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     previousActiveElement.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
   }, []);
@@ -602,7 +602,6 @@ export function ZeroValueConfirmModal({
           <button
             type="button"
             onClick={onCancel}
-            autoFocus
             className="min-h-[48px] rounded-xl border border-slate-400 px-4 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50"
           >
             입력 수정하기

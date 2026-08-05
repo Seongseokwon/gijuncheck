@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const e2ePort = process.env.E2E_PORT ?? '4180';
+const e2eBaseURL = `http://127.0.0.1:${e2ePort}`;
+
 /**
  * P0-2 공개 전 전수 QA 용 E2E 설정.
  *
@@ -27,13 +30,15 @@ export default defineConfig({
   expect: { timeout: 10_000 },
 
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: e2eBaseURL,
     trace: 'retain-on-failure',
   },
 
   webServer: {
-    command: 'node node_modules/serve/build/main.js out -l 4173',
-    url: 'http://127.0.0.1:4173',
+    // serve v14 probes the port and may silently switch to a random port when
+    // localhost probing is restricted. Keep the test URL and server port fixed.
+    command: `node e2e/static-server.mjs out ${e2ePort}`,
+    url: e2eBaseURL,
     reuseExistingServer: process.env.REUSE_E2E_SERVER === 'true',
     timeout: 30_000,
   },
