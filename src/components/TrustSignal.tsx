@@ -12,10 +12,12 @@ export default function TrustSignal({
   status,
   detail,
   tone = 'verified',
+  lastVerified = SITE.lastVerified,
 }: {
   status: string;
   detail: string;
   tone?: TrustSignalTone;
+  lastVerified?: string;
 }) {
   return (
     <section
@@ -27,7 +29,8 @@ export default function TrustSignal({
           {SITE.baseYear}년 기준
         </span>
         <span className="rounded-full bg-white/80 px-2.5 py-1">
-          최종 확인 {SITE.lastVerified}
+          최종 확인{' '}
+          <time dateTime={lastVerified}>{lastVerified}</time>
         </span>
         <span className="rounded-full bg-white/80 px-2.5 py-1">{status}</span>
       </div>

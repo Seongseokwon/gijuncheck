@@ -23,6 +23,7 @@ const jsonLd = {
       url: POLICY_URL,
       name: '검증 원칙',
       description: metadata.description,
+      dateModified: ROUTES.verificationPolicy.lastModified,
       isPartOf: { '@id': SITE_ENTITY_IDS.website },
       about: { '@id': SITE_ENTITY_IDS.author },
       mainEntity: { '@id': SITE_ENTITY_IDS.author },
@@ -241,7 +242,11 @@ export default function VerificationPolicyPage() {
           ))}
         </ul>
         <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-600">
-          기준 연도 {SITE.baseYear}년 · 최종 종합 검토 {SITE.lastVerified} · 세부 대조
+          기준 연도 {SITE.baseYear}년 · 최종 종합 검토{' '}
+          <time dateTime={ROUTES.verificationPolicy.lastModified}>
+            {ROUTES.verificationPolicy.lastModified}
+          </time>{' '}
+          · 세부 대조
           기록과 공개 범위의 변동은 이 페이지에 반영합니다.
         </p>
       </section>

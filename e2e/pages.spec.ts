@@ -58,7 +58,10 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
   await expect(mobileNav).toBeVisible();
   await expect(mobileNav.getByRole('link', { name: '가이드' })).toHaveAttribute('href', '/#guides');
   await expect(mobileNav.getByRole('link', { name: '이용 방법' })).toHaveAttribute('href', '/#journey');
-  await expect(mobileNav.getByRole('link', { name: '피부양자 판정' })).toHaveAttribute('href', '/#judge');
+  await expect(mobileNav.getByRole('link', { name: '피부양자 판정' })).toHaveAttribute(
+    'href',
+    ROUTES.dependent.path,
+  );
   await expect(mobileNav.getByRole('link', { name: '검증 원칙' })).toHaveAttribute(
     'href',
     ROUTES.verificationPolicy.path,
@@ -67,16 +70,16 @@ test('모바일에서도 주요 메뉴가 노출되어 핵심 페이지에 접�
 
 test('세 도구 상단에 기준일과 검증 범위를 표시한다', async ({ page }) => {
   const signals = [
-    ['/health-insurance/dependent/', '공개 기준 8건 자체 재현'],
-    ['/health-insurance/regional-premium/', '공단 재대조 전 참고 계산'],
-    ['/health-insurance/voluntary-continuation/', '법령·공단 산식 기반 참고 비교'],
+    ['/health-insurance/dependent/', '2026-08-04', '공개 기준 8건 자체 재현'],
+    ['/health-insurance/regional-premium/', '2026-08-03', '공단 재대조 전 참고 계산'],
+    ['/health-insurance/voluntary-continuation/', '2026-08-03', '법령·공단 산식 기반 참고 비교'],
   ] as const;
 
-  for (const [path, status] of signals) {
+  for (const [path, lastVerified, status] of signals) {
     await page.goto(path);
     const signal = page.getByRole('region', { name: '검증 범위와 기준일' });
     await expect(signal).toContainText('2026년 기준');
-    await expect(signal).toContainText('최종 확인 2026-08-03');
+    await expect(signal).toContainText(`최종 확인 ${lastVerified}`);
     await expect(signal).toContainText(status);
     await expect(signal.getByRole('link', { name: /검증 원칙과 범위/ })).toHaveAttribute(
       'href',
@@ -88,13 +91,13 @@ test('세 도구 상단에 기준일과 검증 범위를 표시한다', async ({
 test('홈 — 검증된 보험료 도구는 모두 접근 가능하다', async ({ page }) => {
   await page.goto('/');
   await expect(
-    page.locator(`#journey a[href="${ROUTES.dependent.path}"]`),
+    page.locator(`#journey ol a[href="${ROUTES.dependent.path}"]`),
   ).toHaveCount(1);
   await expect(
-    page.locator(`#journey a[href="${ROUTES.regionalPremium.path}"]`),
+    page.locator(`#journey ol a[href="${ROUTES.regionalPremium.path}"]`),
   ).toHaveCount(1);
   await expect(
-    page.locator(`#journey a[href="${ROUTES.voluntaryContinuation.path}"]`),
+    page.locator(`#journey ol a[href="${ROUTES.voluntaryContinuation.path}"]`),
   ).toHaveCount(1);
   await expect(page.getByText('공단 대조 미완료')).toHaveCount(0);
   const disabledCards = page.locator('[aria-disabled="true"]');

@@ -4,6 +4,7 @@ import ScenarioIcon from '@/components/ScenarioIcon';
 import TrackedLink from '@/components/TrackedLink';
 import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 import { SITE } from '@/lib/site';
+import { ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 const HOME_TITLE = `${SITE.name} | 건강보험 피부양자 자격 확인`;
 
@@ -101,9 +102,57 @@ const POPULAR_QUESTIONS = [
 
 const shell = 'mx-auto w-full max-w-[1120px] px-4';
 
+const homeJsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${SITE.url}#home`,
+      url: SITE.url,
+      name: HOME_TITLE,
+      description: SITE.homeDescription,
+      isPartOf: { '@id': SITE_ENTITY_IDS.website },
+      about: { '@id': SITE_ENTITY_IDS.organization },
+      inLanguage: 'ko',
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${SITE.url}#tools`,
+      name: '기준체크 건강보험 도구',
+      itemListElement: TOOL_KEYS.filter((key) => ROUTES[key].ready).map(
+        (key, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: ROUTES[key].label,
+          url: new URL(ROUTES[key].path, SITE.url).toString(),
+        }),
+      ),
+    },
+    {
+      '@type': 'ItemList',
+      '@id': `${SITE.url}#popular-questions`,
+      name: '자주 찾는 질문',
+      itemListElement: POPULAR_QUESTIONS.map((item, index) => {
+        const route = ROUTES[item.routeKey];
+        const href = `${route.path}${'anchor' in item ? `#${item.anchor}` : ''}`;
+        return {
+          '@type': 'ListItem',
+          position: index + 1,
+          name: item.question,
+          url: new URL(href, SITE.url).toString(),
+        };
+      }),
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: ldJson(homeJsonLd) }}
+      />
       <section className="overflow-hidden bg-[radial-gradient(circle_at_85%_20%,rgba(8,126,139,.11),transparent_30%),radial-gradient(circle_at_15%_75%,rgba(23,50,77,.07),transparent_28%),#f4f8fa] pb-[54px] pt-[58px] lg:pb-[74px] lg:pt-[84px]">
         <div className={`${shell} grid items-center gap-16 lg:grid-cols-[1.08fr_0.92fr] lg:gap-[72px]`}>
           <div>
@@ -286,7 +335,7 @@ export default function Home() {
                 <li key={key} className="relative border-t border-slate-200 first:border-t-0 lg:border-l lg:border-t-0 lg:first:border-l-0">
                   {tool.ready ? (
                     <TrackedLink
-                      href={key === 'dependent' ? '#judge' : tool.path}
+                      href={tool.path}
                       location="tool"
                       className="block min-h-[224px] p-7 transition hover:bg-slate-50"
                     >

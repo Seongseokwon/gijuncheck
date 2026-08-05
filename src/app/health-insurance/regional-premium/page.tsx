@@ -3,7 +3,7 @@ import { PREMIUM_LIMIT, RATE, YEAR } from '@/lib/constants/2026';
 import { VERIFIED_AGAINST_NHIS } from '@/lib/constants/property-score-table';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
-import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
+import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';
 import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 
@@ -50,11 +50,11 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'WebApplication',
-      name: ROUTES.regionalPremium.label,
-      applicationCategory: 'FinanceApplication',
-      operatingSystem: 'Web',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+      ...webApplicationJsonLd({
+        name: ROUTES.regionalPremium.label,
+        url: ROUTES.regionalPremium.path,
+        description: DESCRIPTION,
+      }),
     },
     breadcrumbJsonLd([
       { name: '기준체크', path: ROUTES.home.path },
@@ -107,6 +107,7 @@ export default function Page() {
                 : '금융소득 기준을 수정했으며 기존 공단 대표 사례의 재대조 전입니다. 실제 고지액·개별 심사 결과를 대신하지 않습니다.'
             }
             tone={VERIFIED_AGAINST_NHIS ? 'verified' : 'reference'}
+            lastVerified={ROUTES.regionalPremium.lastModified}
           />
         </header>
 

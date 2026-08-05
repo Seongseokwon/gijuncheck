@@ -105,10 +105,10 @@ export default function RootLayout({
               <nav aria-label="데스크톱 주요 메뉴" className="hidden items-center gap-6 text-sm font-semibold text-slate-600 sm:flex">
                 <Link href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</Link>
                 <Link href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</Link>
-                <Link href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
+                <Link href={ROUTES.dependent.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
                 <Link href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</Link>
                 <Link
-                  href="/#judge"
+                  href={ROUTES.dependent.path}
                   className="inline-flex min-h-[44px] items-center rounded-[10px] bg-brand-900 px-4 text-white hover:bg-brand-800"
                 >
                   내 자격 확인
@@ -121,7 +121,7 @@ export default function RootLayout({
             >
               <Link href="/#guides" className="inline-flex min-h-[44px] items-center hover:text-brand-900">가이드</Link>
               <Link href="/#journey" className="inline-flex min-h-[44px] items-center hover:text-brand-900">이용 방법</Link>
-              <Link href="/#judge" className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
+              <Link href={ROUTES.dependent.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">피부양자 판정</Link>
               <Link href={ROUTES.verificationPolicy.path} className="inline-flex min-h-[44px] items-center hover:text-brand-900">검증 원칙</Link>
             </nav>
           </div>
@@ -136,7 +136,8 @@ export default function RootLayout({
               최종 확인은 국민건강보험공단(1577-1000)에 문의하시기 바랍니다.
             </p>
             <p className="mt-2">
-              기준 · {SITE.baseYear}년 · 최종 확인 {SITE.lastVerified}
+              기준 · {SITE.baseYear}년 · 최종 확인{' '}
+              <time dateTime={SITE.lastVerified}>{SITE.lastVerified}</time>
             </p>
             <nav className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
               <a

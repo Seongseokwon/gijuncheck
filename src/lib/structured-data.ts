@@ -24,6 +24,12 @@ export function siteJsonLd() {
           contentUrl: new URL('/logo.svg', SITE.url).toString(),
         },
         email: SITE.contactEmail,
+        contactPoint: {
+          '@type': 'ContactPoint',
+          contactType: 'customer support',
+          email: SITE.contactEmail,
+          availableLanguage: ['ko'],
+        },
       },
       {
         '@type': 'WebSite',
@@ -45,6 +51,30 @@ export function siteJsonLd() {
  */
 export function ldJson(data: unknown): string {
   return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+/** 도구 페이지가 공통 발행 주체와 연결되는 WebApplication 엔티티다. */
+export function webApplicationJsonLd({
+  name,
+  url,
+  description,
+}: {
+  name: string;
+  url: string;
+  description: string;
+}) {
+  const absoluteUrl = new URL(url, SITE.url).toString();
+  return {
+    '@type': 'WebApplication',
+    '@id': `${absoluteUrl}#application`,
+    name,
+    url: absoluteUrl,
+    description,
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: 'Web',
+    provider: { '@id': SITE_ENTITY_IDS.organization },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+  };
 }
 
 export interface BreadcrumbItem {

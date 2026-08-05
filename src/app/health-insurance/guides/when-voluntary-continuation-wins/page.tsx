@@ -109,6 +109,7 @@ export default function Page() {
               path: PATH,
               faq: FAQ,
               published: PUBLISHED,
+              modified: ROUTES.guideVoluntaryContinuation.lastModified,
             }),
           ),
         }}
@@ -290,7 +291,10 @@ export default function Page() {
 
         <SourceList sources={SOURCES} />
 
-        <GuideFooter published={PUBLISHED} />
+        <GuideFooter
+          published={PUBLISHED}
+          modified={ROUTES.guideVoluntaryContinuation.lastModified}
+        />
       </article>
     </>
   );

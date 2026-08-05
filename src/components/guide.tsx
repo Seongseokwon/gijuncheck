@@ -43,14 +43,19 @@ export function guideJsonLd({
   path,
   faq,
   published,
+  modified,
 }: {
   title: string;
   description: string;
   path: string;
   faq: FaqItem[];
   published: string;
+  modified?: string;
 }) {
   const url = new URL(path, SITE.url).toString();
+  const route = Object.values(ROUTES).find((entry) => entry.path === path);
+  const routeModified = route && 'lastModified' in route ? route.lastModified : undefined;
+  const effectiveModified = modified ?? routeModified ?? SITE.lastVerified;
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -68,7 +73,7 @@ export function guideJsonLd({
         },
         publisher: { '@id': SITE_ENTITY_IDS.organization },
         datePublished: toIsoDateTime(published),
-        dateModified: toIsoDateTime(SITE.lastVerified),
+        dateModified: toIsoDateTime(effectiveModified),
         inLanguage: 'ko',
       },
       breadcrumbJsonLd([
@@ -338,12 +343,18 @@ export function RelatedList({ keys }: { keys: readonly RouteKey[] }) {
 }
 
 /** 기준 연도·확인일. 신뢰와 검색 신선도 신호를 동시에 준다 */
-export function GuideFooter({ published }: { published: string }) {
+export function GuideFooter({
+  published,
+  modified = SITE.lastVerified,
+}: {
+  published: string;
+  modified?: string;
+}) {
   return (
     <p className="border-t border-slate-200 pt-6 text-sm text-slate-600">
       기준 · {SITE.baseYear}년 · 발행{' '}
       <time dateTime={published}>{published}</time> · 최종 확인{' '}
-      <time dateTime={SITE.lastVerified}>{SITE.lastVerified}</time>
+      <time dateTime={modified}>{modified}</time>
     </p>
   );
 }

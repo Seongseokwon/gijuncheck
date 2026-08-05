@@ -94,7 +94,10 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
     const publicationTimes = page.locator('article time[dateTime]');
     await expect(publicationTimes, `${ROUTES[key].path} 발행·확인일 time`).toHaveCount(2);
     await expect(publicationTimes.nth(0)).toHaveAttribute('dateTime', /^\d{4}-\d{2}-\d{2}$/);
-    await expect(publicationTimes.nth(1)).toHaveAttribute('dateTime', SITE.lastVerified);
+    await expect(publicationTimes.nth(1)).toHaveAttribute(
+      'dateTime',
+      ROUTES[key].lastModified ?? SITE.lastVerified,
+    );
     expect(breadcrumb, `${ROUTES[key].path} BreadcrumbList`).toBeDefined();
     expect(breadcrumb?.itemListElement).toHaveLength(2);
   }
@@ -142,6 +145,36 @@ test('검증 원칙 페이지는 AboutPage와 운영자 Person 엔티티를 제�
     url: policyUrl,
     worksFor: { '@id': `${SITE.url}#organization` },
   });
+});
+
+test('홈은 사이트 엔티티와 도구·질문 목록을 페이지 레벨 JSON-LD로 제공한다', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop-1440', '뷰포트와 무관한 JSON-LD 검사');
+  await page.goto(ROUTES.home.path);
+
+  const graph = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('script[type="application/ld+json"]')).flatMap(
+      (script) => {
+        if (!script.textContent) return [];
+        const json = JSON.parse(script.textContent) as {
+          '@graph'?: Array<Record<string, unknown>>;
+        };
+        return json['@graph'] ?? [];
+      },
+    ),
+  );
+
+  expect(graph).toEqual(
+    expect.arrayContaining([
+      expect.objectContaining({ '@type': 'Organization', '@id': `${SITE.url}#organization` }),
+      expect.objectContaining({ '@type': 'WebSite', '@id': `${SITE.url}#website` }),
+      expect.objectContaining({ '@type': 'WebPage', '@id': `${SITE.url}#home` }),
+      expect.objectContaining({ '@type': 'ItemList', '@id': `${SITE.url}#tools` }),
+      expect.objectContaining({ '@type': 'ItemList', '@id': `${SITE.url}#popular-questions` }),
+    ]),
+  );
+
+  const tools = graph.find((node) => node['@id'] === `${SITE.url}#tools`);
+  expect(tools?.itemListElement).toHaveLength(3);
 });
 
 /**

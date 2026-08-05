@@ -2,7 +2,7 @@ import VoluntaryComparison from '@/components/VoluntaryComparison';
 import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
-import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
+import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';
 import TrustSignal from '@/components/TrustSignal';
 
 const TITLE = '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인';
@@ -42,11 +42,11 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'WebApplication',
-      name: ROUTES.voluntaryContinuation.label,
-      applicationCategory: 'FinanceApplication',
-      operatingSystem: 'Web',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+      ...webApplicationJsonLd({
+        name: ROUTES.voluntaryContinuation.label,
+        url: ROUTES.voluntaryContinuation.path,
+        description: DESCRIPTION,
+      }),
     },
     breadcrumbJsonLd([
       { name: '기준체크', path: ROUTES.home.path },
@@ -96,6 +96,7 @@ export default function Page() {
             tone="reference"
             status="법령·공단 산식 기반 참고 비교"
             detail="현행 법령·공단 안내·보험료 산식을 반영한 비교입니다. 개인별 공단 고지액을 그대로 복제한 계산은 아닙니다."
+            lastVerified={ROUTES.voluntaryContinuation.lastModified}
           />
         </header>
 

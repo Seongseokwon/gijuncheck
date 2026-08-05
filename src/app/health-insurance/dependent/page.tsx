@@ -3,7 +3,7 @@ import { INCOME, PROPERTY } from '@/lib/constants/2026';
 import { toEok, toManwon } from '@/lib/dependent/judge';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
-import { breadcrumbJsonLd, ldJson } from '@/lib/structured-data';
+import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';
 import TrustSignal from '@/components/TrustSignal';
 
 const TITLE = '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정';
@@ -50,11 +50,11 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'WebApplication',
-      name: ROUTES.dependent.label,
-      applicationCategory: 'FinanceApplication',
-      operatingSystem: 'Web',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'KRW' },
+      ...webApplicationJsonLd({
+        name: ROUTES.dependent.label,
+        url: ROUTES.dependent.path,
+        description: DESCRIPTION,
+      }),
     },
     breadcrumbJsonLd([
       { name: '기준체크', path: ROUTES.home.path },
@@ -94,6 +94,7 @@ export default function Page() {
             tone="reference"
             status="공개 기준 8건 자체 재현"
             detail="공단 공개 안내와 시행규칙 기준을 코드로 재현한 참고 판정입니다. 공단 로그인 심사 결과나 개인별 최종 처리를 대조한 것은 아닙니다."
+            lastVerified={ROUTES.dependent.lastModified}
           />
         </header>
 
