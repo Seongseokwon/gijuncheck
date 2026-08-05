@@ -457,6 +457,14 @@ export function SubmitButton({
     <button
       type="button"
       onClick={onClick}
+      onKeyDown={(event) => {
+        // Playwright와 일부 브라우저 조합에서 type="button"의 Enter 활성화가
+        // 누락될 수 있으므로 키보드 제출을 명시적으로 보장한다.
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className="min-h-[54px] w-full rounded-xl bg-brand-900 px-5 py-3 text-base font-bold text-white shadow-[0_8px_20px_rgba(23,50,77,.14)] transition hover:bg-brand-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-accent-100"
     >
       {children}
@@ -482,19 +490,15 @@ export function ZeroValueConfirmModal({
   const dialogRef = useRef<HTMLElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
   const onCancelRef = useRef(onCancel);
-  const [mounted, setMounted] = useState(false);
 
   onCancelRef.current = onCancel;
 
   useEffect(() => {
     previousActiveElement.current =
       document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    setMounted(true);
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-
     const focusableSelector =
       'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const getFocusable = () =>
@@ -561,9 +565,7 @@ export function ZeroValueConfirmModal({
         previousActiveElement.current.focus();
       }
     };
-  }, [mounted]);
-
-  if (!mounted) return null;
+  }, []);
 
   return createPortal(
     <div

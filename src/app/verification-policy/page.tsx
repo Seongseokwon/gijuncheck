@@ -75,7 +75,7 @@ export default function VerificationPolicyPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: ldJson(jsonLd) }}
       />
-      <article className="mx-auto max-w-4xl space-y-12 px-4 py-12 sm:py-16">
+      <article className="mx-auto min-w-0 max-w-4xl space-y-12 px-4 py-12 sm:py-16">
       <header className="rounded-[22px] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p className="text-sm font-bold text-accent-700">기준체크의 운영 원칙</p>
         <h1 className="mt-3 text-3xl font-bold tracking-tight text-brand-950 sm:text-4xl">
@@ -117,8 +117,8 @@ export default function VerificationPolicyPage() {
         <h2 id="scope" className="text-2xl font-bold tracking-tight text-brand-950">
           현재 공개 범위
         </h2>
-        <div className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
-          <table className="min-w-[42rem] w-full border-collapse text-sm">
+        <div className="min-w-0 max-w-full overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
+          <table className="w-full min-w-0 table-fixed border-collapse text-sm sm:min-w-[42rem]">
             <caption className="sr-only">기준체크 기능별 공개 범위와 확인 방식</caption>
             <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
               <tr>
@@ -152,8 +152,8 @@ export default function VerificationPolicyPage() {
         <h2 id="dependent-sources" className="text-2xl font-bold tracking-tight text-brand-950">
           피부양자 판정의 근거 매핑
         </h2>
-        <div className="overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
-          <table className="min-w-[58rem] w-full border-collapse text-sm">
+        <div className="min-w-0 max-w-full overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
+          <table className="w-full min-w-0 table-fixed border-collapse text-sm sm:min-w-[58rem]">
             <caption className="sr-only">피부양자 판정 단계별 근거 매핑</caption>
             <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
               <tr>

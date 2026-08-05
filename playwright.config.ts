@@ -14,7 +14,12 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  reporter: [['list']],
+  reporter: process.env.CI
+    ? [
+        ['list'],
+        ['html', { outputFolder: 'playwright-report', open: 'never' }],
+      ]
+    : [['list']],
 
   // WebKit 프로젝트가 붙으면서 같은 시간에 도는 브라우저가 늘었다. 느린 엔진이
   // 경합에 밀려 나는 시간 초과를 실패로 오해하지 않도록 기본값보다 여유를 둔다.

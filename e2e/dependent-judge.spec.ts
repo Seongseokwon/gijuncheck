@@ -225,7 +225,7 @@ test('0원 입력 항목이 있으면 확인 후 판정을 진행한다', async 
 
   const dialog = page.getByRole('dialog', { name: '0원 입력 항목을 확인해 주세요' });
   await expect(dialog).toBeVisible();
-  await expect(dialog).toContainText('사업소득 · 0원');
+  await expect(dialog).toContainText('사업소득 (원) · 0원');
   await expect(page.getByRole('status')).toHaveCount(0);
 
   await dialog.getByRole('button', { name: '입력 수정하기' }).click();
