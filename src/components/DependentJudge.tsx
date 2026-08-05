@@ -77,11 +77,13 @@ export default function DependentJudge() {
 
   useEffect(() => {
     if (!submissionId) return;
-    const frame = requestAnimationFrame(() => {
-      resultHeadingRef.current?.focus();
-      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
-    return () => cancelAnimationFrame(frame);
+    const timer = window.setTimeout(() => {
+      const heading = resultHeadingRef.current;
+      if (!heading) return;
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [submissionId]);
 
   const result = useMemo(() => judgeDependent(input), [input]);

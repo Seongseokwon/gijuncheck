@@ -54,11 +54,13 @@ export default function VoluntaryComparison() {
 
   useEffect(() => {
     if (!submissionId) return;
-    const frame = requestAnimationFrame(() => {
-      resultHeadingRef.current?.focus();
-      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
-    return () => cancelAnimationFrame(frame);
+    const timer = window.setTimeout(() => {
+      const heading = resultHeadingRef.current;
+      if (!heading) return;
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [submissionId]);
 
   useEffect(() => {
@@ -136,31 +138,31 @@ export default function VoluntaryComparison() {
             50%, 사업·금융·기타소득은 100% 반영합니다.
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            <Field label="근로소득 (50%) (원)">
+            <Field label="근로소득 (원, 50% 반영)">
               <MoneyInput
                 value={income.wage}
                 onChange={(v) => set('wage', v)}
               />
             </Field>
-            <Field label="연금소득 (50%) (원)">
+            <Field label="연금소득 (원, 50% 반영)">
               <MoneyInput
                 value={income.pension}
                 onChange={(v) => set('pension', v)}
               />
             </Field>
-            <Field label="사업소득 (100%) (원)">
+            <Field label="사업소득 (원, 100% 반영)">
               <MoneyInput
                 value={income.business}
                 onChange={(v) => set('business', v)}
               />
             </Field>
-            <Field label="금융소득 (100%) (원)">
+            <Field label="금융소득 (원, 100% 반영)">
               <MoneyInput
                 value={income.financial}
                 onChange={(v) => set('financial', v)}
               />
             </Field>
-            <Field label="기타소득 (100%) (원)" hint="과세자료 기준">
+            <Field label="기타소득 (원, 100% 반영)" hint="과세자료 기준">
               <MoneyInput
                 value={income.other}
                 onChange={(v) => set('other', v)}

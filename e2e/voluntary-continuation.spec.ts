@@ -108,7 +108,7 @@ test('신청 기한을 "퇴직 후 90일"로 안내하지 않는다', async ({ p
 test('보수 외 소득이 연 2,000만원을 넘으면 추가 보험료가 있다는 것을 알려준다', async ({
   page,
 }) => {
-  await fill(page, '사업소득 (100%)', 30_000_000);
+  await fill(page, '사업소득 (원, 100% 반영)', 30_000_000);
   await compare(page);
 
   // 금액의 정확성은 단위 테스트가 본다. 여기서는 존재 여부만 고정한다.
@@ -116,7 +116,7 @@ test('보수 외 소득이 연 2,000만원을 넘으면 추가 보험료가 있�
 });
 
 test('보수 외 소득이 기준 이하이면 추가 보험료 줄을 띄우지 않는다', async ({ page }) => {
-  await fill(page, '사업소득 (100%)', 10_000_000);
+  await fill(page, '사업소득 (원, 100% 반영)', 10_000_000);
   await compare(page);
 
   await expect(result(page)).toBeVisible();
@@ -160,7 +160,7 @@ test('공식 대조 상태에 맞는 고지를 보여주고 면책·비전송 �
 
 test('결과가 나온 뒤에도 가로 스크롤을 만들지 않는다', async ({ page }) => {
   await fill(page, '재산금액 합계', 900_000_000);
-  await fill(page, '사업소득 (100%)', 50_000_000);
+  await fill(page, '사업소득 (원, 100% 반영)', 50_000_000);
   await compare(page);
 
   const { scrollWidth, clientWidth } = await page.evaluate(() => ({

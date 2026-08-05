@@ -92,15 +92,15 @@ test('도움말이 있는 필드도 데스크톱에서 같은 행에 정렬된�
     {
       path: ROUTES.regionalPremium.path,
       rows: [
-        ['사업소득 (100%)', '금융소득 (100%)', '기타소득 (100%)'],
-        ['근로소득 (50%)', '공적연금소득 (50%)'],
+        ['사업소득 (원, 100% 반영)', '금융소득 (원, 100% 반영)', '기타소득 (원, 100% 반영)'],
+        ['근로소득 (원, 50% 반영)', '공적연금소득 (원, 50% 반영)'],
       ],
     },
     {
       path: ROUTES.voluntaryContinuation.path,
       rows: [
-        ['근로소득 (50%)', '연금소득 (50%)', '사업소득 (100%)'],
-        ['금융소득 (100%)', '기타소득 (100%)'],
+        ['근로소득 (원, 50% 반영)', '연금소득 (원, 50% 반영)', '사업소득 (원, 100% 반영)'],
+        ['금융소득 (원, 100% 반영)', '기타소득 (원, 100% 반영)'],
       ],
     },
   ] as const;
@@ -135,7 +135,7 @@ test('탈락 시 이어지는 CTA가 금액을 URL에 노출하지 않고 지역
   await expect(link).toHaveAttribute('href', ROUTES.regionalPremium.path);
   await link.click();
   await expect(page).toHaveURL(new RegExp(`${ROUTES.regionalPremium.path.replaceAll('/', '\\/')}$`));
-  await expect(page.getByLabel('근로소득 (50%)')).toHaveValue('30,000,000');
+  await expect(page.getByLabel('근로소득 (원, 50% 반영)')).toHaveValue('30,000,000');
   expect(new URL(page.url()).search).toBe('');
 });
 

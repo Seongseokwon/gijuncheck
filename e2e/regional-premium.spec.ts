@@ -67,8 +67,8 @@ test.describe('소득 종류별 반영률 — 근로·연금은 50%', () => {
   test('근로 500만 + 연금 500만(=반영 500만)이 사업소득 500만과 같은 보험료가 된다', async ({
     page,
   }) => {
-    await fillMoney(page, '근로소득 (50%)', 5_000_000);
-    await fillMoney(page, '공적연금소득 (50%)', 5_000_000);
+    await fillMoney(page, '근로소득 (원, 50% 반영)', 5_000_000);
+    await fillMoney(page, '공적연금소득 (원, 50% 반영)', 5_000_000);
     await calculate(page);
 
     await expect(result(page)).toContainText('29,950원'); // 건강보험료
@@ -76,13 +76,13 @@ test.describe('소득 종류별 반영률 — 근로·연금은 50%', () => {
 
     // 같은 화면에서 사업소득 500만원만 넣어도 결과가 같아야 한다
     await page.reload();
-    await fillMoney(page, '사업소득 (100%)', 5_000_000);
+    await fillMoney(page, '사업소득 (원, 100% 반영)', 5_000_000);
     await calculate(page);
     await expect(result(page)).toContainText('33,880원');
   });
 
   test('입력 즉시 합산소득 → 반영 후 금액 → 소득월액을 되읽어준다', async ({ page }) => {
-    await fillMoney(page, '공적연금소득 (50%)', 12_000_000);
+    await fillMoney(page, '공적연금소득 (원, 50% 반영)', 12_000_000);
 
     const summary = page.getByText('합산소득', { exact: false });
     await expect(summary).toContainText('12,000,000원');
@@ -110,7 +110,7 @@ test.describe('재산 기본공제 1억 경계', () => {
 });
 
 test('상한을 넘는 소득이면 상한 보험료가 적용되고 계산값을 함께 보여준다', async ({ page }) => {
-  await fillMoney(page, '사업소득 (100%)', 800_000_000);
+  await fillMoney(page, '사업소득 (원, 100% 반영)', 800_000_000);
   await calculate(page);
 
   await expect(result(page)).toContainText('4,591,740원'); // 상한
@@ -165,9 +165,9 @@ test('판정기에서 넘어온 소득·재산이 다시 입력하지 않아도 
   await page.goto(ROUTES.regionalPremium.path);
 
   // 판정기의 소득 종류별 금액을 그대로 전달해 반영률을 보존한다.
-  await expect(moneyField(page, '사업소득 (100%)')).toHaveValue('');
-  await expect(moneyField(page, '근로소득 (50%)')).toHaveValue('12,000,000');
-  await expect(moneyField(page, '공적연금소득 (50%)')).toHaveValue('30,000,000');
+  await expect(moneyField(page, '사업소득 (원, 100% 반영)')).toHaveValue('');
+  await expect(moneyField(page, '근로소득 (원, 50% 반영)')).toHaveValue('12,000,000');
+  await expect(moneyField(page, '공적연금소득 (원, 50% 반영)')).toHaveValue('30,000,000');
   await expect(moneyField(page, '재산세 과세표준 합계')).toHaveValue('200,000,000');
   expect(new URL(page.url()).search).toBe('');
 
@@ -218,7 +218,7 @@ test('임의계속가입이 미검증 상태로 되돌아가면 CTA를 숨긴다
 });
 
 test('결과가 나온 뒤에도 가로 스크롤을 만들지 않는다', async ({ page }) => {
-  await fillMoney(page, '사업소득 (100%)', 800_000_000);
+  await fillMoney(page, '사업소득 (원, 100% 반영)', 800_000_000);
   await fillMoney(page, '재산세 과세표준 합계', 900_000_000);
   await calculate(page);
 
@@ -236,7 +236,7 @@ test('모바일 결과 행에서 금액이 줄바꿈되거나 카드 밖으로 �
 }) => {
   test.skip(!isMobile, '모바일 프로젝트에서만 의미 있는 검사');
 
-  await fillMoney(page, '사업소득 (100%)', 800_000_000);
+  await fillMoney(page, '사업소득 (원, 100% 반영)', 800_000_000);
   await calculate(page);
 
   const resultCard = result(page);
@@ -255,7 +255,7 @@ test('모바일 결과 행에서 금액이 줄바꿈되거나 카드 밖으로 �
 });
 
 test('키보드만으로 소득 입력 → 계산 → 결과까지 도달한다', async ({ page }) => {
-  await moneyField(page, '사업소득 (100%)').focus();
+  await moneyField(page, '사업소득 (원, 100% 반영)').focus();
   await page.keyboard.type('5000000');
 
   const button = page.getByRole('button', { name: '보험료 계산하기' });

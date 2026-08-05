@@ -73,11 +73,13 @@ export default function RegionalPremiumCalc() {
 
   useEffect(() => {
     if (!submissionId) return;
-    const frame = requestAnimationFrame(() => {
-      resultHeadingRef.current?.focus();
-      resultHeadingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    });
-    return () => cancelAnimationFrame(frame);
+    const timer = window.setTimeout(() => {
+      const heading = resultHeadingRef.current;
+      if (!heading) return;
+      heading.focus({ preventScroll: true });
+      heading.scrollIntoView({ block: 'start', behavior: 'auto' });
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [submissionId]);
 
   // 판정기에서 넘어온 값이 있으면 같은 탭의 임시 핸드오프를 소비한다.
@@ -125,7 +127,7 @@ export default function RegionalPremiumCalc() {
 
         <div className="grid gap-5 sm:grid-cols-3">
           {FULL_FIELDS.map((f) => (
-            <Field key={f.key} label={`${f.label} (100%) (원)`} hint={f.hint}>
+            <Field key={f.key} label={`${f.label} (원, 100% 반영)`} hint={f.hint}>
               <MoneyInput
                 value={income[f.key]}
                 onChange={(v) => set(f.key, v)}
@@ -136,7 +138,7 @@ export default function RegionalPremiumCalc() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           {HALF_FIELDS.map((f) => (
-            <Field key={f.key} label={`${f.label} (50%) (원)`} hint={f.hint}>
+            <Field key={f.key} label={`${f.label} (원, 50% 반영)`} hint={f.hint}>
               <MoneyInput
                 value={income[f.key]}
                 onChange={(v) => set(f.key, v)}
