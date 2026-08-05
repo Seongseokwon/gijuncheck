@@ -18,7 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: new URL(route.path, SITE.url).toString(),
     // 공통 배포일이 아니라 각 경로의 실제 콘텐츠·기준 변경일을 사용한다.
     lastModified: route.lastModified,
-    changeFrequency: 'monthly',
+    changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));
 }

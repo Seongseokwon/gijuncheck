@@ -66,10 +66,10 @@
 | 콘텐츠 최대폭 | max-w-3xl = 768px | `layout.tsx` |
 | Breakpoint | sm(640px)만 실사용. lg:grid-cols-3 1곳(소득 5필드 그리드) | `DependentJudge.tsx` |
 | Radius | rounded-md(6px) 인풋/버튼, rounded-lg(8px) 카드 | `ui.tsx` |
-| 폰트 | 커스텀 폰트 지정 없음(시스템 기본 sans). next/font 미사용 | `src/app` 전체 grep 결과 0건 |
+| 폰트 | 외부 웹폰트 미로드. system-ui 중심 스택 사용 | `src/app/globals.css`, ADR-003 |
 | iOS 대응 | color-scheme: light 강제, select 화살표 직접 그림, number spinner 제거 | `globals.css` |
 
-### 대비 기준선 (`.claude/agents/contrast.py` 계산, sRGB WCAG 공식)
+### 대비 기준선 (`docs/design-debate/tools/contrast.py` 계산, sRGB WCAG 공식)
 
 | 조합 | 대비 | 본문 AA(4.5) | 큰글씨 AA(3.0) |
 |---|---:|---|---|

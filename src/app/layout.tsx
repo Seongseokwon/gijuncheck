@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import Analytics from '@/components/Analytics';
@@ -42,10 +43,11 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     images: [SITE.ogImage],
   },
-  // 최종 도메인이 아니면 전 페이지 noindex. src/lib/site.ts 참조
-  robots: SITE.indexable
-    ? { index: true, follow: true }
-    : { index: false, follow: false },
+  // 최종 도메인이 아니면 전 페이지 noindex. 색인 허용은 기본 동작에 맡겨
+  // 404 전용 noindex와 robots 메타가 중복되지 않게 한다.
+  ...(SITE.indexable
+    ? {}
+    : { robots: { index: false, follow: false } }),
 
   // 네이버 서치어드바이저 사이트 소유 확인 태그
   verification: {
@@ -97,7 +99,14 @@ export default function RootLayout({
                 aria-label={`${SITE.name} 홈`}
                 className="inline-flex min-h-[44px] items-center text-brand-950"
               >
-                <img src="/logo.svg" alt="" aria-hidden className="block h-9 w-9" />
+                <Image
+                  src="/logo.svg"
+                  alt=""
+                  aria-hidden
+                  width={36}
+                  height={36}
+                  className="block h-9 w-9"
+                />
                 <span className="ml-3 text-xl font-bold tracking-[-.04em] text-brand-950">
                   {SITE.name}
                 </span>

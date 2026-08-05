@@ -23,6 +23,15 @@ export interface RouteEntry {
   priority: number;
   /** 해당 페이지의 콘텐츠·기준이 실제로 마지막 변경된 날. 배포일과 구분한다. */
   lastModified?: string;
+  /** 콘텐츠 성격에 맞춘 검색엔진 재방문 주기 */
+  changeFrequency?:
+    | 'always'
+    | 'hourly'
+    | 'daily'
+    | 'weekly'
+    | 'monthly'
+    | 'yearly'
+    | 'never';
   /** 구현 완료 여부. false 면 sitemap 에서 제외되고 허브에서 "준비 중"으로 표시된다 */
   ready: boolean;
   /** 색인 대상이 아닌 페이지 (정책·약관 등) */
@@ -36,6 +45,7 @@ export const ROUTES = {
     ogImage: '/og/home.png',
     priority: 1,
     lastModified: '2026-08-04',
+    changeFrequency: 'weekly',
     ready: true,
   },
 
@@ -46,6 +56,7 @@ export const ROUTES = {
     ogImage: '/og/dependent.png',
     priority: 0.9,
     lastModified: '2026-08-04',
+    changeFrequency: 'monthly',
     ready: true,
   },
   regionalPremium: {
@@ -54,6 +65,7 @@ export const ROUTES = {
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     /** 금융소득 기준 수정 후 공단 공식 모의계산 대표 사례 재대조 필요 */
     ready: true,
   },
@@ -63,6 +75,7 @@ export const ROUTES = {
     ogImage: '/og/voluntary-continuation.png',
     priority: 0.8,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     /** 2026-08-03 법령·공단 산식·대표 사례 대조 완료 */
     ready: true,
   },
@@ -74,6 +87,7 @@ export const ROUTES = {
     ogImage: '/og/property-tax-base.png',
     priority: 0.7,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     ready: true,
   },
   guideBusinessRegistration: {
@@ -82,6 +96,7 @@ export const ROUTES = {
     ogImage: '/og/before-business-registration.png',
     priority: 0.7,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     ready: true,
   },
   guideLosingEligibility: {
@@ -90,6 +105,7 @@ export const ROUTES = {
     ogImage: '/og/losing-eligibility.png',
     priority: 0.7,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     ready: true,
   },
   guideVoluntaryContinuation: {
@@ -98,6 +114,7 @@ export const ROUTES = {
     ogImage: '/og/when-voluntary-continuation-wins.png',
     priority: 0.7,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     ready: true,
   },
   guidePensionImpact: {
@@ -106,6 +123,7 @@ export const ROUTES = {
     ogImage: '/og/pension-impact.png',
     priority: 0.7,
     lastModified: '2026-08-03',
+    changeFrequency: 'monthly',
     ready: true,
   },
   guideNovemberReassessment: {
@@ -115,6 +133,7 @@ export const ROUTES = {
     ogImage: '/og/november-reassessment.png',
     priority: 0.8,
     lastModified: '2026-08-03',
+    changeFrequency: 'weekly',
     ready: true,
   },
 
@@ -124,6 +143,7 @@ export const ROUTES = {
     ogImage: '/og/verification-policy.png',
     priority: 0.5,
     lastModified: '2026-08-03',
+    changeFrequency: 'yearly',
     ready: true,
   },
 

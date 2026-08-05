@@ -46,8 +46,7 @@ test.describe('OG/canonical 메타데이터', () => {
     const ogImage = page.locator('meta[property="og:image"]');
     await expect(ogImage).toHaveAttribute('content', 'https://gijuncheck.kr/og/home.png');
 
-    const robots = page.locator('meta[name="robots"]');
-    await expect(robots).toHaveAttribute('content', /index, ?follow|index,follow/);
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
   });
 
   test('준비된 페이지마다 해당 페이지 전용 OG 이미지를 사용한다', async ({ page }) => {
@@ -104,7 +103,7 @@ test.describe('OG/canonical 메타데이터', () => {
     await expect(page).toHaveTitle('페이지를 찾을 수 없습니다 | 기준체크');
     await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
     const noindexRobots = page.locator('meta[name="robots"][content*="noindex"]');
-    expect(await noindexRobots.count()).toBeGreaterThan(0);
+    await expect(noindexRobots).toHaveCount(1);
   });
 
   test('정책 페이지(약관·개인정보·문의)는 noindex 다', async ({ page }) => {
@@ -174,6 +173,20 @@ test.describe('OG/canonical 메타데이터', () => {
 
     expect(entries).toEqual(expected);
     expect(entries.every(([, value]) => /^\d{4}-\d{2}-\d{2}$/.test(value))).toBe(true);
+    expect(new Set(entries.map(([, value]) => value)).size).toBeGreaterThan(1);
+  });
+
+  test('sitemap 의 changefreq 는 경로별 콘텐츠 주기를 반영한다', async ({ page }) => {
+    const res = await page.goto('/sitemap.xml');
+    const xml = await res!.text();
+    const entries = [...xml.matchAll(/<url>\s*<loc>([^<]+)<\/loc>\s*<lastmod>[^<]+<\/lastmod>\s*<changefreq>([^<]+)<\/changefreq>/g)].map(
+      (match) => [new URL(match[1]).pathname, match[2]] as const,
+    );
+    const expected = indexableRoutes().map(
+      (route) => [route.path, route.changeFrequency] as const,
+    );
+
+    expect(entries).toEqual(expected);
     expect(new Set(entries.map(([, value]) => value)).size).toBeGreaterThan(1);
   });
 });

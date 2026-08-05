@@ -27,7 +27,7 @@ export default defineConfig({
   },
 
   webServer: {
-    command: 'npx serve out -l 4173',
+    command: 'node node_modules/serve/build/main.js out -l 4173',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: process.env.REUSE_E2E_SERVER === 'true',
     timeout: 30_000,

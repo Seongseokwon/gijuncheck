@@ -205,6 +205,20 @@ test('제출 전에는 결과 영역이 렌더링되지 않는다', async ({ pag
   await expect(page.getByRole('status')).toHaveCount(0);
 });
 
+test('금액이 16자리를 넘으면 입력을 반영하지 않고 피드백한다', async ({ page }) => {
+  const input = page.getByLabel('근로소득');
+  await input.fill('12345678901234567');
+
+  await expect(input).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('p[role="alert"]')).toContainText(
+    '금액은 16자리 이하로 입력해 주세요.',
+  );
+
+  await input.fill('1234567890123456');
+  await expect(input).toHaveValue('1,234,567,890,123,456');
+  await expect(page.locator('p[role="alert"]')).toHaveCount(0);
+});
+
 test('0원 입력 항목이 있으면 확인 후 판정을 진행한다', async ({ page }) => {
   await selectRelation(page, '배우자');
   await page.getByRole('button', { name: '내 자격 판정하기' }).click();

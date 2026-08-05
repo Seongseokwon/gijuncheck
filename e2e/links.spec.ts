@@ -102,7 +102,7 @@ test('홈은 피부양자 판정기 실경로로 최소 2개의 내부 링크를
   expect(dependentLinks.length).toBeGreaterThanOrEqual(2);
 });
 
-test('sitemap.xml 의 모든 URL이 200으로 열린다', async ({ page, baseURL }) => {
+test('sitemap.xml 의 모든 URL이 200으로 열린다', async ({ page }) => {
   const res = await page.goto('/sitemap.xml');
   expect(res?.status()).toBe(200);
   const xml = await res!.text();
@@ -113,5 +113,22 @@ test('sitemap.xml 의 모든 URL이 200으로 열린다', async ({ page, baseURL
     const url = new URL(loc);
     const r = await page.goto(url.pathname);
     expect(r?.status(), `${loc}`).toBeLessThan(400);
+  }
+});
+
+test('정적 빌드 루트에 내부 문서와 사용하지 않는 공개 자산이 노출되지 않는다', async ({ page }) => {
+  const internalPaths = [
+    '/README.md',
+    '/public/README.md',
+    '/critic-alpha.md',
+    '/critic-beta.md',
+    '/contrast.py',
+    '/.claude/agents/contrast.py',
+    '/og.png',
+  ];
+
+  for (const path of internalPaths) {
+    const response = await page.request.get(path);
+    expect(response.status(), `${path} 는 빌드 루트에 없어야 한다`).toBe(404);
   }
 });

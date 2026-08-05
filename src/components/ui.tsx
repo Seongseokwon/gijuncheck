@@ -174,12 +174,17 @@ export function MoneyInput({
   id?: string;
   'aria-labelledby'?: string;
 }) {
+  const errorId = useId();
+  const [tooManyDigits, setTooManyDigits] = useState(false);
+
   return (
     <>
       <input
         type="text"
         id={id}
         aria-labelledby={ariaLabelledBy}
+        aria-invalid={tooManyDigits}
+        aria-describedby={tooManyDigits ? errorId : undefined}
         // 모바일 숫자 키패드. type=number 없이도 숫자 입력이 편해진다
         inputMode="numeric"
         autoComplete="off"
@@ -189,12 +194,24 @@ export function MoneyInput({
         onChange={(e) => {
           // 숫자만 남긴다. 콤마·원·공백을 붙여넣어도 받아준다
           const digits = e.target.value.replace(/[^0-9]/g, '');
-          if (digits === '') return onChange(0);
-          // 자릿수 폭주 방지 (조 단위 이상은 입력 오류로 본다)
-          if (digits.length > 15) return;
+          if (digits === '') {
+            setTooManyDigits(false);
+            return onChange(0);
+          }
+          // 16자리는 허용하되, 초과 입력은 조용히 버리지 않고 이유를 알린다.
+          if (digits.length > 16) {
+            setTooManyDigits(true);
+            return;
+          }
+          setTooManyDigits(false);
           onChange(Number(digits));
         }}
       />
+      {tooManyDigits && (
+        <p id={errorId} role="alert" className="mt-1.5 text-right text-sm text-red-700">
+          금액은 16자리 이하로 입력해 주세요.
+        </p>
+      )}
       {showReading && value > 0 && (
         <p className="mt-1.5 text-right text-sm text-slate-600">
           {toKoreanAmount(value)}
