@@ -17,7 +17,7 @@ const ALL_ROUTES: RouteEntry[] = Object.values(ROUTES);
  * 빌드됐는지, title/description 이 비어있지 않은지.
  * 여기서 확인하지 못하는 것: OG 이미지가 실제로 200을 반환하는지, 카카오·트위터
  * 공유 미리보기가 실제로 어떻게 보이는지 — 이건 도메인이 살아있는 실제
- * 프로덕션에서 손으로 확인해야 한다 (04-실행-우선순위.md P0-2).
+ * 프로덕션에서 손으로 확인해야 한다 (로컬 전용 `docs/04-실행-우선순위.md` P0-2).
  */
 
 test.describe('OG/canonical 메타데이터', () => {

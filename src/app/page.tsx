@@ -120,34 +120,17 @@ const homeJsonLd = {
       publisher: { '@id': SITE_ENTITY_IDS.organization },
       inLanguage: 'ko',
     },
-    {
-      '@type': 'ItemList',
-      '@id': `${SITE.url}#tools`,
-      name: '기준체크 건강보험 도구',
-      itemListElement: TOOL_KEYS.filter((key) => ROUTES[key].ready).map(
-        (key, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: ROUTES[key].label,
-          url: new URL(ROUTES[key].path, SITE.url).toString(),
-        }),
-      ),
-    },
-    {
-      '@type': 'ItemList',
-      '@id': `${SITE.url}#popular-questions`,
-      name: '자주 찾는 질문',
-      itemListElement: POPULAR_QUESTIONS.map((item, index) => {
-        const route = ROUTES[item.routeKey];
-        const href = `${route.path}${'anchor' in item ? `#${item.anchor}` : ''}`;
-        return {
-          '@type': 'ListItem',
-          position: index + 1,
-          name: item.question,
-          url: new URL(href, SITE.url).toString(),
-        };
-      }),
-    },
+    // `ItemList` 를 여기에 두지 않는다 — 2026-08-06 Rich Results Test 실측 결과,
+    // Google 은 홈의 `ItemList` 두 개(`#tools`·`#popular-questions`)를 **캐러셀
+    // 후보로 읽고 「2 invalid items」로 판정했다.**
+    //
+    // 형식 문제가 아니라 자격 문제다. 캐러셀 리치 결과는 Recipe·Course·Movie·
+    // Restaurant·Product 계열에만 지원되므로, `ListItem` 을 `item` 으로 감싸도
+    // 건강보험 도구 목록은 대상이 되지 않는다. **고치면 유효해지는 오류가 아니라
+    // 얻을 수 없는 리치 결과를 주장하던 상태였다.**
+    //
+    // 도구·질문 목록은 화면의 실제 링크와 `BreadcrumbList`·`WebSite` 로 이미
+    // 전달된다. 다시 추가하지 말 것 — `e2e/guide-quality.spec.ts` 가 회귀를 막는다.
   ],
 };
 
