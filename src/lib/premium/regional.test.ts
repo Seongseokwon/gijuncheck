@@ -170,6 +170,96 @@ describe('재산점수 산정', () => {
   });
 
   /**
+   * 농어촌 지역 거주 경감 — 2026-08-06 공단 모의계산 실측으로 확정.
+   *
+   * 기대값은 전부 공단 화면에서 읽은 숫자다.
+   */
+  describe('농어촌 지역 거주 경감', () => {
+    const rural = { ruralResident: true };
+
+    it('경감을 요청하지 않으면 0원이다', () => {
+      const r = calculateRegionalPremium(income({ business: 3_000_000 }), 360_000_000);
+      expect(r.ruralReduction).toBe(0);
+      expect(r.total).toBe(180_490); // 공단 C10
+    });
+
+    it('건강보험료의 22%를 10원 단위로 절사해 경감한다', () => {
+      // 공단 실측: 건강 159,530 → 경감 35,090 → 장기 16,350 → 합계 140,790
+      const r = calculateRegionalPremium(
+        income({ business: 3_000_000 }),
+        360_000_000,
+        rural,
+      );
+      expect(r.health).toBe(159_530); // ④는 경감 전 값을 유지한다
+      expect(r.ruralReduction).toBe(35_090);
+      expect(r.longTermCare).toBe(16_350);
+      expect(r.total).toBe(140_790);
+    });
+
+    it('장기요양보험료는 경감 후 건강보험료 기준으로 계산한다', () => {
+      // 순서를 반대로 하면 장기요양이 20,960원이 되어 과대 계산된다.
+      const withRural = calculateRegionalPremium(
+        income({ business: 3_000_000 }),
+        360_000_000,
+        rural,
+      );
+      const without = calculateRegionalPremium(
+        income({ business: 3_000_000 }),
+        360_000_000,
+      );
+      expect(without.longTermCare).toBe(20_960);
+      expect(withRural.longTermCare).toBeLessThan(without.longTermCare);
+    });
+
+    it('하한액에도 경감이 적용된다', () => {
+      // 공단 실측: 소득·재산 0원 → 건강 20,160 → 경감 4,430 → 장기 2,060 → 합계 17,790
+      const r = calculateRegionalPremium(noIncome, 0, rural);
+      expect(r.health).toBe(PREMIUM_LIMIT.LOWER);
+      expect(r.ruralReduction).toBe(4_430);
+      expect(r.longTermCare).toBe(2_060);
+      expect(r.total).toBe(17_790);
+    });
+
+    it('사업소득이 500만원을 넘으면 경감하지 않고 사유를 남긴다', () => {
+      const r = calculateRegionalPremium(
+        income({ business: 6_000_000 }),
+        360_000_000,
+        rural,
+      );
+      expect(r.ruralReduction).toBe(0);
+      expect(r.ruralReductionBlockedReason).toContain('농어업인');
+    });
+
+    it('사업소득이 넘어도 농어업인 등록자가 있으면 경감한다', () => {
+      // 공단 실측(조건 무검사): 건강 175,320 → 경감 38,570 → 장기 17,960 → 합계 154,710
+      const r = calculateRegionalPremium(
+        income({ business: 6_000_000 }),
+        360_000_000,
+        { ruralResident: true, registeredFarmer: true },
+      );
+      expect(r.ruralReduction).toBe(38_570);
+      expect(r.longTermCare).toBe(17_960);
+      expect(r.total).toBe(154_710);
+      expect(r.ruralReductionBlockedReason).toBeUndefined();
+    });
+
+    it('사업소득 500만원 경계에서는 경감된다 (이하 조건)', () => {
+      const at = calculateRegionalPremium(income({ business: 5_000_000 }), 0, rural);
+      const over = calculateRegionalPremium(income({ business: 5_000_001 }), 0, rural);
+      expect(at.ruralReduction).toBeGreaterThan(0);
+      expect(over.ruralReduction).toBe(0);
+    });
+
+    it('읍·면 거주가 아니면 농어업인이어도 경감하지 않는다', () => {
+      const r = calculateRegionalPremium(noIncome, 360_000_000, {
+        registeredFarmer: true,
+      });
+      expect(r.ruralReduction).toBe(0);
+      expect(r.ruralReductionBlockedReason).toBeUndefined();
+    });
+  });
+
+  /**
    * 2026-08-06 공단 재대조에서 발견.
    *
    * 공단 화면 ①은 하한·상한을 적용한 값을 표시해 `① + ③ = ④`가 성립한다.

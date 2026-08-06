@@ -18,6 +18,7 @@ import {
   INCOME_REFLECTION,
   PREMIUM_LIMIT,
   RATE,
+  RURAL_REDUCTION,
   VOLUNTARY_CONTINUATION,
 } from '../constants/2026';
 import {
@@ -109,9 +110,22 @@ export interface PremiumBreakdown {
   health: number;
   /** 상한·하한이 적용되었는지 */
   limitApplied: 'lower' | 'upper' | null;
-  /** 장기요양보험료 (원/월) */
+  /**
+   * 농어촌 지역 거주 경감액 (원/월). 적용되지 않으면 0.
+   * 공단 화면의 ⑥ 항목에 해당한다.
+   */
+  ruralReduction: number;
+  /**
+   * 농어촌 경감을 요청했지만 **적용하지 않은 사유**.
+   * 적용했거나 요청하지 않았으면 undefined.
+   *
+   * 공단 모의계산기는 이 조건을 검사하지 않고 무조건 22%를 적용한다.
+   * 우리는 제도 기준으로 판정하므로 결과가 갈릴 수 있고, 그 사실을 화면에 밝힌다.
+   */
+  ruralReductionBlockedReason?: string;
+  /** 장기요양보험료 (원/월). **경감 후 건강보험료** 기준으로 계산한다 */
   longTermCare: number;
-  /** 합계 (원/월) */
+  /** 합계 (원/월). 건강보험료 - 경감액 + 장기요양보험료 */
   total: number;
   /** 등급표 자체가 검증되었는지 */
   verified: boolean;
@@ -172,16 +186,49 @@ function applyLimit(health: number, propertyPortion = 0): {
   return { health: roundPremiumUnit(healthWithIncomeFloor), limitApplied: null };
 }
 
+export interface RegionalPremiumOptions {
+  /** 군·도농복합시의 읍·면지역에 거주하는가 */
+  ruralResident?: boolean;
+  /** 세대에 농어업인으로 등록된 가입자가 있는가 */
+  registeredFarmer?: boolean;
+}
+
+/**
+ * 농어촌 경감 판정.
+ *
+ * 제도 기준으로 본다 — 읍·면 거주 + 사업소득 500만원 이하,
+ * 초과 시에는 농어업인 등록자가 있어야 한다.
+ * 공단 모의계산기는 이 조건을 검사하지 않는다(2026-08-06 실측).
+ */
+function judgeRuralReduction(
+  income: Income,
+  { ruralResident, registeredFarmer }: RegionalPremiumOptions,
+): { eligible: boolean; blockedReason?: string } {
+  if (!ruralResident) return { eligible: false };
+  if (
+    income.business > RURAL_REDUCTION.BUSINESS_INCOME_LIMIT &&
+    !registeredFarmer
+  ) {
+    return {
+      eligible: false,
+      blockedReason: `사업소득이 ${RURAL_REDUCTION.BUSINESS_INCOME_LIMIT.toLocaleString('ko-KR')}원을 넘어 농어촌 경감을 적용하지 않았습니다. 농어업인으로 등록된 가입자가 세대에 있으면 경감 대상입니다.`,
+    };
+  }
+  return { eligible: true };
+}
+
 /**
  * 지역가입자 월 보험료
  *
  * @param income 연간 소득 내역. 종류별 반영률이 다르므로 항목을 분리해서 받는다.
  * @param propertyAmount 재산금액 합계 (원). 재산세 과세표준 + 전월세평가금액.
- *                       전월세평가금액은 rentEvaluationAmount()로 계산한다.
+ *                       전월세평가금액은 propertyAmountFor()로 계산한다.
+ * @param options 농어촌 경감 판정에 필요한 세대 정보.
  */
 export function calculateRegionalPremium(
   income: Income,
   propertyAmount: number,
+  options: RegionalPremiumOptions = {},
 ): PremiumBreakdown {
   const base = incomeBaseForPremium(income);
   // 공단 모의계산은 구성 보험료를 원 단위에서 절사한 뒤 합산한다.
@@ -197,7 +244,14 @@ export function calculateRegionalPremium(
     healthBeforeLimit,
     propertyPortion,
   );
-  const longTermCare = longTermCareOf(health);
+
+  // 경감은 건강보험료를 깎지 않고 별도 항목으로 뺀다.
+  // 장기요양은 **경감 후** 금액 기준이다 — 순서를 바꾸면 장기요양이 과대 계산된다.
+  const rural = judgeRuralReduction(income, options);
+  const ruralReduction = rural.eligible
+    ? roundPremiumUnit(health * RURAL_REDUCTION.RATE)
+    : 0;
+  const longTermCare = longTermCareOf(health - ruralReduction);
 
   return {
     incomePortion,
@@ -209,11 +263,18 @@ export function calculateRegionalPremium(
     healthBeforeLimit,
     health,
     limitApplied,
+    ruralReduction,
+    ruralReductionBlockedReason: rural.blockedReason,
     longTermCare,
-    total: health + longTermCare,
+    total: health - ruralReduction + longTermCare,
     verified: VERIFIED,
     crossChecked: VERIFIED_AGAINST_NHIS,
-    basis: [BASIS.RATE, BASIS.PROPERTY_SCORE, BASIS.PREMIUM_LIMIT],
+    basis: [
+      BASIS.RATE,
+      BASIS.PROPERTY_SCORE,
+      BASIS.PREMIUM_LIMIT,
+      ...(ruralReduction > 0 ? [BASIS.RURAL_REDUCTION] : []),
+    ],
   };
 }
 
@@ -277,6 +338,8 @@ export function calculateVoluntaryPremium(
     // 임의계속은 보수월액보험료 자체에 이미 경감·상한이 반영돼 있고
     // 재산보험료가 없어 표시용 보정이 필요 없다.
     incomePortionApplied: wagePremium,
+    // 임의계속가입자는 직장가입자 자격을 유지하므로 지역가입자 농어촌 경감 대상이 아니다.
+    ruralReduction: 0,
     nonWageIncomePortion: nonWagePremium,
     propertyPortion: 0,
     propertyScore: 0,
@@ -356,10 +419,13 @@ export function compareAfterRetirement(params: {
   propertyAmount: number;
   avgMonthlyWage: number;
   insuredMonthsInLookback: number;
+  /** 지역가입자 쪽에만 적용되는 농어촌 경감 조건 */
+  regionalOptions?: RegionalPremiumOptions;
 }): ComparisonResult {
   const regional = calculateRegionalPremium(
     params.income,
     params.propertyAmount,
+    params.regionalOptions,
   );
 
   const eligible = canApplyVoluntary({

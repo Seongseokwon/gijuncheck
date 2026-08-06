@@ -26,7 +26,7 @@ import {
   longTermCareRatio,
 } from '@/lib/premium/regional';
 import type { Income } from '@/lib/dependent/types';
-import { DISCLAIMER, RATE } from '@/lib/constants/2026';
+import { DISCLAIMER, RATE, RURAL_REDUCTION } from '@/lib/constants/2026';
 import { toPercent, wonExact } from '@/lib/format';
 import {
   propertyAmountFor,
@@ -68,6 +68,8 @@ export default function RegionalPremiumCalc() {
   const [rentEligible, setRentEligible] = useState(false);
   const [rentDeposit, setRentDeposit] = useState(0);
   const [monthlyRent, setMonthlyRent] = useState(0);
+  const [ruralResident, setRuralResident] = useState(false);
+  const [registeredFarmer, setRegisteredFarmer] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submissionId, setSubmissionId] = useState(0);
   const resultHeadingRef = useRef<HTMLHeadingElement>(null);
@@ -116,8 +118,12 @@ export default function RegionalPremiumCalc() {
   );
   const base = useMemo(() => incomeBaseForPremium(income), [income]);
   const result = useMemo(
-    () => calculateRegionalPremium(income, propertyAmount),
-    [income, propertyAmount],
+    () =>
+      calculateRegionalPremium(income, propertyAmount, {
+        ruralResident,
+        registeredFarmer,
+      }),
+    [income, propertyAmount, ruralResident, registeredFarmer],
   );
 
   const set = (key: keyof Income, v: number) =>
@@ -214,6 +220,41 @@ export default function RegionalPremiumCalc() {
           </div>
         )}
 
+        <label className="mt-5 flex min-h-[48px] items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+          <input
+            type="checkbox"
+            checked={ruralResident}
+            onChange={(event) => setRuralResident(event.target.checked)}
+            className="h-5 w-5 accent-brand-900"
+          />
+          군·도농복합시의 읍·면지역에 거주합니다
+        </label>
+
+        {ruralResident && (
+          <>
+            <p className="mt-3 text-sm leading-6 text-slate-600">
+              농어촌 지역 거주 세대는 보험료의{' '}
+              <strong className="font-semibold text-slate-700">
+                {RURAL_REDUCTION.RATE * 100}%
+              </strong>
+              가 경감됩니다. 주민등록 주소지 기준으로 공단이 일괄 적용하며 별도
+              신청이 필요하지 않습니다.
+            </p>
+
+            {income.business > RURAL_REDUCTION.BUSINESS_INCOME_LIMIT && (
+              <label className="mt-3 flex min-h-[48px] items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={registeredFarmer}
+                  onChange={(event) => setRegisteredFarmer(event.target.checked)}
+                  className="h-5 w-5 accent-brand-900"
+                />
+                세대에 농어업인으로 등록된 가입자가 있습니다
+              </label>
+            )}
+          </>
+        )}
+
         </FormSection>
 
         <div className="px-5 py-6 sm:px-7 sm:py-7">
@@ -279,15 +320,37 @@ export default function RegionalPremiumCalc() {
               value={won(result.propertyPortion)}
             />
             <ResultRow label="건강보험료" value={won(result.health)} />
+            {result.ruralReduction > 0 && (
+              <ResultRow
+                label={`농어촌 경감 (${RURAL_REDUCTION.RATE * 100}%)`}
+                hint="건강보험료에서 차감합니다"
+                value={`− ${won(result.ruralReduction)}`}
+              />
+            )}
             <ResultRow
               label="장기요양보험료"
-              hint={`건강보험료 × ${toPercent(longTermCareRatio())}`}
+              hint={
+                result.ruralReduction > 0
+                  ? `경감 후 건강보험료 × ${toPercent(longTermCareRatio())}`
+                  : `건강보험료 × ${toPercent(longTermCareRatio())}`
+              }
               value={won(result.longTermCare)}
             />
             <div className="pt-2">
               <ResultRow label="합계" value={won(result.total)} strong />
             </div>
           </div>
+
+          {result.ruralReductionBlockedReason && (
+            <p className="rounded-xl bg-canvas px-4 py-3 text-sm leading-6 text-slate-700">
+              {result.ruralReductionBlockedReason}
+              <br />
+              <span className="text-slate-600">
+                공단 모의계산기는 이 조건을 확인하지 않고 경감을 적용합니다. 실제
+                경감 여부는 국민건강보험공단에 확인해 주세요.
+              </span>
+            </p>
+          )}
 
           {result.limitApplied === 'lower' && (
             <p className="text-sm leading-6 text-slate-600">

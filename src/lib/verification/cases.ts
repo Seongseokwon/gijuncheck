@@ -410,6 +410,45 @@ const UNVERIFIED_CASES: readonly VerificationCase[] = [
   },
 ];
 
+/**
+ * 농어촌 지역 거주 경감 — 2026-08-06 실측.
+ *
+ * C28은 **공단 모의계산기와 우리 결과가 다른 첫 사례**다. 오류가 아니라
+ * 의도한 차이이므로 `expected` 를 제도 기준 결과로 적고 그 이유를 note 에 남긴다.
+ */
+const RURAL_REDUCTION_CASES: readonly VerificationCase[] = [
+  {
+    id: 'C26',
+    input: '사업소득 등 300만원 + 주택 과세표준 3억 6,000만원 + 농어촌 거주',
+    expected: '140,790원 (경감 35,090원)',
+    actual: '140,790원',
+    diff: '0원',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: '경감은 건강보험료를 직접 깎지 않고 별도 항목으로 빠진다. 장기요양보험료가 20,960원에서 16,350원으로 줄어드는데, 이는 장기요양을 경감 후 건강보험료 기준으로 계산하기 때문이다. 이 순서를 반대로 하면 장기요양이 과대 계산된다',
+  },
+  {
+    id: 'C27',
+    input: '소득 0원 + 재산 0원 + 농어촌 거주',
+    expected: '17,790원 (경감 4,430원)',
+    actual: '17,790원',
+    diff: '0원',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: '건강보험료 하한 20,160원에도 경감이 적용된다. 하한이 경감을 막지 않는다는 것을 확인한 사례',
+  },
+  {
+    id: 'C28',
+    input: '사업소득 등 600만원 + 주택 과세표준 3억 6,000만원 + 농어촌 거주 (농어업인 등록 없음)',
+    expected: '경감 없음 — 사업소득 500만원 초과',
+    actual: '경감 없음',
+    diff: '공단 계산기와 13,920원 차이',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: '기준체크가 공단 모의계산기와 의도적으로 다르게 계산하는 유일한 사례다. 제도는 읍·면 거주에 더해 사업소득 500만원 이하를 요구하고, 초과 시에는 농어업인 등록자가 있어야 한다. 그런데 공단 모의계산기는 이 조건을 검사하지 않고 체크만 하면 22%를 적용한다(154,710원). 계산기를 그대로 따라 하면 실제보다 적은 금액을 보여주게 되므로 제도 기준으로 판정하고, 그 사유를 화면에 함께 표시한다',
+  },
+];
+
 export const VERIFICATION_CASE_GROUPS: readonly VerificationCaseGroup[] = [
   {
     id: 'cases-regional',
@@ -423,6 +462,7 @@ export const VERIFICATION_CASE_GROUPS: readonly VerificationCaseGroup[] = [
       ...REGIONAL_CASES,
       ...REGIONAL_CASES_2026_08_06,
       ...RENT_RULE_CASES,
+      ...RURAL_REDUCTION_CASES,
     ],
   },
   {
