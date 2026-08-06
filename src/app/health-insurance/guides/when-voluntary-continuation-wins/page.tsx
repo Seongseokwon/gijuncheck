@@ -33,10 +33,12 @@ const LEAD =
 const ANSWER =
   '임의계속가입은 신청 조건과 기한을 충족할 때 선택할 수 있으며, 재산이 많은 퇴직자는 지역보험료와 실제 금액을 비교해야 합니다.';
 
+// 검색 결과 스니펫은 160자 안쪽에서 잘린다. 신청기한 규정 원문은 본문에 두고,
+// 여기에는 자격 판단에 바로 쓰이는 숫자만 남긴다.
 const DESCRIPTION =
   `임의계속가입은 퇴직 전 ${VOLUNTARY_CONTINUATION.LOOKBACK_MONTHS}개월 중 직장가입 ${VOLUNTARY_CONTINUATION.REQUIRED_MONTHS}개월 이상이면 신청할 수 있고, ` +
   `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 유지됩니다. 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ` +
-  `${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정됩니다.`;
+  '신청기한과 손익 분기점을 숫자로 정리했습니다.';
 
 export const metadata = createPageMetadata({
   title: TITLE,

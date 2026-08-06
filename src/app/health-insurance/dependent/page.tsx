@@ -55,6 +55,7 @@ const jsonLd = {
         name: ROUTES.dependent.label,
         url: ROUTES.dependent.path,
         description: DESCRIPTION,
+        dateModified: ROUTES.dependent.lastModified,
       }),
     },
     breadcrumbJsonLd([

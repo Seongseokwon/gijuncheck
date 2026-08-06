@@ -12,7 +12,8 @@ import {
 } from '@/lib/verification/cases';
 
 export const metadata = createPageMetadata({
-  title: '검증 원칙',
+  // '검증 원칙 | 기준체크' 는 12자라 검색 결과에서 무엇을 다루는 문서인지 드러나지 않는다.
+  title: '검증 원칙 — 기준 출처와 자체 재현 테스트 범위',
   description: '기준체크가 건강보험 정보를 확인하고, 테스트하며, 공개 범위를 결정하는 방법을 안내합니다.',
   path: ROUTES.verificationPolicy.path,
 });
