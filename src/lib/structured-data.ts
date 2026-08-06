@@ -106,14 +106,21 @@ export function webApplicationJsonLd({
  *
  * `@id` 로 전 페이지가 같은 노드를 참조하므로, 어느 페이지에서 정의하든
  * 하나의 인물로 병합된다. 검증 원칙 페이지가 이 인물의 상세 설명을 갖는다.
+ *
+ * **실명을 쓰지 않는 대신 `url`·`description`·`knowsAbout` 로 엔티티를 성립시킨다.**
+ * 엔티티 해소에 필요한 것은 법적 이름이 아니라 항상 같은 곳을 가리키는 식별자다.
+ * `url` 은 반드시 이 인물을 실제로 설명하는 페이지여야 한다 — 지금은 검증 원칙
+ * 페이지의 「운영자」 절이 그 역할을 한다. 그 절을 지우면 이 노드도 근거를 잃는다.
  */
 export function authorJsonLd() {
   return {
     '@type': 'Person' as const,
     '@id': SITE_ENTITY_IDS.author,
     name: SITE.authorName,
-    url: new URL('/verification-policy/', SITE.url).toString(),
+    url: new URL('/verification-policy/#operator', SITE.url).toString(),
+    description: SITE.operator.description,
     knowsAbout: [...SITE.knowsAbout],
+    worksFor: { '@id': SITE_ENTITY_IDS.organization },
   };
 }
 
