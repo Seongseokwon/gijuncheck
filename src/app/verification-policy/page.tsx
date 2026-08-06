@@ -34,15 +34,21 @@ const jsonLd = {
       isPartOf: { '@id': SITE_ENTITY_IDS.website },
       about: { '@id': SITE_ENTITY_IDS.author },
       mainEntity: { '@id': SITE_ENTITY_IDS.author },
+      // 저자 엔티티를 정의하는 문서가 정작 자기 저자를 선언하지 않은 상태였다.
+      author: { '@id': SITE_ENTITY_IDS.author },
       publisher: { '@id': SITE_ENTITY_IDS.organization },
       inLanguage: 'ko',
     },
+    // 이 사이트에서 운영자를 가장 상세히 설명하는 지점이다.
+    // `authorJsonLd()` 가 만드는 노드와 같은 `@id` 라 하나로 병합되며,
+    // 아래 필드는 모두 이 페이지 「운영자」 절에 실제로 표시되는 내용이다.
     {
       '@type': 'Person',
       '@id': SITE_ENTITY_IDS.author,
       name: SITE.authorName,
-      url: POLICY_URL,
-      description: '기준체크의 건강보험 기준 콘텐츠를 정리·검증하는 개인 운영자입니다.',
+      url: `${POLICY_URL}#operator`,
+      description: SITE.operator.description,
+      knowsAbout: [...SITE.knowsAbout],
       worksFor: { '@id': SITE_ENTITY_IDS.organization },
     },
     breadcrumbJsonLd([
@@ -387,9 +393,29 @@ export default function VerificationPolicyPage() {
         </ul>
       </section>
 
+      {/*
+        저자 엔티티(`Person`)의 근거가 되는 화면이다. `authorJsonLd()` 의 `url` 이
+        이 절의 앵커를 가리키므로, 절을 옮기거나 지우면 구조화 데이터가 없는 곳을
+        가리키게 된다. 실명·경력은 쓰지 않는다 — `SITE.operator` 주석 참조.
+      */}
       <section className="rounded-[22px] border border-slate-200 bg-white p-6 sm:p-7" aria-labelledby="operator">
-        <h2 id="operator" className="text-xl font-bold text-brand-950">운영 주체와 책임 범위</h2>
-        <dl className="mt-4 grid gap-3 text-sm leading-6 sm:grid-cols-[140px_1fr]">
+        <h2 id="operator" className="text-xl font-bold text-brand-950">누가 운영하고, 무엇을 보증하지 않는가</h2>
+        <p className="mt-4 text-base leading-7 text-slate-700">{SITE.operator.description}</p>
+
+        <h3 className="mt-6 text-base font-bold text-brand-950">기준을 확인하는 방식</h3>
+        <ul className="mt-3 space-y-2 text-base leading-7 text-slate-700">
+          {SITE.operator.approach.map((item) => (
+            <li key={item} className="flex gap-2">
+              <span aria-hidden="true" className="mt-[2px] text-accent-700">·</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        <h3 className="mt-6 text-base font-bold text-brand-950">하지 않는 것</h3>
+        <p className="mt-3 text-base leading-7 text-slate-700">{SITE.operator.limits}</p>
+
+        <dl className="mt-6 grid gap-3 border-t border-slate-200 pt-6 text-sm leading-6 sm:grid-cols-[140px_1fr]">
           <dt className="font-bold text-slate-900">운영 주체</dt>
           <dd>{SITE.operatorName}</dd>
           <dt className="font-bold text-slate-900">문의 채널</dt>

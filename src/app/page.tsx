@@ -4,7 +4,7 @@ import ScenarioIcon from '@/components/ScenarioIcon';
 import TrackedLink from '@/components/TrackedLink';
 import { GUIDE_KEYS, ROUTES, TOOL_KEYS } from '@/lib/routes';
 import { SITE } from '@/lib/site';
-import { ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
+import { authorJsonLd, ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 const HOME_TITLE = `${SITE.name} | 건강보험 피부양자 자격 확인`;
 
@@ -113,6 +113,11 @@ const homeJsonLd = {
       description: SITE.homeDescription,
       isPartOf: { '@id': SITE_ENTITY_IDS.website },
       about: { '@id': SITE_ENTITY_IDS.organization },
+      // 홈만 author·dateModified 가 빠져 있었다. 값은 화면 하단에 이미
+      // `최종 확인 …` 으로 노출하는 `SITE.lastVerified` 와 같은 날짜를 쓴다.
+      author: authorJsonLd(),
+      dateModified: `${SITE.lastVerified}T00:00:00+09:00`,
+      publisher: { '@id': SITE_ENTITY_IDS.organization },
       inLanguage: 'ko',
     },
     {
