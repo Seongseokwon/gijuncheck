@@ -1,4 +1,4 @@
-import type { Income } from './dependent/types';
+import type { PremiumIncome } from './premium/types';
 
 export const PREMIUM_HANDOFF_STORAGE_KEY = 'gijuncheck:premium-handoff';
 
@@ -9,7 +9,7 @@ export type PremiumHandoffSource = 'dependent-judge' | 'regional-premium';
 export interface PremiumHandoff {
   version: typeof HANDOFF_VERSION;
   source: PremiumHandoffSource;
-  income: Income;
+  income: PremiumIncome;
   propertyTaxBase: number;
 }
 
@@ -17,16 +17,23 @@ function isFiniteNonNegative(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0;
 }
 
-function isIncome(value: unknown): value is Income {
+/**
+ * 분리과세 주택임대소득은 **피부양자 판정기에는 없는 입력**이다.
+ * 판정기에서 넘어온 핸드오프에는 이 값이 없으므로 필수로 검사하면
+ * 퍼널이 통째로 끊긴다. 없으면 0으로 정규화한다.
+ */
+function isPremiumIncome(value: unknown): value is PremiumIncome {
   if (!value || typeof value !== 'object') return false;
 
-  const income = value as Record<keyof Income, unknown>;
+  const income = value as Record<keyof PremiumIncome, unknown>;
   return (
     isFiniteNonNegative(income.business) &&
     isFiniteNonNegative(income.wage) &&
     isFiniteNonNegative(income.pension) &&
     isFiniteNonNegative(income.financial) &&
-    isFiniteNonNegative(income.other)
+    isFiniteNonNegative(income.other) &&
+    (income.housingRental === undefined ||
+      isFiniteNonNegative(income.housingRental))
   );
 }
 
@@ -37,7 +44,7 @@ function isPremiumHandoff(value: unknown): value is PremiumHandoff {
   return (
     handoff.version === HANDOFF_VERSION &&
     (handoff.source === 'dependent-judge' || handoff.source === 'regional-premium') &&
-    isIncome(handoff.income) &&
+    isPremiumIncome(handoff.income) &&
     isFiniteNonNegative(handoff.propertyTaxBase)
   );
 }
@@ -45,7 +52,7 @@ function isPremiumHandoff(value: unknown): value is PremiumHandoff {
 /** 금액은 URL이 아니라 현재 브라우저 탭에만 잠시 보관한다. */
 export function savePremiumHandoff(
   source: PremiumHandoffSource,
-  income: Income,
+  income: PremiumIncome,
   propertyTaxBase: number,
 ) {
   if (typeof window === 'undefined') return;
@@ -75,7 +82,17 @@ export function consumePremiumHandoff(): PremiumHandoff | null {
     if (!raw) return null;
 
     const parsed: unknown = JSON.parse(raw);
-    return isPremiumHandoff(parsed) ? parsed : null;
+    if (!isPremiumHandoff(parsed)) return null;
+
+    // 판정기에서 온 값에는 분리과세 주택임대소득이 없다. 수신 측이 매번
+    // `?? 0` 을 쓰지 않도록 여기서 한 번만 채운다.
+    return {
+      ...parsed,
+      income: {
+        ...parsed.income,
+        housingRental: parsed.income.housingRental ?? 0,
+      },
+    };
   } catch {
     try {
       window.sessionStorage.removeItem(PREMIUM_HANDOFF_STORAGE_KEY);

@@ -22,21 +22,18 @@ import {
   propertyScore,
   propertyScoreDetail,
 } from '../constants/property-score-table';
-import type { Income } from '../dependent/types';
+import { EMPTY_PREMIUM_INCOME, type PremiumIncome } from './types';
 
 /** 만원 → 원 */
 const man = (n: number) => n * 10_000;
 /** 기본공제 후 금액이 정확히 n만원이 되는 재산금액 */
 const afterDeduction = (manwon: number) => BASIC_DEDUCTION + man(manwon);
 
-const noIncome: Income = {
-  business: 0,
-  wage: 0,
-  pension: 0,
-  financial: 0,
-  other: 0,
-};
-const income = (p: Partial<Income>): Income => ({ ...noIncome, ...p });
+const noIncome: PremiumIncome = EMPTY_PREMIUM_INCOME;
+const income = (p: Partial<PremiumIncome>): PremiumIncome => ({
+  ...noIncome,
+  ...p,
+});
 
 describe('요율·한도', () => {
   it('2026년 건강보험료율은 7.19%다', () => {
@@ -257,6 +254,99 @@ describe('재산점수 산정', () => {
       expect(r.ruralReduction).toBe(0);
       expect(r.ruralReductionBlockedReason).toBeUndefined();
     });
+
+    /**
+     * 미확인 경계. 경감고시의 "사업소득 500만원"에 분리과세 주택임대소득이
+     * 포함되는지 확인하지 못했다 — 공단 모의계산기가 이 조건 자체를 검사하지
+     * 않아 실측이 불가능하다. 근거를 확보하기 전까지 현재 동작을 고정해
+     * **모르는 채로 조용히 바뀌는 것**을 막는다.
+     */
+    it('분리과세 주택임대소득은 현재 농어촌 경감 판정에 넣지 않는다 (미확인)', () => {
+      const r = calculateRegionalPremium(
+        income({ housingRental: 60_000_000 }),
+        0,
+        rural,
+      );
+      expect(r.ruralReduction).toBeGreaterThan(0);
+      expect(r.ruralReductionBlockedReason).toBeUndefined();
+    });
+  });
+
+  /**
+   * 2026-08-06 공단 모의계산 실측 (C29~C31).
+   *
+   * 공단 화면이 「분리과세 주택임대소득」을 사업소득과 **별도 칸**으로 받길래
+   * 반영률이 다를 것을 의심했다. 실측 결과 같은 금액을 「사업소득 등」에 넣었을
+   * 때와 결과가 완전히 같았다. 칸이 나뉜 이유는 반영률이 아니라 부과 자료의
+   * 출처가 다르기 때문이다 — 분리과세분은 종합소득 신고 자료에 잡히지 않는다.
+   */
+  describe('분리과세 주택임대소득 — 공단 대조', () => {
+    it('C29·C30 1,000만원은 사업소득 등에 넣은 것과 결과가 같다', () => {
+      const asRental = calculateRegionalPremium(
+        income({ housingRental: 10_000_000 }),
+        0,
+      );
+      const asBusiness = calculateRegionalPremium(
+        income({ business: 10_000_000 }),
+        0,
+      );
+
+      // 공단 실측: ① 59,916 → ④ 59,910 → ⑤ 7,870 → 합계 67,780
+      expect(asRental.incomePortion).toBe(59_916);
+      expect(asRental.health).toBe(59_910);
+      expect(asRental.longTermCare).toBe(7_870);
+      expect(asRental.total).toBe(67_780);
+      expect(asRental).toEqual(asBusiness);
+    });
+
+    it('C31 2,400만원도 100% 반영된다', () => {
+      // 공단 실측: ① 143,800 → ④ 143,800 → ⑤ 18,890 → 합계 162,690
+      const r = calculateRegionalPremium(
+        income({ housingRental: 24_000_000 }),
+        0,
+      );
+      expect(r.incomePortion).toBe(143_800);
+      expect(r.health).toBe(143_800);
+      expect(r.longTermCare).toBe(18_890);
+      expect(r.total).toBe(162_690);
+    });
+
+    it('반영률은 100%이며 근로·연금의 50%와 구분된다', () => {
+      const base = incomeBaseForPremium(income({ housingRental: 12_000_000 }));
+      expect(base.annualReflected).toBe(12_000_000);
+      expect(base.annualRaw).toBe(12_000_000);
+
+      const half = incomeBaseForPremium(income({ pension: 12_000_000 }));
+      expect(base.annualReflected).toBeGreaterThan(half.annualReflected);
+    });
+
+    it('다른 소득과 합산된다', () => {
+      const split = incomeBaseForPremium(
+        income({ business: 6_000_000, housingRental: 6_000_000 }),
+      );
+      const merged = incomeBaseForPremium(income({ business: 12_000_000 }));
+      expect(split.annualReflected).toBe(merged.annualReflected);
+      expect(split.monthly).toBe(merged.monthly);
+    });
+
+    it('임의계속가입의 보수 외 소득에도 합산된다', () => {
+      // 보수 외 소득 2,000만원 초과분만 반영되므로 문턱을 넘겨서 본다
+      const withRental = calculateVoluntaryPremium(
+        3_000_000,
+        income({ housingRental: 30_000_000 }),
+      );
+      const withBusiness = calculateVoluntaryPremium(
+        3_000_000,
+        income({ business: 30_000_000 }),
+      );
+      const without = calculateVoluntaryPremium(3_000_000, noIncome);
+
+      expect(withRental.nonWageIncomePortion).toBe(
+        withBusiness.nonWageIncomePortion,
+      );
+      expect(withRental.nonWageIncomePortion).toBeGreaterThan(0);
+      expect(withRental.total).toBeGreaterThan(without.total);
+    });
   });
 
   /**
@@ -276,7 +366,7 @@ describe('재산점수 산정', () => {
     });
 
     it('표시값과 재산보험료의 합이 건강보험료와 맞는다 (상한 제외)', () => {
-      const cases: [Income, number][] = [
+      const cases: [PremiumIncome, number][] = [
         [noIncome, 0],
         [noIncome, 100_010_000],
         [noIncome, 360_000_000],

@@ -44,6 +44,7 @@ import {
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import { savePremiumHandoff } from '@/lib/premium-handoff';
+import { toPremiumIncome } from '@/lib/premium/types';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { getConfidenceSummary, RELATION_GUIDANCE, STEP_GUIDANCE } from '@/lib/dependent/guidance';
 import DependentEvidenceChecklist from './DependentEvidenceChecklist';
@@ -610,7 +611,9 @@ export default function DependentJudge() {
               onClick={() =>
                 savePremiumHandoff(
                   'dependent-judge',
-                  input.income,
+                  // 판정기는 분리과세 주택임대소득을 입력받지 않는다.
+                  // 피부양자 판정에서는 "합산"이 아니라 "있으면 탈락"이라 별개 규칙이다.
+                  toPremiumIncome(input.income),
                   input.propertyTaxBase,
                 )
               }

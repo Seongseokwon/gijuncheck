@@ -64,9 +64,9 @@ export const ROUTES = {
     label: '지역가입자 보험료 계산',
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
-    lastModified: '2026-08-05',
+    lastModified: '2026-08-06',
     changeFrequency: 'monthly',
-    /** 2026-08-05 공단 모의계산 대표 사례 13건 재대조 완료 */
+    /** 2026-08-06 분리과세 주택임대소득 입력 추가. 공단 모의계산 30건(C01~C31) 대조 */
     ready: true,
   },
   voluntaryContinuation: {
@@ -74,7 +74,7 @@ export const ROUTES = {
     label: '임의계속가입 비교',
     ogImage: '/og/voluntary-continuation.png',
     priority: 0.8,
-    lastModified: '2026-08-03',
+    lastModified: '2026-08-06',
     changeFrequency: 'monthly',
     /** 2026-08-03 법령·공단 산식·대표 사례 대조 완료 */
     ready: true,

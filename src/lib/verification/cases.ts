@@ -449,6 +449,51 @@ const RURAL_REDUCTION_CASES: readonly VerificationCase[] = [
   },
 ];
 
+/**
+ * 분리과세 주택임대소득 — 2026-08-06 실측.
+ *
+ * 공단 화면이 이 소득을 「사업소득 등」과 **별도 칸**으로 받는다. 칸을 나눈
+ * 데는 이유가 있을 것이라 보고 반영률이 다를 가능성을 먼저 의심했는데,
+ * 실측 결과 같은 금액을 사업소득 칸에 넣었을 때와 결과가 완전히 같았다.
+ *
+ * **칸이 나뉜 이유는 반영률이 아니라 부과 자료의 출처다.** 분리과세분은
+ * 종합소득 신고 자료에 잡히지 않으므로 공단이 따로 받는다. 사적연금이
+ * 피부양자 합산에서 빠지는 이유와 같은 구조다 — 결론은 법 조문이 아니라
+ * 자료 연계 방식 위에 서 있고, 그래서 법 개정 없이 바뀔 수 있다.
+ */
+const HOUSING_RENTAL_CASES: readonly VerificationCase[] = [
+  {
+    id: 'C29',
+    input: '사업소득 등 1,000만원 (대조 기준)',
+    expected: '67,780원 (소득월액보험료 59,916원)',
+    actual: '67,780원',
+    diff: '0원',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: 'C30과 비교하기 위한 기준선입니다. 같은 금액을 어느 칸에 넣는지만 다르게 해서 반영률 차이를 분리했습니다',
+  },
+  {
+    id: 'C30',
+    input: '분리과세 주택임대소득 1,000만원',
+    expected: '67,780원 (소득월액보험료 59,916원)',
+    actual: '67,780원',
+    diff: '0원',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: 'C29와 구성 항목까지 완전히 같았습니다. 공단이 별도 칸으로 받지만 보험료 반영률은 사업소득과 같은 100%입니다. 입력하는 값은 총수입금액이 아니라 필요경비와 기본공제를 뺀 소득금액입니다 — 공단 화면의 해당 구역 제목이 「소득금액(연소득 기준)」입니다',
+  },
+  {
+    id: 'C31',
+    input: '분리과세 주택임대소득 2,400만원',
+    expected: '162,690원 (소득월액보험료 143,800원)',
+    actual: '162,690원',
+    diff: '0원',
+    result: 'match',
+    checkedOn: '2026-08-06',
+    note: '금액을 바꿔도 100% 반영이 유지되는지 확인한 사례입니다. 2,400만원 ÷ 12 × 7.19% = 143,800원으로, 감액이나 별도 공제가 붙지 않습니다',
+  },
+];
+
 export const VERIFICATION_CASE_GROUPS: readonly VerificationCaseGroup[] = [
   {
     id: 'cases-regional',
@@ -463,6 +508,7 @@ export const VERIFICATION_CASE_GROUPS: readonly VerificationCaseGroup[] = [
       ...REGIONAL_CASES_2026_08_06,
       ...RENT_RULE_CASES,
       ...RURAL_REDUCTION_CASES,
+      ...HOUSING_RENTAL_CASES,
     ],
   },
   {

@@ -25,7 +25,10 @@ import {
 } from './ui';
 import { josa } from '@/lib/format';
 import { compareAfterRetirement } from '@/lib/premium/regional';
-import type { Income } from '@/lib/dependent/types';
+import {
+  EMPTY_PREMIUM_INCOME,
+  type PremiumIncome,
+} from '@/lib/premium/types';
 import {
   DISCLAIMER,
   VOLUNTARY_CONTINUATION,
@@ -33,16 +36,8 @@ import {
 import { track } from '@/lib/analytics';
 import { consumePremiumHandoff } from '@/lib/premium-handoff';
 
-const emptyIncome: Income = {
-  business: 0,
-  wage: 0,
-  pension: 0,
-  financial: 0,
-  other: 0,
-};
-
 export default function VoluntaryComparison() {
-  const [income, setIncome] = useState<Income>(emptyIncome);
+  const [income, setIncome] = useState<PremiumIncome>(EMPTY_PREMIUM_INCOME);
   const [property, setProperty] = useState(0);
   const [avgWage, setAvgWage] = useState(3_000_000);
   const [months, setMonths] = useState<number>(
@@ -82,7 +77,7 @@ export default function VoluntaryComparison() {
     [income, property, avgWage, months],
   );
 
-  const set = (key: keyof Income, v: number) =>
+  const set = (key: keyof PremiumIncome, v: number) =>
     setIncome((prev) => ({ ...prev, [key]: v }));
 
   const { regional, voluntary, recommendation } = result;
@@ -135,7 +130,7 @@ export default function VoluntaryComparison() {
         <FormSection number="2" title="퇴직 후 소득을 입력해 주세요">
           <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
             보수 외 소득은 연 2,000만원 초과분만 추가 반영합니다. 근로·연금소득은
-            50%, 사업·금융·기타소득은 100% 반영합니다.
+            50%, 사업·금융·기타소득과 분리과세 주택임대소득은 100% 반영합니다.
           </p>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="근로소득 (원, 50% 반영)">
@@ -166,6 +161,16 @@ export default function VoluntaryComparison() {
               <MoneyInput
                 value={income.other}
                 onChange={(v) => set('other', v)}
+              />
+            </Field>
+            <Field
+              label="분리과세 주택임대소득 (원, 100% 반영)"
+              hint="총수입이 아니라 소득금액"
+              helpText="총수입금액에서 필요경비와 기본공제를 뺀 소득금액을 입력하세요. 지역보험료에서는 공단 모의계산 대조로 100% 반영을 확인했고, 임의계속가입 보수 외 소득에도 같은 반영률을 적용한 참고 계산입니다."
+            >
+              <MoneyInput
+                value={income.housingRental}
+                onChange={(v) => set('housingRental', v)}
               />
             </Field>
           </div>

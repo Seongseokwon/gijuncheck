@@ -81,6 +81,26 @@ test.describe('소득 종류별 반영률 — 근로·연금은 50%', () => {
     await expect(result(page)).toContainText('33,880원');
   });
 
+  /**
+   * 2026-08-06 공단 대조 C29~C31. 공단이 별도 칸으로 받길래 반영률이 다를 것을
+   * 의심했으나 사업소득과 완전히 같은 100%였다. 화면까지 그 값이 도달하는지 본다.
+   */
+  test('분리과세 주택임대소득은 사업소득과 같은 100%로 반영된다', async ({ page }) => {
+    await fillMoney(page, '분리과세 주택임대소득 (원, 100% 반영)', 24_000_000);
+    await calculate(page);
+
+    // 공단 실측 C31: ① 143,800 → ⑤ 18,890 → 합계 162,690
+    await expect(result(page)).toContainText('143,800원');
+    await expect(result(page)).toContainText('18,890원');
+    await expect(result(page)).toContainText('162,690원');
+
+    // 같은 금액을 사업소득에 넣어도 결과가 같아야 한다 (C29 vs C30)
+    await page.reload();
+    await fillMoney(page, '사업소득 (원, 100% 반영)', 24_000_000);
+    await calculate(page);
+    await expect(result(page)).toContainText('162,690원');
+  });
+
   test('입력 즉시 합산소득 → 반영 후 금액 → 소득월액을 되읽어준다', async ({ page }) => {
     await fillMoney(page, '공적연금소득 (원, 50% 반영)', 12_000_000);
 

@@ -25,7 +25,10 @@ import {
   incomeBaseForPremium,
   longTermCareRatio,
 } from '@/lib/premium/regional';
-import type { Income } from '@/lib/dependent/types';
+import {
+  EMPTY_PREMIUM_INCOME,
+  type PremiumIncome,
+} from '@/lib/premium/types';
 import { DISCLAIMER, RATE, RURAL_REDUCTION } from '@/lib/constants/2026';
 import { toPercent, wonExact } from '@/lib/format';
 import {
@@ -39,7 +42,14 @@ import {
   savePremiumHandoff,
 } from '@/lib/premium-handoff';
 
-const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = [
+type IncomeField = {
+  key: keyof PremiumIncome;
+  label: string;
+  hint?: string;
+  helpText?: string;
+};
+
+const FULL_FIELDS: IncomeField[] = [
   { key: 'business', label: '사업소득' },
   {
     key: 'financial',
@@ -47,23 +57,22 @@ const FULL_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = 
     hint: '이자 + 배당 · 지역보험료에 100% 반영',
   },
   { key: 'other', label: '기타소득' },
+  {
+    key: 'housingRental',
+    label: '분리과세 주택임대소득',
+    hint: '총수입이 아니라 소득금액',
+    helpText:
+      '총수입금액에서 필요경비와 기본공제를 뺀 소득금액을 입력하세요. 공단이 사업소득과 별도 칸으로 받지만 보험료에는 똑같이 100% 반영됩니다. 피부양자 자격에서는 규칙이 달라, 금액과 무관하게 주택임대소득이 있으면 피부양자가 될 수 없습니다.',
+  },
 ];
 
-const HALF_FIELDS: Array<{ key: keyof Income; label: string; hint?: string }> = [
+const HALF_FIELDS: IncomeField[] = [
   { key: 'wage', label: '근로소득' },
   { key: 'pension', label: '공적연금소득', hint: '개인연금 제외' },
 ];
 
-const emptyIncome: Income = {
-  business: 0,
-  wage: 0,
-  pension: 0,
-  financial: 0,
-  other: 0,
-};
-
 export default function RegionalPremiumCalc() {
-  const [income, setIncome] = useState<Income>(emptyIncome);
+  const [income, setIncome] = useState<PremiumIncome>(EMPTY_PREMIUM_INCOME);
   const [property, setProperty] = useState(0);
   const [rentEligible, setRentEligible] = useState(false);
   const [rentDeposit, setRentDeposit] = useState(0);
@@ -126,7 +135,7 @@ export default function RegionalPremiumCalc() {
     [income, propertyAmount, ruralResident, registeredFarmer],
   );
 
-  const set = (key: keyof Income, v: number) =>
+  const set = (key: keyof PremiumIncome, v: number) =>
     setIncome((prev) => ({ ...prev, [key]: v }));
 
   return (
@@ -137,7 +146,8 @@ export default function RegionalPremiumCalc() {
       >
         <FormSection number="1" title="연간 소득을 입력해 주세요">
         <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
-          소득 종류에 따라 반영률이 다릅니다. 사업·금융·기타소득은 100%,
+          소득 종류에 따라 반영률이 다릅니다. 사업·금융·기타소득과 분리과세
+          주택임대소득은 100%,
           <strong className="font-semibold text-slate-700">
             {' '}
             근로·연금소득은 50%
@@ -145,9 +155,14 @@ export default function RegionalPremiumCalc() {
           만 반영됩니다. 금융소득(이자·배당)은 입력한 금액을 전액 반영합니다.
         </p>
 
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FULL_FIELDS.map((f) => (
-            <Field key={f.key} label={`${f.label} (원, 100% 반영)`} hint={f.hint}>
+            <Field
+              key={f.key}
+              label={`${f.label} (원, 100% 반영)`}
+              hint={f.hint}
+              helpText={f.helpText}
+            >
               <MoneyInput
                 value={income[f.key]}
                 onChange={(v) => set(f.key, v)}
