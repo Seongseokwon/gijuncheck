@@ -12,7 +12,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { ogImageForPath, ROUTES, type RouteKey } from '@/lib/routes';
 import { SITE } from '@/lib/site';
-import { breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
+import { authorJsonLd, breadcrumbJsonLd, SITE_ENTITY_IDS } from '@/lib/structured-data';
 
 const KOREA_TIME_ZONE = '+09:00';
 
@@ -82,12 +82,8 @@ export function guideJsonLd({
         description,
         mainEntityOfPage: { '@type': 'WebPage', '@id': url },
         image: [new URL(ogImageForPath(path), SITE.url).toString()],
-        author: {
-          '@type': 'Person',
-          '@id': SITE_ENTITY_IDS.author,
-          name: SITE.authorName,
-          url: new URL(ROUTES.verificationPolicy.path, SITE.url).toString(),
-        },
+        // 저자 노드 정의를 한 곳에 모아 도구·가이드·검증 원칙이 같은 @id 를 공유하게 한다.
+        author: authorJsonLd(),
         publisher: { '@id': SITE_ENTITY_IDS.organization },
         datePublished: toIsoDateTime(published),
         dateModified: toIsoDateTime(effectiveModified),

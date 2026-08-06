@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기준체크 SEO / GEO 진단 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --good:#0f9d58; --warn:#e8a317; --bad:#d64545; --brand:#1e3a5f; --accent:#b45309;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+       line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1160px;margin:0 auto;padding:32px 20px 64px}
+  header.top{margin-bottom:28px}
+  h1{font-size:26px;font-weight:800;letter-spacing:-.03em;margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;margin:0}
+  .notice{margin-top:14px;background:#fff9e8;border:1px solid #ead9a8;color:#6f4b0c;
+          padding:10px 14px;border-radius:10px;font-size:13px;font-weight:600}
+  .grid{display:grid;gap:16px}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:2fr 1fr}
+  @media(max-width:880px){.g4,.g3,.g2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .card h2{font-size:14px;font-weight:800;margin:0 0 14px;color:var(--muted);
+           text-transform:uppercase;letter-spacing:.06em}
+  .gauge{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .gauge canvas{max-width:150px}
+  .gv{font-size:30px;font-weight:800;letter-spacing:-.03em;margin-top:-64px;margin-bottom:26px}
+  .gl{font-size:13px;font-weight:700;color:var(--muted)}
+  .gw{font-size:11px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  tr:last-child td{border-bottom:0}
+  .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;white-space:nowrap}
+  .p0{background:#fdecec;color:var(--bad)} .p1{background:#fdf3e0;color:#9a6b00}
+  .p2{background:#eef2f7;color:#516070} .done{background:#e6f5ed;color:var(--good)}
+  .area{display:inline-block;padding:2px 7px;border-radius:6px;font-size:11px;font-weight:700;
+        background:#f1f5f9;color:#475569}
+  .bar{height:7px;border-radius:99px;background:#eef1f5;overflow:hidden;min-width:70px}
+  .bar span{display:block;height:100%;border-radius:99px}
+  .fil{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .fil button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:5px 13px;
+              font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);font-family:inherit}
+  .fil button[aria-pressed="true"]{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .num{font-variant-numeric:tabular-nums;text-align:right}
+  .ok{color:var(--good);font-weight:800} .no{color:var(--bad);font-weight:800}
+  .wa{color:var(--warn);font-weight:800}
+  .lead{font-size:14px;color:#334155;margin:0 0 12px}
+  .lead strong{color:var(--ink)}
+  footer{margin-top:28px;color:var(--muted);font-size:12px;text-align:center}
+  .hm td:first-child{font-weight:600}
+  code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>기준체크 — SEO / GEO·AEO 진단</h1>
+  <p class="sub">https://gijuncheck.kr · 2026-08-06 · 색인 대상 11개 페이지 전수 · 브랜치 <code>seo/audit-fixes</code></p>
+  <div class="notice">치명적 결함(P0) 없음. 남은 격차는 GEO 영역의 엔티티 신뢰 신호에 집중되어 있습니다.</div>
+</header>
+
+<section class="grid g4" style="margin-bottom:16px">
+  <div class="card gauge"><canvas id="gTech"></canvas><div class="gv" id="vTech"></div>
+    <div class="gl">기술 SEO</div><div class="gw">가중치 40%</div></div>
+  <div class="card gauge"><canvas id="gGeo"></canvas><div class="gv" id="vGeo"></div>
+    <div class="gl">GEO / AEO</div><div class="gw">가중치 35%</div></div>
+  <div class="card gauge"><canvas id="gCon"></canvas><div class="gv" id="vCon"></div>
+    <div class="gl">콘텐츠</div><div class="gw">가중치 25%</div></div>
+  <div class="card gauge"><canvas id="gAll"></canvas><div class="gv" id="vAll"></div>
+    <div class="gl">종합</div><div class="gw">가중 평균</div></div>
+</section>
+
+<section class="grid g2" style="margin-bottom:16px">
+  <div class="card">
+    <h2>세부 항목 점수</h2>
+    <canvas id="bd" height="150"></canvas>
+  </div>
+  <div class="card">
+    <h2>핵심 수치</h2>
+    <table>
+      <tr><td>색인 페이지</td><td class="num"><b>11</b> / sitemap 11</td></tr>
+      <tr><td>JSON-LD 파싱 오류</td><td class="num ok">0</td></tr>
+      <tr><td>JS 렌더링 의존</td><td class="num ok">0</td></tr>
+      <tr><td>canonical 자기참조</td><td class="num ok">11 / 11</td></tr>
+      <tr><td>고아 페이지</td><td class="num ok">0</td></tr>
+      <tr><td>중복 title</td><td class="num ok">0</td></tr>
+      <tr><td>TTFB (실측)</td><td class="num ok">270ms</td></tr>
+      <tr><td>CLS (실측)</td><td class="num ok">0</td></tr>
+      <tr><td>페이지 전송량</td><td class="num ok">11KB</td></tr>
+      <tr><td>LCP / INP</td><td class="num wa">측정 불가*</td></tr>
+    </table>
+    <p class="gw" style="margin-top:10px">* 백그라운드 탭이라 페인트 이벤트 미발생. CrUX 필드 데이터로 확인 필요.</p>
+  </div>
+</section>
+
+<section class="card" style="margin-bottom:16px">
+  <h2>이슈 목록</h2>
+  <p class="lead">각 항목은 <strong>문제 → 영향 → 수정 → 검증</strong> 순으로 리포트 본문에 상세 기술되어 있습니다.</p>
+  <div class="fil" id="fil">
+    <button data-f="all" aria-pressed="true">전체</button>
+    <button data-f="P1" aria-pressed="false">P1</button>
+    <button data-f="P2" aria-pressed="false">P2</button>
+    <button data-f="fixed" aria-pressed="false">이번에 수정</button>
+    <button data-f="open" aria-pressed="false">미해결</button>
+  </div>
+  <table id="tbl">
+    <thead><tr><th>심각도</th><th>영역</th><th>이슈</th><th>범위</th><th>조치</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section class="card">
+  <h2>페이지별 히트맵</h2>
+  <table class="hm">
+    <thead><tr>
+      <th>페이지</th><th class="num">단어</th><th class="num">인바운드</th>
+      <th>title</th><th>desc</th><th>canonical</th><th>schema</th>
+      <th>author*</th><th>dateMod*</th><th>OG</th>
+    </tr></thead>
+    <tbody id="hm"></tbody>
+  </table>
+  <p class="gw" style="margin-top:10px">* 수정 전 기준. <span class="no">✕</span> 표시된 5건은 이번 브랜치에서 모두 해결되었습니다.</p>
+</section>
+
+<footer>정적 빌드 산출물 전수 파싱 + 운영 URL 대조 + Chrome 실측 · 상세 내용은 seo-audit-report.md</footer>
+</div>
+
+<script>
+const S={TECH:97,GEO:80,CONTENT:100,OVERALL:92};
+const BD={
+ "기술: title":91,"기술: description":73,"기술: H1":100,"기술: canonical":100,
+ "기술: schema":100,"기술: 렌더링":100,"기술: sitemap":100,
+ "GEO: 리드답변":100,"GEO: author":55,"GEO: 갱신일":64,"GEO: 엔티티":100,
+ "GEO: FAQ":75,"GEO: 크롤러":100,"GEO: llms.txt":50,
+ "콘텐츠: 분량":100,"콘텐츠: 구조":100,"콘텐츠: 내부링크":100,"콘텐츠: OG":100
+};
+const ISSUES=[
+ {s:"P1",a:"GEO",t:"Organization sameAs 부재",d:"전역 1건",fix:1,
+  n:"엔티티 앵커 추가 (GitHub). 운영 채널 확충 필요"},
+ {s:"P1",a:"GEO",t:"도구 페이지 dateModified·author 부재",d:"3 / 11",fix:1,
+  n:"WebApplication에 author·dateModified·publisher·isPartOf 추가"},
+ {s:"P1",a:"TECH",t:"meta description 160자 초과",d:"3 / 11",fix:1,
+  n:"규정 원문을 본문으로 옮기고 판단 숫자만 유지"},
+ {s:"P1",a:"TECH",t:"title 15자 미만",d:"1 / 11",fix:1,
+  n:"verification-policy → 28자로 확장"},
+ {s:"P2",a:"GEO",t:"llms.txt 부재",d:"전역 1건",fix:1,
+  n:"추가함. Google 미사용 — 영향 제한적"},
+ {s:"P1",a:"GEO",t:"저자 엔티티가 익명 (Person sameAs 없음)",d:"전역",fix:0,
+  n:"사용자 결정 필요 — 실명 / 프로필 페이지 / 현행 유지"},
+ {s:"P1",a:"CONTENT",t:"내부 링크 얇은 가이드",d:"3건",fix:0,
+  n:"november-reassessment 인바운드 2개 — 11월 전 보강"},
+ {s:"P2",a:"TECH",t:"트레일링 슬래시 중복 URL",d:"전역",fix:0,
+  n:"canonical이 방어 중. Vercel 308로 정규화 시 완전 차단"},
+ {s:"P2",a:"CONTENT",t:"카니발라이제이션 감시 대상",d:"2건",fix:0,
+  n:"임의계속가입 도구 vs 가이드 — 의도 분리됨, Search Console로 감시"},
+ {s:"P2",a:"TECH",t:"noindex 3종 중복 description",d:"3건",fix:0,
+  n:"noindex이므로 검색 영향 없음"},
+ {s:"P2",a:"GEO",t:"홈 FAQPage 미적용",d:"1건",fix:-1,
+  n:"적용하지 않음 — 링크 목록이지 답변 본문이 아님 (오탐)"},
+ {s:"P2",a:"GEO",t:"robots.txt AI 크롤러 명시",d:"전역",fix:-1,
+  n:"적용하지 않음 — * Allow로 이미 전면 허용"}
+];
+const PAGES=[
+ ["/",1214,13,1,1,1,1,0,0,1],
+ ["/health-insurance/dependent/",768,13,1,1,1,1,0,0,1],
+ ["/health-insurance/regional-premium/",681,8,1,1,1,1,0,0,1],
+ ["/health-insurance/voluntary-continuation/",856,4,1,0,1,1,0,0,1],
+ ["/guides/property-tax-base/",1755,5,1,1,1,1,1,1,1],
+ ["/guides/before-business-registration/",2191,3,1,1,1,1,1,1,1],
+ ["/guides/losing-eligibility/",1866,4,1,0,1,1,1,1,1],
+ ["/guides/when-voluntary-continuation-wins/",1896,5,1,0,1,1,1,1,1],
+ ["/guides/pension-impact/",2504,3,1,1,1,1,1,1,1],
+ ["/guides/november-reassessment/",1838,2,1,1,1,1,1,1,1],
+ ["/verification-policy/",4478,13,0,1,1,1,0,1,1]
+];
+const col=v=>v>=90?"#0f9d58":v>=70?"#e8a317":"#d64545";
+function gauge(id,val,vid){
+ new Chart(document.getElementById(id),{type:"doughnut",
+  data:{datasets:[{data:[val,100-val],backgroundColor:[col(val),"#eef1f5"],
+        borderWidth:0,circumference:360,cutout:"76%"}]},
+  options:{responsive:true,plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+ const e=document.getElementById(vid); e.textContent=val; e.style.color=col(val);
+}
+gauge("gTech",S.TECH,"vTech");gauge("gGeo",S.GEO,"vGeo");
+gauge("gCon",S.CONTENT,"vCon");gauge("gAll",S.OVERALL,"vAll");
+
+new Chart(document.getElementById("bd"),{type:"bar",
+ data:{labels:Object.keys(BD),datasets:[{data:Object.values(BD),
+   backgroundColor:Object.values(BD).map(col),borderRadius:4,barPercentage:.8}]},
+ options:{indexAxis:"y",responsive:true,
+  plugins:{legend:{display:false}},
+  scales:{x:{max:100,grid:{color:"#eef1f5"},ticks:{font:{size:10}}},
+          y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+
+const tb=document.querySelector("#tbl tbody");
+function render(f){
+ tb.innerHTML=ISSUES.filter(i=>
+   f==="all"||(f==="fixed"&&i.fix===1)||(f==="open"&&i.fix===0)||i.s===f
+ ).map(i=>{
+   const badge = i.fix===1 ? '<span class="pill done">수정 완료</span>'
+     : i.fix===-1 ? '<span class="pill p2">적용 안 함</span>'
+     : '<span class="pill p1">미해결</span>';
+   return `<tr>
+    <td><span class="pill ${i.s.toLowerCase()}">${i.s}</span></td>
+    <td><span class="area">${i.a}</span></td>
+    <td><b>${i.t}</b></td>
+    <td>${i.d}</td>
+    <td>${badge}<div style="color:var(--muted);font-size:12px;margin-top:3px">${i.n}</div></td>
+   </tr>`;}).join("")||'<tr><td colspan="5" style="color:var(--muted)">해당 항목 없음</td></tr>';
+}
+render("all");
+document.getElementById("fil").addEventListener("click",e=>{
+ const b=e.target.closest("button"); if(!b)return;
+ [...e.currentTarget.children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+ render(b.dataset.f);
+});
+
+const mk=v=>v?'<span class="ok">✓</span>':'<span class="no">✕</span>';
+const maxW=Math.max(...PAGES.map(p=>p[1]));
+document.getElementById("hm").innerHTML=PAGES.map(p=>`<tr>
+ <td>${p[0]}</td>
+ <td class="num">${p[1].toLocaleString()}
+   <div class="bar"><span style="width:${Math.round(p[1]/maxW*100)}%;background:#94a3b8"></span></div></td>
+ <td class="num">${p[2]}
+   <div class="bar"><span style="width:${Math.round(p[2]/13*100)}%;background:${p[2]<=3?"#d64545":"#0f9d58"}"></span></div></td>
+ <td>${mk(p[3])}</td><td>${mk(p[4])}</td><td>${mk(p[5])}</td>
+ <td>${mk(p[6])}</td><td>${mk(p[7])}</td><td>${mk(p[8])}</td><td>${mk(p[9])}</td>
+</tr>`).join("");
+</script>
+</body>
+</html>

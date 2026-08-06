@@ -7,10 +7,12 @@ import TrustSignal from '@/components/TrustSignal';
 import { Breadcrumbs } from '@/components/guide';
 
 const TITLE = '임의계속가입 비교 — 지역가입자보다 보험료가 저렴한지 확인';
+// 검색 결과 스니펫은 160자 안쪽에서 잘린다. 신청기한 규정 원문과 보수 외 소득
+// 단서는 화면 본문에서 안내하고, 여기에는 비교 기준이 되는 숫자만 남긴다.
 const DESCRIPTION =
   '퇴직 후 지역가입자와 임의계속가입 중 어느 쪽이 유리한지 월 금액으로 비교합니다. ' +
-  '임의계속가입은 재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. 보수 외 소득은 별도 보험료가 추가될 수 있습니다. ' +
-  `최대 36개월, ${VOLUNTARY_CONTINUATION.APPLY_DEADLINE_RULE} 신고 시 소급 인정.`;
+  '재산이 보험료에 반영되지 않아 재산이 많고 퇴직 전 보수가 낮았을수록 유리합니다. ' +
+  `최대 ${VOLUNTARY_CONTINUATION.MAX_MONTHS}개월간 유지되며 총 차액까지 계산합니다.`;
 
 export const metadata = createPageMetadata({
   title: TITLE,
@@ -47,6 +49,7 @@ const jsonLd = {
         name: ROUTES.voluntaryContinuation.label,
         url: ROUTES.voluntaryContinuation.path,
         description: DESCRIPTION,
+        dateModified: ROUTES.voluntaryContinuation.lastModified,
       }),
     },
     breadcrumbJsonLd([
