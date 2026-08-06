@@ -69,14 +69,44 @@
     동작을 유지해 전환 리스크를 만들지 않았다(action-plan B안). `e2e/links.spec.ts`에 홈이
     이 경로로 실경로 링크를 2개 이상 갖는지 확인하는 회귀 테스트를 추가했다.
   - 2-E JSON-LD 이스케이프: `src/lib/structured-data.ts`에 `ldJson()` 헬퍼(꺾쇠괄호 여는
-    문자를 유니코드 이스케이프로 치환)를 추가하고 `dangerouslySetInnerHTML`을 쓰는 11곳
-    (레이아웃 공통 엔티티, 도구 3개, 검증 원칙, 가이드 6편) 전부를 `JSON.stringify` 대신
-    이 헬퍼로 교체했다.
-  - 2-E 보안 헤더: `vercel.json`에 `Referrer-Policy`, `X-Content-Type-Options`,
-    `Strict-Transport-Security`를 추가했다. `output: 'export'`라 `next.config.mjs`의
-    `headers()`는 쓸 수 없어 Vercel 엣지 설정으로 대체했다. CSP는 JSON-LD를
-    `dangerouslySetInnerHTML`로 9곳 이상 인라인 주입하는 구조상 `unsafe-inline`이
-    강제되어 방어력 없이 장식만 되므로 의도적으로 넣지 않았다(action-plan 3절 사유와 동일).
+    문자를 유니코드 이스케이프로 치환)를 추가하고 `dangerouslySetInnerHTML`을 쓰는 곳
+    전부를 `JSON.stringify` 대신 이 헬퍼로 교체했다.
+    **2026-08-06 정정: 실제 개수는 11곳이 아니라 12곳이다**(레이아웃·**홈**·도구 3개·
+    검증 원칙·가이드 6편). 기존 기록에서 홈이 누락돼 있었다. 12곳 전부 `ldJson()` 경유를 확인했다.
+  - 2-E 보안 헤더: `output: 'export'`라 `next.config.mjs`의 `headers()`를 쓸 수 없어
+    `vercel.json`의 Vercel 엣지 설정으로 대체했다.
+
+    > **2026-08-06 정정.** 이 문단은 원래 "CSP는 의도적으로 넣지 않았다"고 적혀 있었으나
+    > **실제 `vercel.json`에는 CSP가 있다.** 문서가 코드보다 낡았던 경우다
+    > (`VERIFIED_AGAINST_NHIS` 때와 같은 종류의 드리프트). 아래는 실제 파일 기준이다.
+
+    현재 `vercel.json`이 모든 경로(`/(.*)`)에 보내는 헤더 6개:
+
+    | 헤더 | 값 요약 |
+    |---|---|
+    | `Referrer-Policy` | `strict-origin-when-cross-origin` |
+    | `X-Content-Type-Options` | `nosniff` |
+    | `Strict-Transport-Security` | `max-age=63072000; includeSubDomains; preload` |
+    | `Content-Security-Policy` | 아래 주의사항 참조 |
+    | `X-Frame-Options` | `DENY` |
+    | `Permissions-Policy` | `camera=() microphone=() geolocation=()` |
+
+    **CSP에서 주의할 것 세 가지.**
+
+    1. `script-src`에 `'unsafe-inline'`이 들어 있다. JSON-LD를 `dangerouslySetInnerHTML`로
+       **12곳**(레이아웃·홈·도구 3개·검증 원칙·가이드 6편)에 인라인 주입하는 구조상
+       불가피하다. **XSS 방어력은 제한적이라고 봐야 한다.**
+       12곳 전부 `src/lib/structured-data.ts`의 `ldJson()`을 경유하는 것을 2026-08-06 확인했다.
+    2. 허용된 외부 출처는 GTM·Vercel 스크립트, GA4·Vercel Insights 연결뿐이다.
+       **새 외부 스크립트(예: 애드센스)를 붙이면 `script-src`·`connect-src`·`img-src`에
+       출처를 추가해야 하며, 빠뜨리면 조용히 차단된다.** 09 문서 5-1 애드센스 작업의
+       선행 조건으로 다룬다.
+    3. **`form-action 'none'`이 있다.** 지금은 폼이 없어 무해하지만, 문의 폼 등
+       어떤 형태든 form 제출을 붙이는 순간 차단된다. 채널 확장을 검토할 때 함께 본다.
+
+    **HSTS 부작용:** `preload`가 있어 한 번 https를 방문한 브라우저는 서버에 묻지 않고
+    http를 https로 올린다. **리다이렉트 동작을 브라우저로 검증할 수 없다**는 뜻이다.
+    반드시 `curl -I`로 확인한다 (`docs/08` 색인 절차 함정 ②).
   - 로컬 `npm run lint`·`npm run typecheck`·`npm test`(최신 실행 146개)·`npm run build`·
     `npx playwright test --project=desktop-1440`(관련 스펙 40개) 전부 통과 확인.
     Phase 2 2-F(배포 후 Rich Results Test·Search Console 재크롤 기록)는 아직 남아 있다.
@@ -171,6 +201,13 @@
 0. **완료(2026-08-05):** 지역보험료 금융소득 재대조 및 `VERIFIED_AGAINST_NHIS = true` 갱신.
 0-1. **완료(2026-08-05):** 배우자 동반 판정 구현. 배우자 소득·재산을 대상자와 별도로 확인한다.
 1. **[A안 3-1 · 첫 항목]** Google Search Console과 네이버 서치어드바이저에서 요청한 URL의 색인 상태·제외 사유·선택 canonical을 1주 단위로 확인한다.
+   **2026-08-06 Google 실측: 색인 대상 11개 전부 색인 확인.** A안 중단 조건 1번 해제.
+   남은 관찰은 홈이 http·https 두 URL로 잡혀 있는 것 하나이며, **2026-08-06 진단 완료 — 설정 결함은 없다.**
+   canonical(절대 https)·http 절대링크 0건·`curl -I` 결과 308 Permanent Redirect 모두 정상이고,
+   원인은 2026-08-03 도메인 연결 직후의 낡은 크롤 스냅샷이다. **남은 조치는 GSC에서 http URL에 색인 생성 요청 → 2주 뒤 통합 확인.**
+   **측정 함정:** `vercel.json`의 HSTS preload 때문에 브라우저 접속으로는 리다이렉트를 검증할 수 없다. 반드시 `curl -I` 로 본다.
+   상세는 `docs/06-QA-전수점검.md`의 「Q4-1. 색인 실측」. 네이버는 미측정.
+   **측정 함정:** `site:` 결과는 10개에서 잘린다. `num` 파라미터가 무시되므로 반드시 2페이지 이상 확인한다.
 2. 임시 Vercel 주소가 검색 결과에 남아 있지 않은지 확인한다.
 3. Vercel Speed Insights에서 Core Web Vitals 데이터가 누적되는지 확인하고 GA4와 역할을 분리한다.
 3-1. 내부 테스트 트래픽을 구분·제외하는 방식을 정한다. (`docs/04` P1-2에서 이관)
