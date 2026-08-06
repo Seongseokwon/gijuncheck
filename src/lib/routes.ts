@@ -122,7 +122,8 @@ export const ROUTES = {
     label: '연금 수령이 피부양자 자격에 미치는 영향',
     ogImage: '/og/pension-impact.png',
     priority: 0.7,
-    lastModified: '2026-08-03',
+    // 2026-08-06 사적연금 제외의 실제 근거(부과 자료 범위) 절 추가
+    lastModified: '2026-08-06',
     changeFrequency: 'monthly',
     ready: true,
   },
