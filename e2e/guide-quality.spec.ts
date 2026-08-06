@@ -57,7 +57,8 @@ test('가이드 Article과 가이드·도구 BreadcrumbList JSON-LD가 완성되
       );
     });
 
-  const expectedAuthorUrl = new URL(ROUTES.verificationPolicy.path, SITE.url).toString();
+  // 저자 엔티티는 검증 원칙 페이지의 「운영자」 절을 가리킨다 (`authorJsonLd()`).
+  const expectedAuthorUrl = `${new URL(ROUTES.verificationPolicy.path, SITE.url).toString()}#operator`;
   const expectedOrganizationId = `${SITE.url}#organization`;
   const expectedWebsiteId = `${SITE.url}#website`;
   for (const key of GUIDE_KEYS) {
@@ -142,12 +143,25 @@ test('검증 원칙 페이지는 AboutPage와 운영자 Person 엔티티를 제�
   expect(person).toMatchObject({
     '@type': 'Person',
     name: SITE.authorName,
-    url: policyUrl,
+    // 프로필 절의 앵커까지 가리킨다. 이 값이 페이지 전체 URL 로 되돌아가면
+    // 저자 엔티티가 자기를 설명하는 절이 아니라 문서 전체를 가리키게 된다.
+    url: `${policyUrl}#operator`,
+    description: SITE.operator.description,
     worksFor: { '@id': `${SITE.url}#organization` },
   });
+  // AboutPage 는 자기 저자를 선언해야 한다.
+  expect(aboutPage).toMatchObject({ author: { '@id': `${SITE.url}#author` } });
 });
 
-test('홈은 사이트 엔티티와 도구·질문 목록을 페이지 레벨 JSON-LD로 제공한다', async ({ page }, testInfo) => {
+/**
+ * 홈은 사이트 엔티티만 제공하고 `ItemList` 는 제공하지 않는다.
+ *
+ * 2026-08-06 Rich Results Test 에서 Google 이 홈의 `ItemList` 두 개를 캐러셀
+ * 후보로 읽고 「2 invalid items」로 판정했다. 캐러셀은 Recipe·Course·Movie·
+ * Restaurant·Product 계열 전용이라 도구 목록은 형식을 고쳐도 자격이 없다.
+ * 되돌아오는 것을 막기 위해 **부재를 검사**한다.
+ */
+test('홈은 사이트 엔티티를 제공하고 캐러셀로 오독되는 ItemList를 두지 않는다', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop-1440', '뷰포트와 무관한 JSON-LD 검사');
   await page.goto(ROUTES.home.path);
 
@@ -168,13 +182,19 @@ test('홈은 사이트 엔티티와 도구·질문 목록을 페이지 레벨 JS
       expect.objectContaining({ '@type': 'Organization', '@id': `${SITE.url}#organization` }),
       expect.objectContaining({ '@type': 'WebSite', '@id': `${SITE.url}#website` }),
       expect.objectContaining({ '@type': 'WebPage', '@id': `${SITE.url}#home` }),
-      expect.objectContaining({ '@type': 'ItemList', '@id': `${SITE.url}#tools` }),
-      expect.objectContaining({ '@type': 'ItemList', '@id': `${SITE.url}#popular-questions` }),
     ]),
   );
 
-  const tools = graph.find((node) => node['@id'] === `${SITE.url}#tools`);
-  expect(tools?.itemListElement).toHaveLength(3);
+  // 홈 `WebPage` 는 저자·수정일을 갖는다. 다른 페이지에는 있는데 홈만 빠져 있었다.
+  const home = graph.find((node) => node['@id'] === `${SITE.url}#home`);
+  expect(home).toMatchObject({
+    author: { '@id': `${SITE.url}#author` },
+    publisher: { '@id': `${SITE.url}#organization` },
+  });
+  expect(home?.dateModified).toBeTruthy();
+
+  // 캐러셀로 오독되던 노드가 되돌아오지 않는지 확인한다.
+  expect(graph.filter((node) => node['@type'] === 'ItemList')).toHaveLength(0);
 });
 
 /**
