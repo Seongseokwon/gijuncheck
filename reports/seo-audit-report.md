@@ -10,12 +10,14 @@
 
 ## 1. 요약
 
-| 영역 | 점수 | 가중치 |
-|---|---:|---:|
-| 기술 SEO | **97** | 40% |
-| GEO / AEO | **80** | 35% |
-| 콘텐츠 | **100** | 25% |
-| **종합** | **92** | |
+| 영역 | 진단 시 | 수정 후 | 가중치 |
+|---|---:|---:|---:|
+| 기술 SEO | 97 | **100** | 40% |
+| GEO / AEO | 80 | **93** | 35% |
+| 콘텐츠 | 100 | **100** | 25% |
+| **종합** | **92** | **98** | |
+
+수정 후 점수는 `npm run verify` 통과 및 재빌드된 `out/` 산출물 전수 재파싱으로 확인한 값이다.
 
 **총평.** 이 사이트는 기술 SEO 관점에서 고칠 것이 거의 없다. 전 페이지가 정적으로 발행되어 초기 HTML에 본문이 들어 있고, canonical은 11개 전부 자기참조이며, JSON-LD 파싱 오류가 0건이고, 고아 페이지도 없다. TTFB 270ms에 페이지당 전송량 11KB로 성능 여유도 크다. 흔한 실패 지점(JS 렌더링 의존, sitemap 누락, canonical 불일치, 중복 title)이 전부 비어 있다는 것은 설계 단계에서 이미 다뤄졌다는 뜻이다.
 
@@ -131,6 +133,65 @@ export function webApplicationJsonLd({ name, url, description, dateModified }) {
 **수정.** `public/llms.txt` 신규 작성. 핵심 수치(2,000만원 / 1,000만원 / 500만원 / 5.4억·9억 / 7.19% / 211.5원)와 반직관적 구분(공시가격 ≠ 과세표준, 공적연금 전액 vs 50%)을 인용 가능한 단위로 정리하고, 모의 판정이라는 한계와 1차 출처를 명시했다.
 
 **검증.** 배포 후 `https://gijuncheck.kr/llms.txt` 200 응답 확인.
+
+---
+
+### 2-6. 검증 결과
+
+`npm run verify`(lint · typecheck · 172 unit test · build · e2e) 전부 통과. 재빌드된 `out/` 14개 HTML을 전수 재파싱한 결과는 아래와 같다.
+
+**회귀 점검 — 전부 통과**
+
+| 점검 항목 | 결과 |
+|---|---|
+| canonical 자기참조 이탈 | 0건 |
+| 색인 페이지에 robots 메타 오적용 | 0건 (`noindex`는 의도한 3개에만 유지) |
+| JSON-LD 파싱 오류 | 0건 |
+| og:image 누락 | 0건 |
+| 중복 title / description | 0 / 0 |
+
+**수정 항목 반영 확인**
+
+| 항목 | 진단 시 | 수정 후 |
+|---|---|---|
+| title 15~60자 | 10 / 11 | **11 / 11** |
+| description 50~160자 | 8 / 11 | **11 / 11** |
+| `author` 엔티티 | 6 / 11 | **9 / 11** |
+| `dateModified` | 7 / 11 | **10 / 11** |
+| Organization `sameAs` | 없음 | `["https://github.com/Seongseokwon/gijuncheck"]` |
+| Organization `knowsAbout` | 없음 | 3개 항목 |
+
+도구 페이지 3종의 `WebApplication` 노드 실측값:
+
+```
+/health-insurance/dependent/              dateModified=2026-08-04T00:00:00+09:00  author=#author  publisher ✓  isPartOf ✓
+/health-insurance/regional-premium/       dateModified=2026-08-05T00:00:00+09:00  author=#author  publisher ✓  isPartOf ✓
+/health-insurance/voluntary-continuation/ dateModified=2026-08-03T00:00:00+09:00  author=#author  publisher ✓  isPartOf ✓
+```
+
+각 값이 `ROUTES`의 `lastModified`(배포일이 아닌 콘텐츠 실제 변경일)와 정확히 일치한다.
+
+### 2-7. 남은 잔여 2건 — 다음 커밋에서 함께 처리할 것
+
+재검증 과정에서 확인된, 같은 성격의 마무리 항목이다. 범위가 작고 서로 붙어 있으므로 한 번에 처리하는 편이 낫다.
+
+**(a) 홈(`/`)에 `author`·`dateModified` 없음.** 홈의 `WebPage` 노드에만 두 필드가 빠져 있다. 홈은 화면 하단에 이미 `최종 확인 2026-08-03`을 `<time>`으로 노출하므로, 같은 값을 구조화 데이터에 넣으면 된다.
+
+```ts
+// src/app/page.tsx — WebPage 노드
+author: authorJsonLd(),
+dateModified: `${SITE.lastVerified}T00:00:00+09:00`,
+publisher: { '@id': SITE_ENTITY_IDS.organization },
+```
+
+**(b) `/verification-policy/`의 `author` 속성 부재.** 이 페이지는 `Person` 노드를 정의하고 `about`·`mainEntity`로 참조하지만, `AboutPage`에 `author` 속성 자체는 없다. 저자 엔티티의 정의 지점인 문서가 정작 자신의 저자를 선언하지 않는 상태다.
+
+```ts
+// src/app/verification-policy/page.tsx — AboutPage 노드
+author: { '@id': SITE_ENTITY_IDS.author },
+```
+
+두 건을 반영하면 `author`·`dateModified` 모두 11/11이 되고 GEO는 93 → 약 98이 된다.
 
 ---
 
