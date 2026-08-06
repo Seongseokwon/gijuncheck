@@ -97,10 +97,20 @@
        **12곳**(레이아웃·홈·도구 3개·검증 원칙·가이드 6편)에 인라인 주입하는 구조상
        불가피하다. **XSS 방어력은 제한적이라고 봐야 한다.**
        12곳 전부 `src/lib/structured-data.ts`의 `ldJson()`을 경유하는 것을 2026-08-06 확인했다.
-    2. 허용된 외부 출처는 GTM·Vercel 스크립트, GA4·Vercel Insights 연결뿐이다.
-       **새 외부 스크립트(예: 애드센스)를 붙이면 `script-src`·`connect-src`·`img-src`에
-       출처를 추가해야 하며, 빠뜨리면 조용히 차단된다.** 09 문서 5-1 애드센스 작업의
-       선행 조건으로 다룬다.
+    2. 허용된 외부 출처는 GTM·Vercel 스크립트, GA4·Vercel Insights 연결에 더해
+       **2026-08-06부터 애드센스 출처가 선반영되어 있다.** 애드센스 스크립트를 아직
+       넣지 않았지만 CSP만 미리 열어 둔 상태다(붙일 때 조용히 차단되는 사고를 막기 위함).
+       - `script-src` 추가: `pagead2.googlesyndication.com`, `partner.googleadservices.com`,
+         `tpc.googlesyndication.com`, `googleads.g.doubleclick.net`, `adservice.google.com`
+       - `connect-src` 추가: `pagead2.googlesyndication.com`, `googleads.g.doubleclick.net`,
+         `ep1.adtrafficquality.google`, `ep2.adtrafficquality.google`
+       - `frame-src` 신설: `'self'`, `googleads.g.doubleclick.net`,
+         `tpc.googlesyndication.com`, `www.google.com`
+         (기존에는 `frame-src`가 없어 `default-src 'self'`로 폴백됐다. 지시어를 새로
+         만들었으므로 `'self'`를 명시해 동일 출처 iframe 회귀를 막았다.)
+       - `img-src`는 이미 `https:`라 추가 불필요.
+       **아직 열려 있지 않은 것:** `form-action`은 여전히 `'none'`이다(아래 3번).
+       또 다른 외부 스크립트를 붙일 때는 같은 절차를 반복한다.
     3. **`form-action 'none'`이 있다.** 지금은 폼이 없어 무해하지만, 문의 폼 등
        어떤 형태든 form 제출을 붙이는 순간 차단된다. 채널 확장을 검토할 때 함께 본다.
 
@@ -192,6 +202,33 @@
 - 경쟁사 화면을 요건 구현의 근거로 삼지 않는다. 반드시 법령 원문·공단 안내로 확인한다.
 - 가이드 운영은 `docs/08-가이드-운영-런북.md`의 주간 색인·출처 점검, 월간 질문 분석, 제도 변경 순서를 따른다.
 - 문구 수정 시 “퇴직 후 90일” 같은 낡은 고정 일수 안내가 다시 들어가지 않는지 확인한다. 현재 임의계속가입 신청기한은 최초 지역보험료 납부기한부터 2개월 규칙으로 표시한다.
+
+## 2026-08-06 대조 사례 기록표 공개 (A안 3-4 완료)
+
+- `/verification-policy/`에 「대조 사례 기록」 섹션을 추가했다. **0–30일 구간이 이걸로 끝난다.**
+- **화면의 단일 출처는 `src/lib/verification/cases.ts`다.** `docs/03-검증기록.md`의 사례를
+  옮긴 것이며, 두 곳이 어긋나면 문서를 기준으로 코드를 고친다.
+- 공개 35건: 공단 모의계산 직접 대조 13 · 공단 안내 재현 11 · 법령 산식 자체 재현 9 · **미확인 2**.
+- **대조 등급(`VerificationTier`)을 4단계로 나눴다.** 계획에 없던 추가다.
+  한 표에 다 넣으면 공단과 직접 대조한 13건과 법령 산식을 스스로 재현한 9건이
+  같은 무게로 보인다. 후자를 전자처럼 보이게 하는 것은 이 서비스가 파는 신뢰를 깎는다.
+- **미확인 사례(D03·D04)를 화면에서 빼지 않는다.** 불리한 행을 지우면 검증 기록이 아니라
+  홍보물이 된다. `e2e/verification-cases.spec.ts`가 이 묶음의 존재를 회귀 검사한다.
+- 요약 숫자는 하드코딩하지 않고 `summarizeVerificationCases()`가 계산한다.
+  사례를 추가할 때 요약을 같이 못 고쳐서 **검증 페이지의 숫자가 틀리는** 사고를 막는다.
+- 관련 파일: `src/lib/verification/cases.ts`, `cases.test.ts`,
+  `src/app/verification-policy/page.tsx`, `e2e/verification-cases.spec.ts`,
+  `src/lib/routes.ts`(`lastModified` → 2026-08-06).
+
+## 2026-08-06 애드센스 신청 시점 결정
+
+- `vercel.json` CSP에 애드센스 출처를 **선반영**했다. 스크립트는 아직 넣지 않았다.
+- **8월은 신청하지 않는다.** 콘텐츠 보완(09 문서 3-4 사례 기록표)과 계산 신뢰도
+  (4-2 사적연금 기준 재확인, 4-3 대조 사례 확대)에 집중한다.
+- **신청 기본값은 9월 초.** 콘텐츠가 예상보다 빨리 쌓이면 8월 중 앞당길 수 있으나,
+  **신청~심사 종료 기간에는 사이트 구조를 크게 바꾸지 않는다**는 제약을 감수할 때만 앞당긴다.
+- 승인되어도 자동광고는 켜지 않는다. **신청과 게재는 별개**이며 게재는 90일 구간 끝까지 미룬다.
+- 상세와 앞당김·미룸 조건은 `docs/09-A안-90일-실행계획.md` 5-1.
 
 ## 아직 남은 운영 작업
 

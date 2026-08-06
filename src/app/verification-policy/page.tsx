@@ -4,6 +4,12 @@ import { SITE } from '@/lib/site';
 import { BASIS } from '@/lib/constants/2026';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { breadcrumbJsonLd, ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
+import {
+  summarizeVerificationCases,
+  VERIFICATION_CASE_GROUPS,
+  VERIFICATION_TIERS,
+  type VerificationTierMeta,
+} from '@/lib/verification/cases';
 
 export const metadata = createPageMetadata({
   title: '검증 원칙',
@@ -67,6 +73,16 @@ const DEPENDENT_RULE_COVERAGE = [
     source: DEPENDENT_SOURCES.property,
   },
 ] as const;
+
+const CASE_SUMMARY = summarizeVerificationCases();
+
+/** 대조 등급 배지 색. 강도 차이가 눈으로 구분돼야 한다. */
+const TIER_BADGE: Record<VerificationTierMeta['tone'], string> = {
+  strong: 'bg-accent-100 text-accent-700',
+  medium: 'bg-slate-200 text-slate-800',
+  weak: 'bg-slate-100 text-slate-700',
+  open: 'bg-amber-100 text-amber-900',
+};
 
 export default function VerificationPolicyPage() {
   return (
@@ -146,6 +162,164 @@ export default function VerificationPolicyPage() {
             </tbody>
           </table>
         </div>
+        <p className="text-sm leading-6 text-slate-600">
+          각 기능을 어떤 값으로 확인했는지는{' '}
+          <a href="#cases" className="text-accent-700 underline underline-offset-4 hover:text-accent-600">
+            아래 대조 사례 기록
+          </a>
+          에서 사례 단위로 볼 수 있습니다.
+        </p>
+      </section>
+
+      {/* id 는 섹션에 둔다. 제목에 두면 #cases 앵커와 테스트 범위가 h2 한 줄로 좁아진다.
+          그룹 섹션(`${group.id}` / `${group.id}-title`)과 같은 규칙이다. */}
+      <section id="cases" className="scroll-mt-24 space-y-5" aria-labelledby="cases-title">
+        <h2 id="cases-title" className="text-2xl font-bold tracking-tight text-brand-950">
+          대조 사례 기록
+        </h2>
+        <p className="max-w-3xl text-base leading-8 text-slate-600">
+          위의 검증 단계를 실제로 어떤 값에 적용했는지 그대로 공개합니다. 아래 입력값은
+          모두 기준을 넘나드는 합성 경계값이며, 이용자가 입력한 값이나 특정 개인의
+          소득·재산 자료는 들어가지 않습니다.
+        </p>
+
+        <dl className="grid gap-px overflow-hidden rounded-[22px] border border-slate-200 bg-slate-200 sm:grid-cols-4">
+          {[
+            ['공개 사례', `${CASE_SUMMARY.total}건`],
+            ['근거와 일치', `${CASE_SUMMARY.matched}건`],
+            ['근거와 불일치', `${CASE_SUMMARY.mismatched}건`],
+            ['확인하지 못함', `${CASE_SUMMARY.unknown}건`],
+          ].map(([label, value]) => (
+            <div key={label} className="bg-white px-5 py-4">
+              <dt className="text-sm font-bold text-slate-600">{label}</dt>
+              <dd className="mt-1 text-2xl font-bold text-brand-950">{value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="rounded-[22px] border border-slate-200 bg-canvas p-6 sm:p-7">
+          <h3 className="text-lg font-bold text-brand-950">대조 등급을 나눠 표시합니다</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            공단 모의계산기와 직접 비교한 것과, 법령 산식을 스스로 재현한 것은 근거의
+            무게가 다릅니다. 이를 “검증 완료” 한 단어로 합치지 않습니다.
+          </p>
+          <dl className="mt-5 space-y-4">
+            {Object.entries(VERIFICATION_TIERS).map(([key, tier]) => (
+              <div key={key}>
+                <dt>
+                  <span
+                    className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${TIER_BADGE[tier.tone]}`}
+                  >
+                    {tier.label}
+                  </span>
+                </dt>
+                <dd className="mt-2 text-sm leading-6 text-slate-700">{tier.description}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        {VERIFICATION_CASE_GROUPS.map((group) => {
+          const tier = VERIFICATION_TIERS[group.tier];
+
+          return (
+            <section
+              key={group.id}
+              id={group.id}
+              className="scroll-mt-24 space-y-3"
+              aria-labelledby={`${group.id}-title`}
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <h3
+                  id={`${group.id}-title`}
+                  className="text-xl font-bold tracking-tight text-brand-950"
+                >
+                  {group.title}
+                </h3>
+                <span
+                  className={`inline-flex rounded-full px-3 py-1 text-xs font-bold ${TIER_BADGE[tier.tone]}`}
+                >
+                  {tier.label}
+                </span>
+                <span className="text-sm font-bold text-slate-600">{group.cases.length}건</span>
+              </div>
+              <p className="max-w-3xl text-sm leading-6 text-slate-600">{group.summary}</p>
+              <p className="text-sm leading-6">
+                <span className="text-slate-600">대조 기준: </span>
+                <a
+                  href={group.source.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-accent-700 underline underline-offset-4 hover:text-accent-600"
+                >
+                  {group.source.label} ↗ <span className="sr-only">(새 창에서 열림)</span>
+                </a>
+              </p>
+
+              <div className="min-w-0 max-w-full overflow-x-auto rounded-[22px] border border-slate-200 bg-white">
+                <table className="w-full min-w-0 border-collapse text-sm lg:min-w-[56rem]">
+                  <caption className="sr-only">
+                    {group.title} 대조 사례 {group.cases.length}건. 입력값, {group.expectedLabel},
+                    기준체크 결과, 오차, 대조일 순서입니다.
+                  </caption>
+                  <thead className="border-b border-slate-200 bg-canvas text-left text-slate-700">
+                    <tr>
+                      <th scope="col" className="px-5 py-4 font-bold">사례</th>
+                      <th scope="col" className="px-5 py-4 font-bold">입력값</th>
+                      <th scope="col" className="px-5 py-4 font-bold">{group.expectedLabel}</th>
+                      <th scope="col" className="px-5 py-4 font-bold">기준체크 결과</th>
+                      <th scope="col" className="px-5 py-4 font-bold">오차</th>
+                      <th scope="col" className="px-5 py-4 font-bold">대조일</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200 text-slate-700">
+                    {group.cases.map((item) => (
+                      <tr key={item.id}>
+                        <th
+                          scope="row"
+                          className="whitespace-nowrap px-5 py-4 text-left align-top font-bold text-brand-950"
+                        >
+                          {item.id}
+                        </th>
+                        <td className="px-5 py-4 align-top leading-6">
+                          {item.input}
+                          <span className="mt-1 block text-xs leading-5 text-slate-500">
+                            {item.note}
+                          </span>
+                        </td>
+                        <td className="px-5 py-4 align-top leading-6">{item.expected}</td>
+                        <td className="px-5 py-4 align-top leading-6">{item.actual}</td>
+                        <td
+                          className={`px-5 py-4 align-top font-bold ${
+                            item.result === 'match' ? 'text-slate-700' : 'text-amber-900'
+                          }`}
+                        >
+                          {item.diff}
+                        </td>
+                        <td className="px-5 py-4 align-top">
+                          <time dateTime={item.checkedOn}>{item.checkedOn}</time>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          );
+        })}
+
+        <p className="max-w-3xl text-sm leading-6 text-slate-600">
+          대조 결과가 근거와 달랐던 사례는 현재 없습니다. 앞으로 불일치가 나오면 행을
+          지우지 않고 원인(입력 모델 누락·자료 반영 시점·해석 차이)과 함께 남깁니다.
+          오류를 발견하시면{' '}
+          <a
+            href={`mailto:${SITE.contactEmail}`}
+            className="text-accent-700 underline underline-offset-4"
+          >
+            {SITE.contactEmail}
+          </a>
+          으로 알려 주세요.
+        </p>
       </section>
 
       <section className="space-y-4" aria-labelledby="dependent-sources">
