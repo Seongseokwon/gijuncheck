@@ -143,7 +143,7 @@ export const ROUTES = {
     label: '검증 원칙',
     ogImage: '/og/verification-policy.png',
     priority: 0.5,
-    // 2026-08-06 대조 사례 기록표 공개
+    // 2026-08-06 대조 사례 기록표 공개 + 지역보험료 대조 12건 추가
     lastModified: '2026-08-06',
     changeFrequency: 'yearly',
     ready: true,

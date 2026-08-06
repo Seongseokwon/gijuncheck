@@ -309,9 +309,11 @@ export default function VerificationPolicyPage() {
         })}
 
         <p className="max-w-3xl text-sm leading-6 text-slate-600">
-          대조 결과가 근거와 달랐던 사례는 현재 없습니다. 앞으로 불일치가 나오면 행을
-          지우지 않고 원인(입력 모델 누락·자료 반영 시점·해석 차이)과 함께 남깁니다.
-          오류를 발견하시면{' '}
+          2026년 8월 6일 대조에서 <strong>불일치가 한 건 나왔습니다.</strong> 주택을
+          가진 사람의 전월세를 재산에 더해 계산했는데, 공단은 주택·건물이 있으면
+          전월세를 반영하지 않았습니다. 조건을 바꿔가며 다섯 번 더 확인해 원인을 찾고
+          계산 방식을 고쳤습니다. 그 과정이 위 표의 C24·C25입니다. 앞으로도 불일치가
+          나오면 행을 지우지 않고 원인과 함께 남깁니다. 오류를 발견하시면{' '}
           <a
             href={`mailto:${SITE.contactEmail}`}
             className="text-accent-700 underline underline-offset-4"

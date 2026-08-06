@@ -78,6 +78,64 @@ export function rentEvaluationAmount(
   return Math.round((deposit + monthlyRent * 40) * 0.3);
 }
 
+export interface PropertyInput {
+  /** 재산세 과세표준 합계 (원) — 주택·건물·토지·선박·항공기 */
+  taxBase: number;
+  /** 임차 보증금 (원) */
+  rentDeposit?: number;
+  /** 월세 (원) */
+  monthlyRent?: number;
+  /**
+   * **주택 또는 건물을 소유하고 있는가.**
+   * true 이면 전월세는 재산에 반영되지 않는다. 금액과 무관하다.
+   */
+  ownsHouseOrBuilding: boolean;
+}
+
+/**
+ * 보험료 계산에 넣을 재산금액 (원).
+ *
+ * ## 이 함수가 존재하는 이유
+ *
+ * 「주택·건물을 소유하면 전월세를 반영하지 않는다」는 규칙이
+ * **2026-08-06까지 계산기 화면의 체크박스 라벨에만 있었다.** 모델에는 없었고
+ * 단위 테스트도 없었다. 호출처가 한 곳이라 결과는 맞았지만, 문구를 고치거나
+ * 호출처가 늘어나면 조용히 깨지는 구조였다. 규칙을 코드로 내린다.
+ *
+ * ## 2026-08-06 공단 모의계산 실측
+ *
+ * | 입력 | 공단 재산점수 | 해석 |
+ * |---|---|---|
+ * | 주택 2억 + 전세 2억 | 439 | 주택 2억 **단독과 동일**. 전세가 통째로 빠진다 |
+ * | 주택 5,000만(기본공제 미달) + 전세 2억 | 0 | 금액이 작아도 마찬가지 |
+ * | 주택 **1만원** + 전세 2억 | 0 | **1만원만 있어도** 전세 2억이 사라진다 |
+ * | 건물 2억 + 전세 2억 | 439 | 건물도 같다 |
+ * | **토지** 2억 + 전세 2억 | 535 | **토지는 전월세와 합산된다** |
+ *
+ * 즉 판단 기준은 재산 금액의 크기가 아니라 **주택·건물 보유 여부**다.
+ * 토지·선박·항공기만 가진 임차인은 둘이 더해진다.
+ *
+ * @example
+ *   // 무주택 임차인 — 토지 과세표준과 전월세 평가금액이 더해진다
+ *   propertyAmountFor({ taxBase: 200_000_000, rentDeposit: 200_000_000,
+ *                       monthlyRent: 0, ownsHouseOrBuilding: false })
+ *   // → 260,000,000
+ *
+ *   // 주택 보유자 — 전월세는 무시된다
+ *   propertyAmountFor({ taxBase: 200_000_000, rentDeposit: 200_000_000,
+ *                       monthlyRent: 0, ownsHouseOrBuilding: true })
+ *   // → 200,000,000
+ */
+export function propertyAmountFor({
+  taxBase,
+  rentDeposit = 0,
+  monthlyRent = 0,
+  ownsHouseOrBuilding,
+}: PropertyInput): number {
+  if (ownsHouseOrBuilding) return taxBase;
+  return taxBase + rentEvaluationAmount(rentDeposit, monthlyRent);
+}
+
 export interface PropertyBracket {
   /** 등급 (1~60) */
   grade: number;

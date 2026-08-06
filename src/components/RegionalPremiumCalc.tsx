@@ -28,7 +28,10 @@ import {
 import type { Income } from '@/lib/dependent/types';
 import { DISCLAIMER, RATE } from '@/lib/constants/2026';
 import { toPercent, wonExact } from '@/lib/format';
-import { rentEvaluationAmount } from '@/lib/constants/property-score-table';
+import {
+  propertyAmountFor,
+  rentEvaluationAmount,
+} from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
 import {
@@ -93,11 +96,24 @@ export default function RegionalPremiumCalc() {
     }
   }, []);
 
+  // 화면에 "현재 평가금액"으로 보여주는 값. 반영 여부와는 별개다.
   const rentAmount = useMemo(
     () => (rentEligible ? rentEvaluationAmount(rentDeposit, monthlyRent) : 0),
     [rentEligible, rentDeposit, monthlyRent],
   );
-  const propertyAmount = property + rentAmount;
+  // 주택·건물 보유 시 전월세 미반영 규칙은 propertyAmountFor 가 갖는다.
+  // 여기서 직접 더하지 말 것 — 그 규칙이 체크박스 라벨에만 있던 것이
+  // 2026-08-06 공단 대조에서 드러난 문제였다.
+  const propertyAmount = useMemo(
+    () =>
+      propertyAmountFor({
+        taxBase: property,
+        rentDeposit,
+        monthlyRent,
+        ownsHouseOrBuilding: !rentEligible,
+      }),
+    [property, rentDeposit, monthlyRent, rentEligible],
+  );
   const base = useMemo(() => incomeBaseForPremium(income), [income]);
   const result = useMemo(
     () => calculateRegionalPremium(income, propertyAmount),
@@ -240,10 +256,16 @@ export default function RegionalPremiumCalc() {
           <ReferenceOnlyNotice crossChecked={result.crossChecked} />
 
           <div className="divide-y divide-slate-100">
+            {/* 공단 화면과 같이 하한·상한을 적용한 값을 표시한다.
+                원값을 쓰면 "0원 + 139,378원 = 159,530원"처럼 표에서 덧셈이 안 맞는다. */}
             <ResultRow
               label="소득보험료"
-              hint={`소득월액 × ${toPercent(RATE.HEALTH)}`}
-              value={won(result.incomePortion)}
+              hint={
+                result.incomePortionApplied !== result.incomePortion
+                  ? `소득월액 × ${toPercent(RATE.HEALTH)} = ${won(result.incomePortion)} → 하한·상한 적용`
+                  : `소득월액 × ${toPercent(RATE.HEALTH)}`
+              }
+              value={won(result.incomePortionApplied)}
             />
             <ResultRow
               label="재산보험료"

@@ -269,7 +269,8 @@ export default function VoluntaryComparison() {
                     {won(regional.total)}
                   </p>
                   <p className="mt-2 text-sm text-slate-600">
-                    소득 {won(regional.incomePortion)} + 재산{' '}
+                    {/* 하한·상한 적용값을 쓴다. 원값을 쓰면 덧셈이 맞지 않는다. */}
+                    소득 {won(regional.incomePortionApplied)} + 재산{' '}
                     {won(regional.propertyPortion)}
                     {regional.propertyGrade
                       ? ` (${regional.propertyGrade}등급)`

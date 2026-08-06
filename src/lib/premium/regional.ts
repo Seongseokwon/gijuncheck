@@ -76,8 +76,25 @@ export function incomeBaseForPremium(income: Income): IncomeBase {
 /* ------------------------------------------------------------------ */
 
 export interface PremiumBreakdown {
-  /** 소득 기준 보험료 (원/월) */
+  /** 소득 기준 보험료 (원/월). 하한·상한 적용 **전** 원값 */
   incomePortion: number;
+  /**
+   * 화면에 표시할 소득보험료 (원/월). 하한·상한을 적용한 값.
+   *
+   * ## 왜 두 값이 따로 있는가 — 2026-08-06 공단 재대조
+   *
+   * 공단 모의계산 화면은 ① 소득월액보험료 칸에 **하한·상한을 적용한 값**을 넣는다.
+   * 소득이 0원이어도 20,160원으로 표시되고, 소득분이 상한을 넘으면 4,591,740원으로
+   * 잘려서 표시된다. 그래야 화면의 `① + ③ = ④`가 성립한다.
+   *
+   * 우리는 `incomePortion` 에 원값을 담고 그대로 화면에 뿌리고 있었다. 그래서
+   * 재산만 있는 세대의 화면이 **`0원 + 139,378원 = 159,530원`** 처럼 산수가 맞지
+   * 않게 보였다. 최종 금액은 맞았지만, 근거를 보여주는 것이 이 서비스의 존재
+   * 이유인데 표에서 덧셈이 안 맞는 것은 그 자체로 결함이다.
+   *
+   * C01~C25 23건에서 `clamp(원값, 하한, 상한)` 이 공단 ① 표시값과 전부 일치했다.
+   */
+  incomePortionApplied: number;
   /** 임의계속가입자에게 별도로 더해지는 보수 외 소득월액보험료 (원/월) */
   nonWageIncomePortion?: number;
   /** 재산 기준 보험료 (원/월) */
@@ -120,6 +137,16 @@ function longTermCareOf(health: number): number {
 /** 공단 모의계산처럼 건강보험료·장기요양보험료를 10원 단위로 절사한다. */
 function roundPremiumUnit(amount: number): number {
   return Math.floor(amount / 10) * 10;
+}
+
+/**
+ * 공단 화면 ① 소득월액보험료 표시값.
+ *
+ * 계산에는 쓰지 않는다. 표시 전용이다 — 하한은 재산보험료를 더한 뒤 총액에
+ * 적용되므로, 이 값을 그대로 더하면 이중 적용된다.
+ */
+function displayedIncomePortion(raw: number): number {
+  return Math.min(Math.max(raw, PREMIUM_LIMIT.LOWER), PREMIUM_LIMIT.UPPER);
 }
 
 /** 소득보험료 하한과 전체 건강보험료 상한을 적용한다. */
@@ -174,6 +201,7 @@ export function calculateRegionalPremium(
 
   return {
     incomePortion,
+    incomePortionApplied: displayedIncomePortion(incomePortion),
     nonWageIncomePortion: 0,
     propertyPortion,
     propertyScore: property.score,
@@ -246,6 +274,9 @@ export function calculateVoluntaryPremium(
 
   return {
     incomePortion: wagePremium,
+    // 임의계속은 보수월액보험료 자체에 이미 경감·상한이 반영돼 있고
+    // 재산보험료가 없어 표시용 보정이 필요 없다.
+    incomePortionApplied: wagePremium,
     nonWageIncomePortion: nonWagePremium,
     propertyPortion: 0,
     propertyScore: 0,

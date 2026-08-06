@@ -15,6 +15,7 @@ import {
 import {
   BASIC_DEDUCTION,
   PROPERTY_BRACKETS,
+  propertyAmountFor,
   rentEvaluationAmount,
   VERIFIED,
   VERIFIED_AGAINST_NHIS,
@@ -166,6 +167,113 @@ describe('재산점수 산정', () => {
 
   it('전월세 평가금액은 (보증금 + 월세×40)×30%다', () => {
     expect(rentEvaluationAmount(400_000_000, 500_000)).toBe(126_000_000);
+  });
+
+  /**
+   * 2026-08-06 공단 재대조에서 발견.
+   *
+   * 공단 화면 ①은 하한·상한을 적용한 값을 표시해 `① + ③ = ④`가 성립한다.
+   * 우리는 원값을 그대로 뿌려 "0원 + 139,378원 = 159,530원"처럼 보였다.
+   */
+  describe('화면 표시용 소득보험료 (incomePortionApplied)', () => {
+    it('소득이 0원이어도 하한액으로 표시한다', () => {
+      const r = calculateRegionalPremium(noIncome, 360_000_000);
+      expect(r.incomePortion).toBe(0);
+      expect(r.incomePortionApplied).toBe(PREMIUM_LIMIT.LOWER);
+      // 공단 C10 실측: ① 20,160 + ③ 139,378 = ④ 159,530
+      expect(r.propertyPortion).toBe(139_378);
+      expect(r.health).toBe(159_530);
+    });
+
+    it('표시값과 재산보험료의 합이 건강보험료와 맞는다 (상한 제외)', () => {
+      const cases: [Income, number][] = [
+        [noIncome, 0],
+        [noIncome, 100_010_000],
+        [noIncome, 360_000_000],
+        [income({ business: 3_000_000 }), 0],
+        [income({ business: 12_000_000 }), 300_000_000],
+        [income({ pension: 24_000_000 }), 500_000_000],
+      ];
+      for (const [i, p] of cases) {
+        const r = calculateRegionalPremium(i, p);
+        expect(r.limitApplied).not.toBe('upper');
+        const sum = r.incomePortionApplied + r.propertyPortion;
+        // 공단과 동일하게 10원 단위 절사 후 비교한다
+        expect(Math.floor(sum / 10) * 10).toBe(r.health);
+      }
+    });
+
+    it('소득분이 상한을 넘으면 상한액으로 표시한다', () => {
+      const r = calculateRegionalPremium(income({ business: 800_000_000 }), 0);
+      expect(r.incomePortion).toBeGreaterThan(PREMIUM_LIMIT.UPPER);
+      expect(r.incomePortionApplied).toBe(PREMIUM_LIMIT.UPPER);
+    });
+
+    it('하한·상한 사이에서는 원값과 같다', () => {
+      const r = calculateRegionalPremium(income({ business: 5_000_000 }), 0);
+      expect(r.incomePortionApplied).toBe(r.incomePortion);
+      expect(r.incomePortion).toBe(29_958); // 공단 C03 실측
+    });
+  });
+
+  /**
+   * 2026-08-06 공단 모의계산 실측으로 확정한 규칙.
+   *
+   * 이 규칙은 그전까지 계산기 화면의 체크박스 라벨에만 있었고 테스트가 없었다.
+   * 대조 과정에서 드러났으므로 여기서 고정한다.
+   */
+  describe('전월세 반영 규칙 — 주택·건물 보유 여부', () => {
+    const rent = { rentDeposit: 200_000_000, monthlyRent: 0 };
+
+    it('주택·건물을 보유하면 전월세를 반영하지 않는다', () => {
+      expect(
+        propertyAmountFor({
+          taxBase: 200_000_000,
+          ...rent,
+          ownsHouseOrBuilding: true,
+        }),
+      ).toBe(200_000_000);
+    });
+
+    it('보유 재산이 아무리 적어도 주택·건물이면 전월세가 빠진다', () => {
+      // 공단 실측: 주택 1만원 + 전세 2억 → 재산점수 0점
+      const amount = propertyAmountFor({
+        taxBase: 10_000,
+        ...rent,
+        ownsHouseOrBuilding: true,
+      });
+      expect(amount).toBe(10_000);
+      expect(propertyScore(amount)).toBe(0);
+    });
+
+    it('주택·건물이 없으면 과세표준과 전월세 평가금액을 더한다', () => {
+      // 공단 실측: 토지 2억 + 전세 2억 → 재산점수 535점
+      const amount = propertyAmountFor({
+        taxBase: 200_000_000,
+        ...rent,
+        ownsHouseOrBuilding: false,
+      });
+      expect(amount).toBe(260_000_000);
+      expect(propertyScore(amount)).toBe(535);
+    });
+
+    it('같은 입력이라도 보유 여부에 따라 재산점수가 달라진다 (회귀 방지)', () => {
+      // 공단 실측: 주택 2억 + 전세 2억 → 439점 / 토지 2억 + 전세 2억 → 535점
+      const owns = propertyScore(
+        propertyAmountFor({ taxBase: 200_000_000, ...rent, ownsHouseOrBuilding: true }),
+      );
+      const rents = propertyScore(
+        propertyAmountFor({ taxBase: 200_000_000, ...rent, ownsHouseOrBuilding: false }),
+      );
+      expect(owns).toBe(439);
+      expect(rents).toBe(535);
+    });
+
+    it('임차 정보가 없으면 과세표준만 쓴다', () => {
+      expect(
+        propertyAmountFor({ taxBase: 300_000_000, ownsHouseOrBuilding: false }),
+      ).toBe(300_000_000);
+    });
   });
 
   it('모든 등급 경계에서 등급이 정확히 전환된다', () => {
