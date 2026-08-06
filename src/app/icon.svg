@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-labelledby="title">
   <title id="title">기준체크</title>
-  <path d="M30 10h56v24H54c-11 0-19 8-19 19v17H8V35C8 21 17 10 30 10Z" fill="#102a5b" />
-  <path d="M58 40h34v27c0 17-14 28-31 28H20V75h28c11 0 20-9 20-21V40h-10Z" fill="#0b91ad" />
+  <rect x="6" y="6" width="88" height="88" rx="24" fill="#102a5b" />
+  <path d="M24 27h28M24 43h19M24 59h11M24 75h17" fill="none" stroke="#dff5f3" stroke-linecap="round" stroke-width="7" />
+  <circle cx="69" cy="54" r="18" fill="#0b91ad" />
+  <path d="m60 54 6 6 12-14" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="7" />
 </svg>
