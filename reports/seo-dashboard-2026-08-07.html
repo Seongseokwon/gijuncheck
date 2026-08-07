@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기준체크 SEO/GEO 진단 대시보드 — 2026-08-07</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0;
+    --ok:#059669; --warn:#d97706; --bad:#dc2626; --brand:#1d4ed8;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","Pretendard","Apple SD Gothic Neo",sans-serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:32px 20px 72px}
+  header h1{margin:0 0 6px;font-size:26px;letter-spacing:-.02em}
+  header p{margin:0;color:var(--muted);font-size:13px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:20px}
+  h2{font-size:17px;margin:0 0 14px;letter-spacing:-.01em}
+  h2 small{font-weight:400;color:var(--muted);font-size:12px;margin-left:8px}
+  .gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:760px){.gauges{grid-template-columns:repeat(2,1fr)}}
+  .g{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 14px;text-align:center}
+  .g canvas{max-width:132px;margin:0 auto}
+  .g .lab{font-size:13px;font-weight:700;margin-top:8px}
+  .g .w{font-size:11px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+  tbody tr:hover{background:#f8fafc}
+  .sev{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:800;color:#fff}
+  .P0{background:var(--bad)} .P1{background:var(--warn)} .P2{background:#64748b}
+  .area{font-size:11px;font-weight:700;color:var(--brand)}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .filters button{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;
+       font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted)}
+  .filters button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .heat td.n{text-align:center;font-variant-numeric:tabular-nums;font-size:12.5px}
+  .h100{background:#d1fae5;color:#065f46;font-weight:700}
+  .h75{background:#fef3c7;color:#92400e;font-weight:700}
+  .h50{background:#fee2e2;color:#991b1b;font-weight:700}
+  .note{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:14px 16px;font-size:13.5px;color:#78350f}
+  .note b{color:#7c2d12}
+  .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:4px}
+  @media(max-width:760px){.kpi{grid-template-columns:repeat(2,1fr)}}
+  .kpi div{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;background:#fbfcfd}
+  .kpi b{display:block;font-size:22px;letter-spacing:-.02em}
+  .kpi span{font-size:11.5px;color:var(--muted)}
+  code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-size:12.5px}
+  .muted{color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>기준체크 SEO / GEO·AEO 진단 대시보드</h1>
+  <p>https://gijuncheck.kr · 진단일 2026-08-07 · 기준 커밋 <code>8721534</code> · 색인 대상 11개 페이지 전수 · 코드 변경 없음</p>
+</header>
+
+<div class="gauges" style="margin-top:20px">
+  <div class="g"><canvas id="gT"></canvas><div class="lab">기술 SEO</div><div class="w">가중치 40%</div></div>
+  <div class="g"><canvas id="gG"></canvas><div class="lab">GEO / AEO</div><div class="w">가중치 35%</div></div>
+  <div class="g"><canvas id="gC"></canvas><div class="lab">콘텐츠</div><div class="w">가중치 25%</div></div>
+  <div class="g"><canvas id="gO"></canvas><div class="lab">종합</div><div class="w">가중 평균</div></div>
+</div>
+
+<div class="card">
+  <h2>한눈에</h2>
+  <div class="kpi">
+    <div><b>0</b><span>P0 결함</span></div>
+    <div><b>3</b><span>P1 이번 스프린트</span></div>
+    <div><b>9</b><span>P2 백로그</span></div>
+    <div><b>0</b><span>JSON-LD 파싱 오류</span></div>
+  </div>
+  <p style="margin:16px 0 0;font-size:14px">
+    자동 점검 기술 항목 12개가 전부 100점이다. 이번 진단에서 새로 잡힌 것은 스크립트가 아니라 <b>본문을 읽어야 보이는 문제</b>이고,
+    성격이 하나로 모인다 — 사이트가 스스로 주장하는 숫자·날짜가 사이트가 실제로 담고 있는 것과 어긋나 있다.
+    검증 투명성이 유일한 차별점인 서비스에서 이건 오탈자가 아니라 핵심 약속에 생긴 균열이다.
+  </p>
+</div>
+
+<div class="card">
+  <h2>이슈 목록 <small>심각도로 걸러 보기</small></h2>
+  <div class="filters">
+    <button class="on" data-f="ALL">전체 (12)</button>
+    <button data-f="P1">P1 (3)</button>
+    <button data-f="P2">P2 (9)</button>
+    <button data-f="TECH">기술</button>
+    <button data-f="GEO">GEO</button>
+    <button data-f="CONTENT">콘텐츠</button>
+  </div>
+  <table id="tbl">
+    <thead><tr><th style="width:52px">등급</th><th style="width:62px">영역</th><th>문제</th><th style="width:38%">영향</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>세부 항목 히트맵</h2>
+  <table class="heat">
+    <thead><tr><th>영역</th><th>항목별 점수</th></tr></thead>
+    <tbody id="heat"></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>페이지별 수집 결과 <small>색인 대상 11개</small></h2>
+  <table id="pages">
+    <thead><tr><th>페이지</th><th class="n">title</th><th class="n">desc</th><th class="n">단어</th>
+      <th class="n">헤딩</th><th class="n">내부</th><th class="n">외부</th><th class="n">HTML</th><th>날짜 신호</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>내부 링크 인바운드 분포</h2>
+  <canvas id="links" height="150"></canvas>
+  <p class="muted" style="margin-top:12px">
+    11월 재산정 가이드는 <code>changeFrequency: weekly</code>, <code>priority: 0.8</code>로 등록된 계절 트래픽 타깃인데
+    인바운드 링크가 사이트 최저인 2개다. 링크하는 곳은 홈과 자격상실 가이드뿐이며 도구 3개 페이지의 "함께 읽기"에는 들어가 있지 않다.
+    오늘이 8월 7일이므로 색인·권위 축적에 쓸 수 있는 시간은 약 3개월이다.
+  </p>
+</div>
+
+<div class="card">
+  <h2>수집 제약</h2>
+  <div class="note">
+    <b>Core Web Vitals 미측정.</b> Chrome 확장이 이 세션에 연결되지 않아 LCP / INP / CLS / TTFB를 수집하지 못했다.
+    정적 export + Vercel CDN, 공유 JS 103KB 구성이라 구조적 위험은 낮아 보이지만 이는 <b>추정이지 측정이 아니다</b>.
+    INP는 랩 데이터로 잡히지 않으므로 PageSpeed Insights의 CrUX 필드 데이터를 함께 봐야 한다.
+    <br><br>
+    <b>llms.txt 운영 응답 미확인.</b> 빌드 산출물에는 4,116바이트로 존재하나 운영 URL 페치에서 본문이 비어 돌아왔다.
+    다만 Google Search는 llms.txt를 읽지 않으므로(2026-07 공식 문서) 순위·AI Overviews 영향은 없다.
+    확인해야 하는 이유는 GEO가 아니라 정적 자산 배포 정합성이다.
+  </div>
+</div>
+
+<p class="muted" style="margin-top:24px">
+  상세 근거와 수정 방향은 <code>reports/seo-audit-2026-08-07.md</code> 참조. 이 진단에서 코드는 변경하지 않았다.
+</p>
+
+</div>
+
+<script>
+const ISSUES = [
+ ["P1","CONTENT","대조 사례 수가 세 곳에서 \"13건\"으로 남아 있다 (실제 30건)",
+  "홈·검증원칙·상수 주석이 실제 검증 규모의 43%만 노출한다. 같은 페이지 안에서 13건과 30건이 모순된다."],
+ ["P1","GEO","SITE.lastVerified가 2026-08-03에 고정되어 있다",
+  "홈 한 페이지에서 sitemap lastmod(08-04) · JSON-LD dateModified(08-03) · 화면 푸터(08-03)가 서로 다르다. 갱신일이 어긋나면 어느 신호도 근거로 쓰이지 않는다."],
+ ["P1","CONTENT","11월 재산정 가이드의 인바운드 링크가 사이트 최저(2개)",
+  "계절 피크를 겨냥한 페이지인데 도구 페이지 어디에서도 링크되지 않는다. 색인·권위 축적 가능 기간 약 3개월."],
+ ["P2","GEO","llms.txt 운영 응답 미확인",
+  "Google Search 영향 없음. 정적 자산 배포 정합성 확인 목적."],
+ ["P2","GEO","엔티티 URL이 canonical과 표기가 다르다",
+  "SITE.url에 트레일링 슬래시가 없어 Organization·WebSite·WebPage의 url/@id가 canonical과 다른 문자열이다."],
+ ["P2","GEO","도구 3개 페이지에 질문형 소제목이 없다",
+  "FAQ가 details/summary라 헤딩으로 노출되지 않는다. 구조화 데이터로는 인식되므로 손해는 작다."],
+ ["P2","GEO","AboutPage.dateModified 표기가 다른 노드와 다르다",
+  "날짜만(2026-08-06) vs ISO+오프셋. schema.org상 둘 다 유효 — 표기 통일 항목."],
+ ["P2","GEO","도구 3개 페이지에 datePublished가 없다",
+  "WebApplication은 CreativeWork 하위라 가질 수 있다. 가이드 6개는 둘 다 있다."],
+ ["P2","TECH","OG 이미지가 페이지당 376~482KB PNG",
+  "14개 합계 약 5.6MB. 순위 영향 없음. 공유 미리보기 로딩·저장소 용량."],
+ ["P2","TECH","noindex 3개 페이지의 meta description이 동일",
+  "contact·privacy·terms가 SITE.description을 공유. 전부 noindex라 실질 영향 없음."],
+ ["P2","TECH","검증 원칙 페이지 HTML 181KB",
+  "색인 대상 중 최대. 이 밀도가 곧 가치이므로 분할은 권하지 않되 CWV 우선 확인 대상."],
+ ["P2","TECH","Core Web Vitals 실측 부재",
+  "Chrome 미연결. 이번 점수에서 성능 항목 제외."]
+];
+
+const BREAKDOWN = {
+ "기술 SEO":{"title":100,"description":100,"h1":100,"canonical":100,"lang":100,"img_alt":100,
+   "schema":100,"js_render":100,"robots":100,"sitemap":100,"https":100,"404":100},
+ "GEO / AEO":{"answer_lead":100,"author":100,"freshness":100,"entity_schema":100,
+   "faq":75,"semantic":100,"ai_crawlers":100,"llms_txt":50},
+ "콘텐츠":{"depth":100,"structure":100,"internal_links":100,"social":100}
+};
+
+const PAGES = [
+ ["/",22,73,1102,25,31,0,"102KB",false],
+ ["/health-insurance/dependent/",37,116,718,7,19,0,"54KB",true],
+ ["/health-insurance/regional-premium/",39,118,750,6,19,0,"51KB",true],
+ ["/health-insurance/voluntary-continuation/",39,119,911,6,19,0,"54KB",true],
+ ["/guides/property-tax-base/",36,138,1698,7,20,5,"62KB",true],
+ ["/guides/before-business-registration/",29,116,2117,7,20,3,"64KB",true],
+ ["/guides/losing-eligibility/",26,112,1820,7,21,3,"58KB",true],
+ ["/guides/when-voluntary-continuation-wins/",21,132,1836,7,20,3,"60KB",true],
+ ["/guides/pension-impact/",29,127,2421,7,21,6,"89KB",true],
+ ["/guides/november-reassessment/",27,134,1795,7,20,3,"58KB",true],
+ ["/verification-policy/",34,50,4428,19,16,12,"181KB",true]
+];
+
+const INBOUND = [["홈",14],["피부양자 판정",14],["검증 원칙",14],["지역보험료 계산",8],
+ ["재산세 과세표준",5],["임의계속 유리한 경우",5],["임의계속 비교",4],["자격상실",4],
+ ["사업자등록 전",3],["연금 영향",3],["11월 재산정",2]];
+
+// gauges
+function gauge(id,val,color){
+  new Chart(document.getElementById(id),{
+    type:"doughnut",
+    data:{datasets:[{data:[val,100-val],backgroundColor:[color,"#e8ecf1"],borderWidth:0,cutout:"72%"}]},
+    options:{responsive:true,plugins:{legend:{display:false},tooltip:{enabled:false}}},
+    plugins:[{id:"txt",afterDraw(c){
+      const {ctx,chartArea:a}=c; ctx.save();
+      ctx.font="700 27px -apple-system,Segoe UI,sans-serif"; ctx.fillStyle="#0f172a";
+      ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText(val,(a.left+a.right)/2,(a.top+a.bottom)/2); ctx.restore();
+    }}]
+  });
+}
+const col=v=>v>=95?"#059669":v>=85?"#d97706":"#dc2626";
+gauge("gT",100,col(100)); gauge("gG",91,col(91)); gauge("gC",100,col(100)); gauge("gO",97,col(97));
+
+// issue table
+const tb=document.querySelector("#tbl tbody");
+function render(f){
+  tb.innerHTML="";
+  ISSUES.filter(i=>f==="ALL"||i[0]===f||i[1]===f).forEach(([s,a,t,imp])=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td><span class="sev ${s}">${s}</span></td>
+      <td><span class="area">${a==="TECH"?"기술":a==="GEO"?"GEO":"콘텐츠"}</span></td>
+      <td><b>${t}</b></td><td class="muted">${imp}</td>`;
+    tb.appendChild(tr);
+  });
+}
+render("ALL");
+document.querySelectorAll(".filters button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".filters button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); render(b.dataset.f);
+});
+
+// heatmap
+const hb=document.getElementById("heat");
+Object.entries(BREAKDOWN).forEach(([area,items])=>{
+  const cells=Object.entries(items).map(([k,v])=>
+    `<span class="${v>=100?'h100':v>=75?'h75':'h50'}"
+      style="display:inline-block;padding:4px 9px;border-radius:6px;margin:2px 4px 2px 0;font-size:12px">
+      ${k} ${v}</span>`).join("");
+  hb.insertAdjacentHTML("beforeend",`<tr><td style="white-space:nowrap"><b>${area}</b></td><td>${cells}</td></tr>`);
+});
+
+// pages table
+const pb=document.querySelector("#pages tbody");
+PAGES.forEach(([u,t,d,w,h,li,le,size,ok])=>{
+  pb.insertAdjacentHTML("beforeend",
+   `<tr><td><code>${u}</code></td><td class="n">${t}</td><td class="n">${d}</td>
+    <td class="n">${w.toLocaleString()}</td><td class="n">${h}</td><td class="n">${li}</td>
+    <td class="n">${le}</td><td class="n">${size}</td>
+    <td>${ok?'<span style="color:#059669;font-weight:700">일치</span>'
+            :'<span style="color:#dc2626;font-weight:700">불일치</span> <span class="muted">sitemap 08-04 / LD 08-03</span>'}</td></tr>`);
+});
+
+// inbound chart
+new Chart(document.getElementById("links"),{
+  type:"bar",
+  data:{labels:INBOUND.map(x=>x[0]),
+    datasets:[{data:INBOUND.map(x=>x[1]),
+      backgroundColor:INBOUND.map(x=>x[1]<=2?"#dc2626":x[1]<=4?"#d97706":"#1d4ed8"),
+      borderRadius:5}]},
+  options:{indexAxis:"y",responsive:true,
+    plugins:{legend:{display:false}},
+    scales:{x:{grid:{color:"#eef2f6"},ticks:{stepSize:2}},y:{grid:{display:false},ticks:{font:{size:12}}}}}
+});
+</script>
+</body>
+</html>
