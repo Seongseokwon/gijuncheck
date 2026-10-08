@@ -14,6 +14,7 @@ export default function MonetizationOffer({
 }: {
   placement?: MonetizationPlacement;
 }) {
+  const isGuidePlacement = placement === 'guide';
   const [sampleOpen, setSampleOpen] = useState(false);
   const [interestRecorded, setInterestRecorded] = useState(false);
   const trackedView = useRef(false);
@@ -58,8 +59,9 @@ export default function MonetizationOffer({
         가족과 여러 조건을 한 번에 비교해 보세요
       </h3>
       <p className="mt-2 text-sm leading-6 text-slate-700">
-        현재 결과를 바탕으로 조건 3가지를 나란히 비교하고, 선택할 때 확인할 자료와 다음 행동을
-        한 장으로 정리하는 상품을 준비하고 있습니다.
+        {isGuidePlacement
+          ? '지역보험료와 임의계속가입을 나란히 비교하고, 선택할 때 확인할 자료와 다음 행동을 한 장으로 정리하는 상품을 준비하고 있습니다.'
+          : '현재 결과를 바탕으로 조건 3가지를 나란히 비교하고, 선택할 때 확인할 자료와 다음 행동을 한 장으로 정리하는 상품을 준비하고 있습니다.'}
       </p>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">

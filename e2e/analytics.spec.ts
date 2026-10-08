@@ -133,5 +133,49 @@ test('비교 패키지 안내는 상품 범주와 위치만 기록한다', async
   const captured = await events(page);
   expect(captured.filter((event) => event.name === 'sample_open')).toHaveLength(1);
   expect(captured.filter((event) => event.name === 'purchase_intent')).toHaveLength(1);
-  expect(JSON.stringify(captured)).not.toMatch(/1234567|income|property|age/);
+  expect(JSON.stringify(captured)).not.toMatch(/1234567|"(?:income|property|age)"\s*:/);
+});
+
+test('지역보험료 결과의 비교 패키지 안내도 동일한 범주값만 기록한다', async ({ page }) => {
+  await page.goto(ROUTES.regionalPremium.path);
+  await fillMoney(page.getByLabel(/^재산세 과세표준 합계/), 123456789);
+  await page.getByRole('button', { name: '보험료 계산하기' }).click();
+
+  await expect(page.getByRole('region', { name: '가족과 여러 조건을 한 번에 비교해 보세요' })).toBeVisible();
+  await page.getByRole('button', { name: '구성 샘플 보기' }).click();
+  await page.getByRole('button', { name: '구매 의향 표시' }).click();
+
+  const captured = await events(page);
+  expect(captured.filter((event) => event.name === 'offer_view')).toHaveLength(1);
+  expect(captured.filter((event) => event.name === 'sample_open')).toHaveLength(1);
+  expect(captured.filter((event) => event.name === 'purchase_intent')).toHaveLength(1);
+  expect(JSON.stringify(captured)).not.toMatch(/123456789|"(?:income|property|age)"\s*:/);
+});
+
+test('임의계속가입 결과의 비교 패키지 안내도 동일한 범주값만 기록한다', async ({ page }) => {
+  await page.goto(ROUTES.voluntaryContinuation.path);
+  await fillMoney(page.getByLabel(/^재산금액 합계/), 234567890);
+  await page.getByRole('button', { name: '어느 쪽이 유리한지 비교하기' }).click();
+
+  await expect(page.getByRole('region', { name: '가족과 여러 조건을 한 번에 비교해 보세요' })).toBeVisible();
+  await page.getByRole('button', { name: '구성 샘플 보기' }).click();
+  await page.getByRole('button', { name: '구매 의향 표시' }).click();
+
+  const captured = await events(page);
+  expect(captured.filter((event) => event.name === 'offer_view')).toHaveLength(1);
+  expect(captured.filter((event) => event.name === 'sample_open')).toHaveLength(1);
+  expect(captured.filter((event) => event.name === 'purchase_intent')).toHaveLength(1);
+  expect(JSON.stringify(captured)).not.toMatch(/234567890|"(?:income|property|age)"\s*:/);
+});
+
+test('핵심 가이드의 비교 패키지 안내는 guide 위치를 기록한다', async ({ page }) => {
+  await page.goto(ROUTES.guideVoluntaryContinuation.path);
+
+  await expect(page.getByRole('heading', { name: '가족과 여러 조건을 한 번에 비교해 보세요' })).toBeVisible();
+  await expect.poll(async () => (await events(page)).filter((event) => event.name === 'offer_view')).toHaveLength(1);
+  const viewed = (await events(page)).filter((event) => event.name === 'offer_view');
+  expect(viewed[0].params).toEqual({
+    product: 'comparison_package',
+    placement: 'guide',
+  });
 });

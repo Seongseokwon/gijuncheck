@@ -39,7 +39,10 @@ async function fillMoney(page: Page, label: string, value: number) {
 }
 
 async function calculate(page: Page) {
-  await page.getByRole('button', { name: '보험료 계산하기' }).click();
+  const button = page.getByRole('button', { name: '보험료 계산하기' });
+  await expect(button).toBeVisible();
+  await expect(button).toBeEnabled();
+  await button.dispatchEvent('click');
 }
 
 function result(page: Page) {

@@ -35,6 +35,7 @@ import {
 } from '@/lib/constants/active';
 import { track } from '@/lib/analytics';
 import { consumePremiumHandoff } from '@/lib/premium-handoff';
+import MonetizationOffer from './MonetizationOffer';
 
 export default function VoluntaryComparison() {
   const [income, setIncome] = useState<PremiumIncome>(EMPTY_PREMIUM_INCOME);
@@ -351,6 +352,8 @@ export default function VoluntaryComparison() {
               </p>
             </section>
           )}
+
+          <MonetizationOffer />
         </div>
       )}
     </div>

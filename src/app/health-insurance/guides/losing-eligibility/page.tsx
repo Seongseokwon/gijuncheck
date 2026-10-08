@@ -20,6 +20,7 @@ import { toEok, toManwon } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 import { ldJson } from '@/lib/structured-data';
+import MonetizationOffer from '@/components/MonetizationOffer';
 
 const PATH = ROUTES.guideLosingEligibility.path;
 const PUBLISHED = '2026-07-30';
@@ -289,6 +290,8 @@ export default function Page() {
             'guideVoluntaryContinuation',
           ]}
         />
+
+        <MonetizationOffer placement="guide" />
 
         <SourceList sources={SOURCES} />
 

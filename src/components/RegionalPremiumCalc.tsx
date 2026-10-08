@@ -37,6 +37,7 @@ import {
 } from '@/lib/constants/property-score-table';
 import { ROUTES } from '@/lib/routes';
 import { track } from '@/lib/analytics';
+import MonetizationOffer from './MonetizationOffer';
 import {
   consumePremiumHandoff,
   savePremiumHandoff,
@@ -400,6 +401,8 @@ export default function RegionalPremiumCalc() {
               </p>
             ))}
           </div>
+
+          <MonetizationOffer />
 
           <p className="rounded-xl bg-canvas px-4 py-3 text-sm leading-6 text-slate-600">{DISCLAIMER}</p>
         </section>
