@@ -94,6 +94,7 @@ describe('소득 종류별 반영률 — 가장 조심해야 하는 지점', () 
   });
 
   it('금융소득은 1,000만원 전후와 무관하게 전액 반영한다', () => {
+    expect(incomeBaseForPremium(income({ financial: 9_999_999 })).annualReflected).toBe(9_999_999);
     expect(incomeBaseForPremium(income({ financial: 10_000_000 })).annualReflected).toBe(10_000_000);
     const r = incomeBaseForPremium(income({ financial: 10_000_001 }));
     expect(r.annualReflected).toBe(10_000_001);

@@ -81,7 +81,7 @@ export function Field({
 
   return (
     <div className="block">
-      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-bold text-slate-700">
+      <div className="flex min-h-11 flex-wrap items-center gap-x-1.5 gap-y-1 text-sm font-bold text-slate-700">
         <span id={labelId}>{label}</span>
         {/*
           text-slate-600 인 이유: slate-400(2.56:1)·slate-500(4.01:1, 14px 미만에서
