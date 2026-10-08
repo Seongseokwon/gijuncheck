@@ -405,7 +405,7 @@ describe('기혼 피부양자 — 배우자 동반 요건', () => {
       },
     });
 
-  it('대상자와 배우자가 각각 소득·재산 기준 이하면 통과한다', () => {
+  it('대상자와 배우자가 각각 소득 기준 이하면 통과한다', () => {
     const r = judgeDependent(
       marriedDependent({ income: { ...emptyInput().spouse!.income, pension: 20_000_000 } }),
     );
@@ -423,13 +423,15 @@ describe('기혼 피부양자 — 배우자 동반 요건', () => {
     expect(r.steps[1].message).toContain('배우자');
   });
 
-  it('배우자 재산세 과세표준이 9억원을 넘으면 재산요건에서 탈락한다', () => {
-    const r = judgeDependent(
-      marriedDependent({ propertyTaxBase: 900_000_001 }),
-    );
-    expect(r.eligible).toBe(false);
-    expect(r.failedAt).toBe('property');
-    expect(r.steps[2].message).toContain('배우자');
+  it('배우자 재산이 많아도 대상자의 재산요건 판정에는 영향을 주지 않는다', () => {
+    // 이전 버전의 브라우저 저장값에 이 필드가 남아 있어도 판정에 쓰지 않는다.
+    const legacyInput = marriedDependent() as DependentInput & {
+      spouse: NonNullable<DependentInput['spouse']> & { propertyTaxBase: number };
+    };
+    legacyInput.spouse.propertyTaxBase = 900_000_001;
+    const r = judgeDependent(legacyInput);
+    expect(r.eligible).toBe(true);
+    expect(r.steps).toHaveLength(3);
   });
 });
 

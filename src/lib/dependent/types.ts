@@ -38,15 +38,13 @@ export interface Income {
   other: number;
 }
 
-/** 기혼 피부양자의 배우자 확인에 사용하는 연간 소득·재산 정보 */
+/** 기혼 피부양자의 배우자 소득요건 확인에 사용하는 정보 */
 export interface SpouseDetails {
   income: Income;
   /** 배우자의 사업자등록 보유 여부 */
   businessRegistered: boolean;
   /** 배우자의 장애인·국가유공상이자 등 특례 여부 */
   disabled: boolean;
-  /** 배우자의 재산세 과세표준 (원) */
-  propertyTaxBase: number;
 }
 
 export type MaritalStatus = 'single' | 'married' | 'divorcedOrWidowed';

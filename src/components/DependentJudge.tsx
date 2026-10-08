@@ -179,7 +179,6 @@ export default function DependentJudge() {
           ...SPOUSE_INCOME_FIELDS.filter((field) => spouse.income[field.key] === 0).map(
             (field) => field.label,
           ),
-          ...(spouse.propertyTaxBase === 0 ? ['배우자 재산세 과세표준'] : []),
         ]
       : []),
   ];
@@ -187,8 +186,7 @@ export default function DependentJudge() {
     INCOME_FIELDS.every((field) => input.income[field.key] === 0) &&
     input.propertyTaxBase === 0 &&
     (!needsSpouseDetails ||
-      (SPOUSE_INCOME_FIELDS.every((field) => spouse.income[field.key] === 0) &&
-        spouse.propertyTaxBase === 0));
+      SPOUSE_INCOME_FIELDS.every((field) => spouse.income[field.key] === 0));
 
   const completeJudge = () => {
     recordJudgeStart();
@@ -361,10 +359,11 @@ export default function DependentJudge() {
         </FormSection>
 
         {needsSpouseDetails && (
-          <FormSection number="3" title="배우자의 소득·재산도 확인해 주세요">
+          <FormSection number="3" title="배우자의 소득도 확인해 주세요">
             <p className="-mt-1 mb-5 text-sm leading-6 text-slate-600">
-              기혼 피부양자는 대상자 본인뿐 아니라 배우자도 소득·재산 요건을 충족해야 합니다. 두 사람의
-              소득을 단순히 한 사람의 소득으로 합산하는 것이 아니라, 각각의 기준을 확인합니다.
+              기혼 피부양자는 대상자 본인뿐 아니라 배우자도 소득요건을 충족해야 합니다. 두 사람의
+              소득을 단순히 한 사람의 소득으로 합산하는 것이 아니라, 각각의 기준을 확인합니다. 재산은
+              피부양자가 되려는 대상자 기준으로 확인합니다.
             </p>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {SPOUSE_INCOME_FIELDS.map((f) => (
@@ -406,17 +405,6 @@ export default function DependentJudge() {
                     { value: 'n', label: '해당 없음' },
                     { value: 'y', label: '해당' },
                   ]}
-                />
-              </Field>
-              <Field
-                label="배우자 재산세 과세표준 (원)"
-                hint="실거래가·공시가격 아님"
-                helpText="실거래가·공시가격이 아니라 지방세 재산세 과세표준을 입력합니다."
-              >
-                <MoneyInput
-                  value={spouse.propertyTaxBase}
-                  onChange={(v) => setSpouse('propertyTaxBase', v)}
-                  max={999_900_000_000}
                 />
               </Field>
             </div>

@@ -344,12 +344,12 @@ const DEPENDENT_CASES: readonly VerificationCase[] = [
   {
     id: 'A11',
     input: '기혼 동거 자녀 / 대상자 과세표준 0원 / 배우자 과세표준 9억원 + 1원',
-    expected: '불가 — 배우자 재산요건 초과',
-    actual: '재산요건 탈락',
-    diff: '일치',
+    expected: '가능 — 재산요건은 피부양자가 되려는 대상자 기준',
+    actual: '가능',
+    diff: '정정 완료',
     result: 'match',
-    checkedOn: '2026-08-05',
-    note: '배우자 재산도 별도 확인 대상',
+    checkedOn: '2026-10-08',
+    note: '공단 법령 해설의 기혼자 소득요건 문구를 재검토해, 배우자 재산을 별도 탈락 조건으로 보던 이전 해석을 정정',
   },
 ];
 

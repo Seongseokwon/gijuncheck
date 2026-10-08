@@ -411,43 +411,12 @@ function judgePropertyForPerson(
 }
 
 function judgeProperty(input: DependentInput, total: number): StepResult {
-  const primary = judgePropertyForPerson(
+  return judgePropertyForPerson(
     input.relation,
     input.propertyTaxBase,
     total,
     '대상자',
   );
-  if (!primary.passed) return primary;
-
-  if (!needsSpouseCheck(input)) return primary;
-
-  const spouse = input.spouse;
-  if (!spouse) {
-    return {
-      step: 'property',
-      passed: false,
-      message: '기혼 피부양자의 배우자 재산세 과세표준 자료가 입력되지 않았습니다.',
-      basis: BASIS.PROPERTY,
-    };
-  }
-
-  const spouseResult = judgePropertyForPerson(
-    'spouse',
-    spouse.propertyTaxBase,
-    sumIncome(spouse.income),
-    '배우자',
-  );
-  if (!spouseResult.passed) {
-    return {
-      ...spouseResult,
-      message: `대상자는 재산요건을 충족했지만 ${spouseResult.message}`,
-    };
-  }
-
-  return {
-    ...primary,
-    message: `${primary.message} 배우자도 재산요건을 충족합니다 (${toEok(spouse.propertyTaxBase)}).`,
-  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -487,7 +456,6 @@ export function emptySpouseDetails(): SpouseDetails {
     income: { business: 0, wage: 0, pension: 0, financial: 0, other: 0 },
     businessRegistered: false,
     disabled: false,
-    propertyTaxBase: 0,
   };
 }
 
