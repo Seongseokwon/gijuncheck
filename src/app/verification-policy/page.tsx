@@ -158,7 +158,7 @@ export default function VerificationPolicyPage() {
               </tr>
               <tr>
                 <td className="px-5 py-4 font-bold text-brand-950">지역가입자 보험료 계산</td>
-                <td className="px-5 py-4 leading-6">2026-08-05 공단 지역보험료 모의계산 대표 사례 13건을 재대조했습니다. 공단 화면의 ‘사업소득 등’은 사업·이자·배당·기타소득을 합산하므로 지역보험료에는 금융소득을 전액 반영합니다.</td>
+                <td className="px-5 py-4 leading-6">2026-08-05 공단 지역보험료 모의계산 대표 사례 13건을 재대조했고, 2026-08-06 추가 사례를 이어서 확인했습니다. 공단 화면의 ‘사업소득 등’은 사업·이자·배당·기타소득을 합산하므로 지역보험료에는 금융소득을 전액 반영합니다.</td>
                 <td className="px-5 py-4"><span className="inline-flex whitespace-nowrap rounded-full bg-accent-100 px-3 py-1 text-xs font-bold text-accent-700">검증된 참고 계산</span></td>
               </tr>
               <tr>

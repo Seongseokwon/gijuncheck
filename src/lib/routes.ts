@@ -123,7 +123,7 @@ export const ROUTES = {
     ogImage: '/og/pension-impact.png',
     priority: 0.7,
     // 2026-08-06 사적연금 제외의 실제 근거(부과 자료 범위) 절 추가
-    lastModified: '2026-08-06',
+    lastModified: '2026-10-08',
     changeFrequency: 'monthly',
     ready: true,
   },
@@ -133,7 +133,7 @@ export const ROUTES = {
     label: '11월 건강보험 자격 일괄 재산정이란',
     ogImage: '/og/november-reassessment.png',
     priority: 0.8,
-    lastModified: '2026-08-03',
+    lastModified: '2026-10-08',
     changeFrequency: 'weekly',
     ready: true,
   },

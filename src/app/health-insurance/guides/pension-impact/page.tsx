@@ -89,7 +89,7 @@ const SOURCES = [
   },
   {
     label: '국민건강보험법 시행규칙 별표 1의2 — 피부양자 소득·재산요건',
-    href: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+    href: 'https://www.law.go.kr/LSW/lsInfoP.do?lsiSeq=285129',
   },
   {
     label: '건강보험 웹진 2023년 9월호 — 「연금소득에는 공적연금은 포함되고 사적연금은 포함되지 않는다」',
