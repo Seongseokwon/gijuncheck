@@ -14,6 +14,7 @@
  *  - 사람들이 판정에서 어느 요건에 걸리는가 → 다음 가이드 주제가 정해진다
  *  - 판정 후 보험료 계산으로 넘어가는가 → 퍼널이 작동하는지
  *  - 어느 도구가 실제로 쓰이는가
+ *  - 유료 상품 안내를 본 뒤 샘플·구매 의향까지 이어지는가
  */
 
 import type { JudgeStep, Relation } from './dependent/types';
@@ -50,6 +51,15 @@ export interface VoluntaryCompareParams {
   recommendation: 'voluntary' | 'regional' | 'tie' | 'notEligible';
 }
 
+/** 상품명·위치만 기록한다. 가격·주문번호·입력값은 보내지 않는다. */
+export type MonetizationProduct = 'comparison_package' | 'business_pilot';
+export type MonetizationPlacement = 'result' | 'guide' | 'home';
+
+export interface MonetizationInteractionParams {
+  product: MonetizationProduct;
+  placement: MonetizationPlacement;
+}
+
 /**
  * 허용된 이벤트 목록.
  * 여기에 없는 이벤트는 보낼 수 없고, 파라미터에 number 를 넣을 수 없다.
@@ -60,6 +70,11 @@ export interface EventMap {
   judge_complete: JudgeCompleteParams;
   premium_calculate: PremiumCalculateParams;
   voluntary_compare: VoluntaryCompareParams;
+  offer_view: MonetizationInteractionParams;
+  sample_open: MonetizationInteractionParams;
+  purchase_intent: MonetizationInteractionParams;
+  checkout_start: MonetizationInteractionParams;
+  report_download: MonetizationInteractionParams;
 }
 
 /* ------------------------------------------------------------------ */

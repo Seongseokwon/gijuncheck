@@ -113,3 +113,25 @@ test('임의계속가입 이벤트는 추천 결과 범주만 기록한다', asy
   expect(matching[0].params).toEqual({ recommendation: expect.any(String) });
   expect(JSON.stringify(matching[0].params)).not.toContain('234567890');
 });
+
+test('비교 패키지 안내는 상품 범주와 위치만 기록한다', async ({ page }) => {
+  await page.goto(ROUTES.dependent.path);
+  await page.getByLabel('가입자와의 관계').selectOption({ label: '배우자' });
+  await fillMoney(page.getByLabel('근로소득'), 1234567);
+  await page.getByRole('button', { name: '내 자격 판정하기' }).click();
+
+  const viewed = (await events(page)).filter((event) => event.name === 'offer_view');
+  expect(viewed).toHaveLength(1);
+  expect(viewed[0].params).toEqual({
+    product: 'comparison_package',
+    placement: 'result',
+  });
+
+  await page.getByRole('button', { name: '구성 샘플 보기' }).click();
+  await page.getByRole('button', { name: '구매 의향 표시' }).click();
+
+  const captured = await events(page);
+  expect(captured.filter((event) => event.name === 'sample_open')).toHaveLength(1);
+  expect(captured.filter((event) => event.name === 'purchase_intent')).toHaveLength(1);
+  expect(JSON.stringify(captured)).not.toMatch(/1234567|income|property|age/);
+});

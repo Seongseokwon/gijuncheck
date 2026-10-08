@@ -48,6 +48,7 @@ import { toPremiumIncome } from '@/lib/premium/types';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { getConfidenceSummary, RELATION_GUIDANCE, STEP_GUIDANCE } from '@/lib/dependent/guidance';
 import DependentEvidenceChecklist from './DependentEvidenceChecklist';
+import MonetizationOffer from './MonetizationOffer';
 
 /**
  * 근거 조항 원문 링크.
@@ -587,6 +588,8 @@ export default function DependentJudge() {
           </ol>
 
           <DependentEvidenceChecklist input={input} result={result} />
+
+          <MonetizationOffer />
 
           {/*
             탈락 시 "그래서 얼마 내나"로 이어지는 동선.
