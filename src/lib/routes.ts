@@ -52,7 +52,7 @@ export const ROUTES = {
   // ---- 건강보험 ----
   dependent: {
     path: '/health-insurance/dependent/',
-    label: '피부양자 자격판정',
+    label: '건강보험 피부양자 자격 확인',
     ogImage: '/og/dependent.png',
     priority: 0.9,
     lastModified: '2026-10-08',
@@ -61,7 +61,7 @@ export const ROUTES = {
   },
   regionalPremium: {
     path: '/health-insurance/regional-premium/',
-    label: '지역가입자 보험료 계산',
+    label: '지역가입자 건강보험료 계산',
     ogImage: '/og/regional-premium.png',
     priority: 0.9,
     lastModified: '2026-10-08',
@@ -83,19 +83,19 @@ export const ROUTES = {
   // ---- 건강보험 가이드 ----
   guidePropertyTaxBase: {
     path: '/health-insurance/guides/property-tax-base/',
-    label: '재산세 과세표준 확인하는 방법',
+    label: '재산세 과세표준액 조회 방법',
     ogImage: '/og/property-tax-base.png',
     priority: 0.7,
-    lastModified: '2026-08-03',
+    lastModified: '2026-10-08',
     changeFrequency: 'monthly',
     ready: true,
   },
   guideBusinessRegistration: {
     path: '/health-insurance/guides/before-business-registration/',
-    label: '사업자등록 전에 반드시 계산해야 하는 것',
+    label: '사업자등록하면 피부양자 탈락 여부',
     ogImage: '/og/before-business-registration.png',
     priority: 0.7,
-    lastModified: '2026-08-03',
+    lastModified: '2026-10-08',
     changeFrequency: 'monthly',
     ready: true,
   },
@@ -119,7 +119,7 @@ export const ROUTES = {
   },
   guidePensionImpact: {
     path: '/health-insurance/guides/pension-impact/',
-    label: '연금 수령이 피부양자 자격에 미치는 영향',
+    label: '국민연금과 피부양자 자격',
     ogImage: '/og/pension-impact.png',
     priority: 0.7,
     // 2026-08-06 사적연금 제외의 실제 근거(부과 자료 범위) 절 추가

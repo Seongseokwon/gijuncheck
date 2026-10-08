@@ -24,7 +24,7 @@ import { ldJson } from '@/lib/structured-data';
 const PATH = ROUTES.guideBusinessRegistration.path;
 const PUBLISHED = '2026-07-30';
 
-const TITLE = '사업자등록 전에 반드시 계산해야 하는 것';
+const TITLE = '사업자등록하면 피부양자 탈락? 등록 전 건강보험료 계산';
 const LEAD =
   '사업자등록을 하면 세금이 유리해진다는 말은 절반만 맞습니다. ' +
   '건강보험 피부양자였던 사람에게는 등록 즉시 자격이 사라지고, ' +

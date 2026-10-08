@@ -8,7 +8,7 @@ import { toPercent, won } from '@/lib/format';
 import TrustSignal from '@/components/TrustSignal';
 import { Breadcrumbs } from '@/components/guide';
 
-const TITLE = `지역가입자 보험료 계산 — ${YEAR}년 요율 ${toPercent(RATE.HEALTH)} 반영`;
+const TITLE = `지역가입자 건강보험료 계산 — ${YEAR}년 요율·재산세 과세표준 반영`;
 const DESCRIPTION =
   '퇴직 후 지역가입자가 되면 월 보험료가 얼마인지 계산합니다. ' +
   '근로·연금소득 50% 반영, 재산 60등급표, 기본공제 1억원, 상한·하한까지 적용. ' +

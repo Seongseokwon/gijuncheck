@@ -26,7 +26,7 @@ import { ldJson } from '@/lib/structured-data';
 const PATH = ROUTES.guidePropertyTaxBase.path;
 const PUBLISHED = '2026-07-30';
 
-const TITLE = '재산세 과세표준 확인하는 방법 — 공시가격과 다릅니다';
+const TITLE = '재산세 과세표준액 조회 방법 — 공시가격과 다른 건강보험 기준';
 const LEAD =
   '피부양자 자격과 건강보험료를 계산할 때 쓰는 재산 금액은 공시가격이 아니라 ' +
   '재산세 과세표준입니다. 이 둘을 혼동하면 판정 결과가 완전히 달라집니다. ' +
@@ -37,7 +37,7 @@ const ANSWER =
 const DESCRIPTION =
   '건강보험 피부양자 재산요건과 지역가입자 보험료는 재산세 과세표준으로 판단합니다. ' +
   '공시가격에 공정시장가액비율(주택 60%, 1세대 1주택 특례 43~45%, 토지·건축물 70%)을 곱한 금액입니다. ' +
-  '위택스에서 확인하는 절차와 환산 예시를 담았습니다.';
+  '재산세 과세표준액을 위택스·서울시 ETAX에서 조회하는 절차와 환산 예시를 담았습니다.';
 
 export const metadata = createPageMetadata({
   title: TITLE,

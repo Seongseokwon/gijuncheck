@@ -7,7 +7,7 @@ import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured
 import TrustSignal from '@/components/TrustSignal';
 import { Breadcrumbs } from '@/components/guide';
 
-const TITLE = '피부양자 자격판정 — 소득·재산·관계 3단계 자동 판정';
+const TITLE = '건강보험 피부양자 자격 확인 — 소득·재산·관계 자동 판정';
 const DESCRIPTION =
   `2026년 기준 건강보험 피부양자 자격을 자동 판정합니다. 합산소득 ${toManwon(
     INCOME.TOTAL_LIMIT,
