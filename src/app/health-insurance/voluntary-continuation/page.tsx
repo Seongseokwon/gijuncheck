@@ -1,5 +1,5 @@
 import VoluntaryComparison from '@/components/VoluntaryComparison';
-import { VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
+import { VOLUNTARY_CONTINUATION } from '@/lib/constants/active';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';
 import { breadcrumbJsonLd, ldJson, webApplicationJsonLd } from '@/lib/structured-data';

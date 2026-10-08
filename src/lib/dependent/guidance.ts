@@ -1,4 +1,4 @@
-import { INCOME, PROPERTY } from '@/lib/constants/2026';
+import { INCOME, PROPERTY } from '@/lib/constants/active';
 import type { DependentInput, JudgeResult, JudgeStep, Relation } from './types';
 
 export interface RelationGuidance {

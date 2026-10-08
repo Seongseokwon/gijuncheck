@@ -1,5 +1,5 @@
 import RegionalPremiumCalc from '@/components/RegionalPremiumCalc';
-import { PREMIUM_LIMIT, RATE, YEAR } from '@/lib/constants/2026';
+import { PREMIUM_LIMIT, RATE, YEAR } from '@/lib/constants/active';
 import { VERIFIED_AGAINST_NHIS } from '@/lib/constants/property-score-table';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';

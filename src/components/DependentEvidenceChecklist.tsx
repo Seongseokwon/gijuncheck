@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { PROPERTY } from '@/lib/constants/2026';
+import { PROPERTY } from '@/lib/constants/active';
 import { DEPENDENT_APPLICATION } from '@/lib/dependent/application';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { RELATION_LABEL, type DependentInput, type JudgeResult } from '@/lib/dependent/types';

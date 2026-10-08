@@ -20,7 +20,7 @@ import {
   RATE,
   RURAL_REDUCTION,
   VOLUNTARY_CONTINUATION,
-} from '../constants/2026';
+} from '../constants/active';
 import {
   VERIFIED,
   VERIFIED_AGAINST_NHIS,

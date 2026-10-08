@@ -31,7 +31,7 @@ import {
   toEok,
   toManwon,
 } from '@/lib/dependent/judge';
-import { INCOME, PROPERTY } from '@/lib/constants/2026';
+import { INCOME, PROPERTY } from '@/lib/constants/active';
 import {
   RELATION_LABEL,
   STEP_LABEL,

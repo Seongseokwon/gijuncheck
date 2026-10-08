@@ -93,7 +93,7 @@ export const SITE = {
   baseYear: 2026,
 
   /** 요건·요율을 마지막으로 확인한 날 */
-  lastVerified: '2026-08-03',
+  lastVerified: '2026-10-08',
 
   contactEmail: 'devswseong@gmail.com',
 

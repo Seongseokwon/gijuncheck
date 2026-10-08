@@ -15,7 +15,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { RATE, VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
+import { RATE, VOLUNTARY_CONTINUATION } from '@/lib/constants/active';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
 import { toEok, toPercent, wonExact } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';

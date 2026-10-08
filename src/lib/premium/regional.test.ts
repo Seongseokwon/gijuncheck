@@ -11,7 +11,7 @@ import {
   INCOME_REFLECTION,
   PREMIUM_LIMIT,
   RATE,
-} from '../constants/2026';
+} from '../constants/active';
 import {
   BASIC_DEDUCTION,
   PROPERTY_BRACKETS,

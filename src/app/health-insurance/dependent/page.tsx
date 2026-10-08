@@ -1,5 +1,5 @@
 import DependentJudge from '@/components/DependentJudge';
-import { INCOME, PROPERTY } from '@/lib/constants/2026';
+import { INCOME, PROPERTY } from '@/lib/constants/active';
 import { toEok, toManwon } from '@/lib/dependent/judge';
 import { createPageMetadata } from '@/lib/metadata';
 import { GUIDE_KEYS, ROUTES } from '@/lib/routes';

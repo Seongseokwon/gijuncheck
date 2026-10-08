@@ -29,7 +29,7 @@ import {
   EMPTY_PREMIUM_INCOME,
   type PremiumIncome,
 } from '@/lib/premium/types';
-import { DISCLAIMER, RATE, RURAL_REDUCTION } from '@/lib/constants/2026';
+import { DISCLAIMER, RATE, RURAL_REDUCTION } from '@/lib/constants/active';
 import { toPercent, wonExact } from '@/lib/format';
 import {
   propertyAmountFor,

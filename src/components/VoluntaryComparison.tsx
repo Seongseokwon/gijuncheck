@@ -32,7 +32,7 @@ import {
 import {
   DISCLAIMER,
   VOLUNTARY_CONTINUATION,
-} from '@/lib/constants/2026';
+} from '@/lib/constants/active';
 import { track } from '@/lib/analytics';
 import { consumePremiumHandoff } from '@/lib/premium-handoff';
 

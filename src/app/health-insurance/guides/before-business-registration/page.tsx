@@ -14,7 +14,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { INCOME, RATE } from '@/lib/constants/2026';
+import { INCOME, RATE } from '@/lib/constants/active';
 import { longTermCareRatio } from '@/lib/premium/regional';
 import { toManwon, toPercent, won, wonExact } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';

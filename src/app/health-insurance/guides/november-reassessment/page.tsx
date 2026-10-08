@@ -15,7 +15,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { INCOME } from '@/lib/constants/2026';
+import { INCOME } from '@/lib/constants/active';
 import { toManwon } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ldJson } from '@/lib/structured-data';

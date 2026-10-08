@@ -15,7 +15,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { INCOME, PROPERTY, VOLUNTARY_CONTINUATION } from '@/lib/constants/2026';
+import { INCOME, PROPERTY, VOLUNTARY_CONTINUATION } from '@/lib/constants/active';
 import { toEok, toManwon } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';

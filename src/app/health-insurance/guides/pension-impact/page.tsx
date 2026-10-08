@@ -14,7 +14,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { INCOME, INCOME_REFLECTION } from '@/lib/constants/2026';
+import { INCOME, INCOME_REFLECTION } from '@/lib/constants/active';
 import { toManwon } from '@/lib/format';
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';

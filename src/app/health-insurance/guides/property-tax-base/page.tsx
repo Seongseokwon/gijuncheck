@@ -15,7 +15,7 @@ import {
   type FaqItem,
   type TocItem,
 } from '@/components/guide';
-import { PROPERTY, RATE } from '@/lib/constants/2026';
+import { PROPERTY, RATE } from '@/lib/constants/active';
 import { BASIC_DEDUCTION } from '@/lib/constants/property-score-table';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { toEok, wonExact } from '@/lib/format';

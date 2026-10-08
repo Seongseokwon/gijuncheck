@@ -1,7 +1,7 @@
 import { createPageMetadata } from '@/lib/metadata';
 import { ROUTES } from '@/lib/routes';
 import { SITE } from '@/lib/site';
-import { BASIS } from '@/lib/constants/2026';
+import { BASIS } from '@/lib/constants/active';
 import { DEPENDENT_SOURCES } from '@/lib/dependent/sources';
 import { breadcrumbJsonLd, ldJson, SITE_ENTITY_IDS } from '@/lib/structured-data';
 import {

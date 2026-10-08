@@ -44,7 +44,7 @@ export const DEPENDENT_SOURCES = {
   support: {
     law: {
       label: '국민건강보험법 시행규칙 제2조·별표 1',
-      href: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+      href: 'https://www.law.go.kr/lsInfoP.do?joNo=004400&lsId=006696',
     },
     nhis: {
       label: '국민건강보험공단 피부양자 자격취득 및 상실 신고',
@@ -54,7 +54,7 @@ export const DEPENDENT_SOURCES = {
   income: {
     law: {
       label: '국민건강보험법 시행규칙 별표 1의2 제1호',
-      href: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+      href: 'https://www.law.go.kr/lsInfoP.do?joNo=004400&lsId=006696',
     },
     nhis: {
       label: '국민건강보험공단 피부양자 자격취득 및 상실 신고',
@@ -64,7 +64,7 @@ export const DEPENDENT_SOURCES = {
   property: {
     law: {
       label: '국민건강보험법 시행규칙 별표 1의2 제2호',
-      href: 'https://www.law.go.kr/LSW/lsInfoP.do?ancYnChk=0&chrClsCd=010202&efYd=20260501&lsiSeq=285129&urlMode=lsInfoP',
+      href: 'https://www.law.go.kr/lsInfoP.do?joNo=004400&lsId=006696',
     },
     nhis: {
       label: '국민건강보험공단 피부양자 자격취득 및 상실 신고',
