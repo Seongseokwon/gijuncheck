@@ -93,6 +93,12 @@ export default function Page() {
             부양요건 · 소득요건 · 재산요건을 순서대로 판정합니다. 탈락하면 어느
             단계에서 왜 걸리는지 근거 조항과 함께 보여줍니다.
           </p>
+          <div className="mt-6 rounded-2xl border border-accent-200 bg-accent-50 p-5">
+            <p className="text-sm font-extrabold text-accent-800">핵심 답변</p>
+            <p className="mt-2 text-base font-bold leading-7 text-brand-950">
+              피부양자 자격은 가족관계만으로 결정되지 않으며, 관계·소득·재산 요건을 함께 확인해야 합니다.
+            </p>
+          </div>
           <TrustSignal
             tone="reference"
             status="공개 기준 8건 자체 재현"

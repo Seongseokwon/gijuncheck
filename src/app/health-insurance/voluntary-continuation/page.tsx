@@ -97,6 +97,12 @@ export default function Page() {
             있습니다. 재산이 보험료에 반영되지 않아 더 싼 경우가 많은데, 모르고
             넘어가는 사람이 많습니다.
           </p>
+          <div className="mt-6 rounded-2xl border border-accent-200 bg-accent-50 p-5">
+            <p className="text-sm font-extrabold text-accent-800">핵심 답변</p>
+            <p className="mt-2 text-base font-bold leading-7 text-brand-950">
+              임의계속가입이 유리한지는 재산과 퇴직 전 보수에 따라 달라지므로, 지역보험료와 실제 금액을 비교해야 합니다.
+            </p>
+          </div>
           <TrustSignal
             tone="reference"
             status="법령·공단 산식 기반 참고 비교"

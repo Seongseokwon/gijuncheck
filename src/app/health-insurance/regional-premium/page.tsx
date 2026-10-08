@@ -98,6 +98,12 @@ export default function Page() {
             기준입니다. 소득 종류별 반영률과 재산 60등급, 상한·하한까지 적용해
             계산합니다.
           </p>
+          <div className="mt-6 rounded-2xl border border-accent-200 bg-accent-50 p-5">
+            <p className="text-sm font-extrabold text-accent-800">핵심 답변</p>
+            <p className="mt-2 text-base font-bold leading-7 text-brand-950">
+              지역가입자 보험료는 소득과 재산세 과세표준을 기준으로 계산하며, 소득 종류별 반영률과 기본공제를 적용합니다.
+            </p>
+          </div>
           <TrustSignal
             status={
               VERIFIED_AGAINST_NHIS
